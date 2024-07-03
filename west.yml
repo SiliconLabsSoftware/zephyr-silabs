@@ -5,8 +5,14 @@ manifest:
   remotes:
     - name: zephyrproject-rtos
       url-base: https://github.com/zephyrproject-rtos
+    - name: silabs
+      url-base: https://github.com/siliconlabssoftware
 
   projects:
+    - name: hal_silabs
+      remote: silabs
+      revision: d1b170189974182fe1bb5512abca68bf6b0c7092
+      path: modules/hal/silabs
     - name: zephyr
       remote: zephyrproject-rtos
       revision: main

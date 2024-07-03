@@ -6,3 +6,7 @@
 # module options by going to Zephyr -> Modules in Kconfig.
 
 rsource "drivers/Kconfig"
+
+config HAS_SILABS_WISECONNECT
+	bool
+	depends on SOC_FAMILY_SILABS_SIWX917
