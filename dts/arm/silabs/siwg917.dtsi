@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023 Antmicro <www.antmicro.com>
+ * Copyright (c) 2023 Antmicro
  *
  * SPDX-License-Identifier: Apache-2.0
  */
@@ -29,7 +29,16 @@
 		reg = <0x8202000 DT_SIZE_K(2040)>;
 	};
 
+	wifi0: wifi {
+		compatible = "silabs,siwx917-wifi";
+		status = "disabled";
+	};
+
 	soc {
+		pinctrl0: pinctrl@46130000 {
+			compatible = "silabs,siwx917-pinctrl";
+			reg = <0x46130000 0x1000>;
+		};
 	};
 };
 
