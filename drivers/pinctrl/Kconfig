@@ -1,8 +1,8 @@
 # Copyright (c) 2024 Silicon Laboratories Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-menu "Drivers"
+if PINCTRL
 
-rsource "*/Kconfig"
+rsource "Kconfig.siwx917"
 
-endmenu
+endif
