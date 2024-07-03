@@ -1,0 +1,13 @@
+# Copyright (c) 2023 Antmicro
+# SPDX-License-Identifier: Apache-2.0
+
+if SOC_SERIES_SIWG917
+
+config FLASH_BASE_ADDRESS
+	hex
+	default 0x8212000
+
+config NUM_IRQS
+	default 99
+
+endif

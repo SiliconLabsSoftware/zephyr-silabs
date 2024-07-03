@@ -1,0 +1,6 @@
+family:
+  - name: silabs_siwx917
+    series:
+      - name: siwg917
+        socs:
+          - name: siwg917m111mgtba
