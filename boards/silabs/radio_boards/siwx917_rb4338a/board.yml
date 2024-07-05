@@ -1,0 +1,4 @@
+boards:
+  - name: siwx917_rb4338a
+    socs:
+      - name: siwg917m111mgtba
