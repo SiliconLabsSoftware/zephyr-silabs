@@ -1,0 +1,10 @@
+identifier: siwx917_rb4338a
+name: SiWx917 Wi-Fi 6 and Bluetooth LE 8MB Flash Radio Board
+type: mcu
+arch: arm
+ram: 196
+flash: 1024
+toolchain:
+  - zephyr
+  - gnuarmemb
+  - xtools
