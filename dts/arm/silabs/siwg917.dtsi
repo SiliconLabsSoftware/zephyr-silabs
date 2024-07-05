@@ -39,6 +39,26 @@
 			compatible = "silabs,siwx917-pinctrl";
 			reg = <0x46130000 0x1000>;
 		};
+
+		ulpuart0: uart@24041800 {
+			compatible = "ns16550";
+			reg = <0x24041800 0x1000>;
+			interrupts = <12 0>;
+			reg-shift = <2>;
+			clock-frequency = <15000000>;
+			current-speed = <115200>;
+			status = "disabled";
+		};
+
+		uart0: uart@44000000 {
+			compatible = "ns16550";
+			reg = <0x44000000 0x1000>;
+			interrupts = <38 0>;
+			reg-shift = <2>;
+			clock-frequency = <25000000>;
+			current-speed = <115200>;
+			status = "disabled";
+		};
 	};
 };
 

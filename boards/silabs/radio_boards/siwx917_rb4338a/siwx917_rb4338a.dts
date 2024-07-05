@@ -14,5 +14,21 @@
 	chosen {
 		zephyr,sram = &sram0;
 		zephyr,flash = &flash0;
+		zephyr,console = &ulpuart0;
+	};
+};
+
+&ulpuart0 {
+	status = "okay";
+	pinctrl-0 = <&ulpuart_rx_default &ulpuart_tx_default>;
+	pinctrl-names = "default";
+};
+
+&pinctrl0 {
+	ulpuart_rx_default: ulpuart_rx_default {
+		pinmux = <1 0 9 3 0>;
+	};
+	ulpuart_tx_default: ulpuart_tx_default {
+		pinmux = <1 0 11 3 0>;
 	};
 };
