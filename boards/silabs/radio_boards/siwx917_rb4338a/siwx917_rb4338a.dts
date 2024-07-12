@@ -53,6 +53,11 @@
 	};
 };
 
+/* FIXME: relocate that in samples/net/wifi/boards/siwx917_rb4338a.overlay */
+&wifi0 {
+	status = "okay";
+};
+
 &ulpuart0 {
 	status = "okay";
 	pinctrl-0 = <&ulpuart0_default>;

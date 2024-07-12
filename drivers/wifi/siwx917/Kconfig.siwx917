@@ -1,0 +1,47 @@
+# Copyright (c) 2023 Antmicro
+# SPDX-License-Identifier: Apache-2.0
+
+config WIFI_SIWX917
+	bool "Silabs SiWx917 SoC series WiFi driver"
+	default y
+	depends on DT_HAS_SILABS_SIWX917_WIFI_ENABLED
+	select WIFI_OFFLOAD
+	select NET_L2_WIFI_MGMT
+	select CMSIS_RTOS_V2
+	# Also select CMSIS-RTOS v2 dependencies
+	select POLL
+	select DYNAMIC_THREAD
+	select THREAD_NAME
+	select THREAD_STACK_INFO
+	select THREAD_MONITOR
+	select INIT_STACKS
+	help
+	  Enable WiFi driver for the Silabs SiWx917 SoC series.
+
+if WIFI_SIWX917
+
+config NUM_PREEMPT_PRIORITIES
+	default 56
+
+config CMSIS_V2_THREAD_DYNAMIC_MAX_COUNT
+	default 2
+
+config CMSIS_V2_THREAD_DYNAMIC_STACK_SIZE
+	default 1024
+
+config CMSIS_V2_THREAD_MAX_STACK_SIZE
+	default 2048
+
+config NET_TCP_WORKQ_STACK_SIZE
+	default 2048
+
+config NET_RX_STACK_SIZE
+	default 2048
+
+config NET_MGMT_EVENT_STACK_SIZE
+	default 2048
+
+config NET_MGMT_EVENT_QUEUE_SIZE
+	default 10
+
+endif
