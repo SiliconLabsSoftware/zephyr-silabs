@@ -21,12 +21,12 @@
 
 	sram0: memory@400 {
 		compatible = "mmio-sram";
-		reg = <0x400 DT_SIZE_K(196)>;
+		reg = <0x00000000 DT_SIZE_K(191)>;
 	};
 
 	flash0: flash@8212000 {
 		compatible = "soc-nv-flash";
-		reg = <0x8212000 DT_SIZE_K(1024)>;
+		reg = <0x8202000 DT_SIZE_K(2040)>;
 	};
 
 	soc {
