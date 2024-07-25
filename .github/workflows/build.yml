@@ -16,31 +16,31 @@ jobs:
         os: [ubuntu-22.04, macos-14, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          path: zephyr-silabs
+    - name: Checkout
+      uses: actions/checkout@v4
+      with:
+        path: zephyr-silabs
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: 3.11
+    - name: Set up Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
 
-      - name: Setup Zephyr project
-        uses: zephyrproject-rtos/action-zephyr-setup@v1
-        with:
-          app-path: zephyr-silabs
-          toolchains: arm-zephyr-eabi
+    - name: Setup Zephyr project
+      uses: zephyrproject-rtos/action-zephyr-setup@v1
+      with:
+        app-path: zephyr-silabs
+        toolchains: arm-zephyr-eabi
 
-      - name: Install Silabs-specific python dependencies
-        run: |
-          pip3 install crc
+    - name: Install Silabs-specific python dependencies
+      run: |
+        pip3 install crc
 
-      - name: Build hello world
-        working-directory: zephyr-silabs
-        shell: bash
-        run: |
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
-          fi
-          west twister -T ../zephyr/samples -s sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
+    - name: Build hello world
+      working-directory: zephyr-silabs
+      shell: bash
+      run: |
+        if [ "${{ runner.os }}" = "Windows" ]; then
+          EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
+        fi
+        west twister -T ../zephyr/samples -s sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
