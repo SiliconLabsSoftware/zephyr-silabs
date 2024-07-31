@@ -8,15 +8,20 @@
 #include <zephyr/sw_isr_table.h>
 #include "rsi_rom_clks.h"
 #include "rsi_rom_ulpss_clk.h"
+#include "rsi_ipmu.h"
 
 int silabs_siwx917_init(void)
 {
 	SystemInit();
 	SystemCoreClockUpdate();
 
+	/* Trip the clock to 32 MHz */
+	RSI_Clks_Trim32MHzRC(32);
+
 	/* FIXME: do not hardcode UART instances */
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(ulpuart0), okay)
-	RSI_ULPSS_UlpUartClkConfig(ULPCLK, ENABLE_STATIC_CLK, 0, ULP_UART_ULP_32MHZ_RC_CLK, 1);
+	RSI_PS_UlpssPeriPowerUp(ULPSS_PWRGATE_ULP_UART);
+	RSI_ULPSS_UlpUartClkConfig(ULPCLK, ENABLE_STATIC_CLK, 0, ULP_UART_REF_CLK, 0);
 #endif
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(uart0), okay)
 	RSI_CLK_UsartClkConfig(M4CLK, ENABLE_STATIC_CLK, 0, USART1, 0, 1);
