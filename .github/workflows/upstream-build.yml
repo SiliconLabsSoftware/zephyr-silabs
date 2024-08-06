@@ -1,0 +1,49 @@
+name: Silabs upstream daily build
+
+on:
+  schedule:
+    - cron: "15 5 * * *"
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04, macos-14, windows-2022]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: zephyr-silabs
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
+
+      - name: Install Silabs-specific python dependencies
+        run: |
+          pip3 install crc
+
+      - name: Setup Zephyr project
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          app-path: zephyr-silabs
+          toolchains: arm-zephyr-eabi
+
+      - name: Update manifest to point at upstream main branch
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          Z_REV=`grep -A 2 'name: zephyr$' west.yml|grep revision:|sed 's/^.*revision: //'`
+          sed s/$Z_REV/main/ west.yml > west.yml.new
+          mv west.yml.new west.yml
+          west update
+          west blobs fetch hal_silabs
+
+      - name: Build Bluetooth sample for xG27
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          west build -b xg27_dk2602a/efr32bg27c140f768im40 ../zephyr/samples/bluetooth/peripheral_hr
