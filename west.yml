@@ -22,3 +22,5 @@ manifest:
         name-allowlist:
           - cmsis      # required by the ARM port
           - hal_silabs # required by Silabs boards
+          - mbedtls    # required e.g. by Bluetooth
+          - tinycrypt  # required e.g. by Bluetooth
