@@ -10,4 +10,16 @@ config FLASH_BASE_ADDRESS
 config NUM_IRQS
 	default 99
 
+choice SIWX917_FLASH_MODE
+	bool "Flash Mode"
+	default SIWX917_FLASH_MODE_COMMON
+
+config SIWX917_FLASH_MODE_COMMON
+	bool "Common Flash"
+
+config SIWX917_FLASH_MODE_DUAL
+	bool "Dual Flash"
+
+endchoice
+
 endif

@@ -45,7 +45,7 @@
 			reg = <0x24041800 0x1000>;
 			interrupts = <12 0>;
 			reg-shift = <2>;
-			clock-frequency = <15000000>;
+			clock-frequency = <32000000>;
 			current-speed = <115200>;
 			status = "disabled";
 		};
