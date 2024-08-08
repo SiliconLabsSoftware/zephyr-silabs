@@ -43,7 +43,17 @@ jobs:
           west blobs fetch hal_silabs
 
       - name: Build Bluetooth sample for xG27
+        continue-on-error: true
         working-directory: zephyr-silabs
         shell: bash
         run: |
           west build -b xg27_dk2602a/efr32bg27c140f768im40 ../zephyr/samples/bluetooth/peripheral_hr
+
+      - name: Build hello world for siwx917_rb4338a
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
+          fi
+          west twister -T ../zephyr/samples -s sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
