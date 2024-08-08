@@ -9,10 +9,21 @@
 #include "rsi_rom_clks.h"
 #include "rsi_rom_ulpss_clk.h"
 
+#include "sl_si91x_clock_manager.h"
+
 int silabs_siwx917_init(void)
 {
 	SystemInit();
 	SystemCoreClockUpdate();
+
+	/* Use SoC PLL at configured frequency as core clock */
+	sl_si91x_clock_manager_m4_set_core_clk(M4_SOCPLLCLK,
+					       CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC);
+
+	/* Use interface PLL at configured frequency as peripheral clock */
+	sl_si91x_clock_manager_set_pll_freq(INFT_PLL,
+					    CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC,
+					    PLL_REF_CLK_VAL_XTAL);
 
 	/* FIXME: do not hardcode UART instances */
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(ulpuart0), okay)
