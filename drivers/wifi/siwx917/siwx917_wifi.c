@@ -13,7 +13,17 @@
 LOG_MODULE_REGISTER(siwx917_wifi);
 
 struct siwx917_dev {
+	enum wifi_iface_state state;
 };
+
+static int siwx917_status(const struct device *dev, struct wifi_iface_status *status)
+{
+	struct siwx917_dev *sidev = dev->data;
+
+	memset(status, 0, sizeof(*status));
+	status->state = sidev->state;
+	return 0;
+}
 
 static struct net_offload siwx917_offload = {
 };
@@ -21,6 +31,7 @@ static struct net_offload siwx917_offload = {
 static void siwx917_iface_init(struct net_if *iface)
 {
 	iface->if_dev->offload = &siwx917_offload;
+	sidev->state = WIFI_STATE_INTERFACE_DISABLED;
 }
 
 static int siwx917_dev_init(const struct device *dev)
@@ -34,6 +45,7 @@ static enum offloaded_net_if_types siwx917_get_type(void)
 }
 
 static const struct wifi_mgmt_ops siwx917_mgmt = {
+	.iface_status = siwx917_status,
 };
 
 static const struct net_wifi_mgmt_offload siwx917_api = {
