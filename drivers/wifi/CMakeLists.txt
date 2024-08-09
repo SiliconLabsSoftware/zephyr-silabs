@@ -1,5 +1,4 @@
 # Copyright (c) 2024 Silicon Laboratories Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-add_subdirectory(wifi)
-add_subdirectory(pinctrl)
+add_subdirectory(siwx917)
