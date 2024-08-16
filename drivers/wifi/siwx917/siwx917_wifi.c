@@ -12,6 +12,7 @@
 
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi.h"
+#include "sl_net_si91x.h"
 #include "sl_net.h"
 
 LOG_MODULE_REGISTER(siwx917_wifi);
@@ -21,6 +22,160 @@ struct siwx917_dev {
 	enum wifi_iface_state state;
 	scan_result_cb_t scan_res_cb;
 };
+
+static void siwx917_on_join_ipv4(struct siwx917_dev *sidev)
+{
+#ifdef CONFIG_NET_IPV4
+	sl_net_ip_configuration_t ip_config4 = {
+		.mode = SL_IP_MANAGEMENT_DHCP,
+		.type = SL_IPV4,
+	};
+	struct in_addr addr4 = { };
+	int ret;
+
+	/* FIXME: support for static IP configuration */
+	ret = sl_si91x_configure_ip_address(&ip_config4, SL_SI91X_WIFI_CLIENT_VAP_ID);
+	if (!ret) {
+		memcpy(addr4.s4_addr, ip_config4.ip.v4.ip_address.bytes, sizeof(addr4.s4_addr));
+		/* FIXME: also report gateway (net_if_ipv4_router_add()) */
+		net_if_ipv4_addr_add(sidev->iface, &addr4, NET_ADDR_DHCP, 0);
+	} else {
+		LOG_ERR("sl_si91x_configure_ip_address(): %#04x", ret);
+	}
+#endif
+}
+
+static void siwx917_on_join_ipv6(struct siwx917_dev *sidev)
+{
+#ifdef CONFIG_NET_IPV6
+	sl_net_ip_configuration_t ip_config6 = {
+		.mode = SL_IP_MANAGEMENT_DHCP,
+		.type = SL_IPV6,
+	};
+	struct in6_addr addr6 = { };
+	int ret;
+
+	/* FIXME: support for static IP configuration */
+	ret = sl_si91x_configure_ip_address(&ip_config6, SL_SI91X_WIFI_CLIENT_VAP_ID);
+	if (!ret) {
+		memcpy(addr6.s6_addr, ip_config6.ip.v6.global_address.bytes, sizeof(addr6.s6_addr));
+		/* FIXME: also report gateway and link local address */
+		net_if_ipv6_addr_add(sidev->iface, &addr6, NET_ADDR_AUTOCONF, 0);
+	} else {
+		LOG_ERR("sl_si91x_configure_ip_address(): %#04x", ret);
+	}
+#endif
+}
+
+static unsigned int siwx917_on_join(sl_wifi_event_t event,
+				    char *result, uint32_t result_size, void *arg)
+{
+	struct siwx917_dev *sidev = arg;
+
+	if (*result != 'C') {
+		/* TODO: report the real reason of failure */
+		wifi_mgmt_raise_connect_result_event(sidev->iface, WIFI_STATUS_CONN_FAIL);
+		sidev->state = WIFI_STATE_INACTIVE;
+		return 0;
+	}
+
+	wifi_mgmt_raise_connect_result_event(sidev->iface, WIFI_STATUS_CONN_SUCCESS);
+	sidev->state = WIFI_STATE_COMPLETED;
+
+	siwx917_on_join_ipv4(sidev);
+	siwx917_on_join_ipv6(sidev);
+
+	return 0;
+}
+
+static int siwx917_connect(const struct device *dev, struct wifi_connect_req_params *params)
+{
+	sl_wifi_client_configuration_t wifi_config = {
+		.bss_type = SL_WIFI_BSS_TYPE_INFRASTRUCTURE,
+	};
+	int ret;
+
+	switch (params->security) {
+	case WIFI_SECURITY_TYPE_NONE:
+		wifi_config.security = SL_WIFI_OPEN;
+		wifi_config.encryption = SL_WIFI_NO_ENCRYPTION;
+		break;
+	case WIFI_SECURITY_TYPE_WPA_PSK:
+		wifi_config.security = SL_WIFI_WPA;
+		wifi_config.encryption = SL_WIFI_DEFAULT_ENCRYPTION;
+		wifi_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
+		break;
+	case WIFI_SECURITY_TYPE_PSK:
+		wifi_config.security = SL_WIFI_WPA2;
+		wifi_config.encryption = SL_WIFI_TKIP_ENCRYPTION;
+		wifi_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
+		break;
+	case WIFI_SECURITY_TYPE_PSK_SHA256:
+		wifi_config.security = SL_WIFI_WPA2;
+		wifi_config.encryption = SL_WIFI_CCMP_ENCRYPTION;
+		wifi_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
+		break;
+	case WIFI_SECURITY_TYPE_SAE:
+		/* TODO: Support the case where MFP is not required */
+		wifi_config.security = SL_WIFI_WPA3;
+		wifi_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
+		break;
+	case WIFI_SECURITY_TYPE_WPA_AUTO_PERSONAL:
+		wifi_config.security = SL_WIFI_WPA2;
+		wifi_config.encryption = SL_WIFI_DEFAULT_ENCRYPTION;
+		wifi_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
+		break;
+	/* Zephyr WiFi shell doesn't specify how to pass credential for these
+	 * key managements.
+	 */
+	case WIFI_SECURITY_TYPE_WEP: /* SL_WIFI_WEP/SL_WIFI_WEP_ENCRYPTION */
+	case WIFI_SECURITY_TYPE_EAP: /* SL_WIFI_WPA2_ENTERPRISE/<various> */
+	case WIFI_SECURITY_TYPE_WAPI:
+	default:
+		return -ENOTSUP;
+	}
+
+	if (params->band != WIFI_FREQ_BAND_UNKNOWN && params->band != WIFI_FREQ_BAND_2_4_GHZ) {
+		return -ENOTSUP;
+	}
+
+	if (params->psk_length) {
+		sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK,
+				      params->psk, params->psk_length);
+	}
+
+	if (params->sae_password_length) {
+		sl_net_set_credential(SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID, SL_NET_WIFI_PSK,
+				      params->sae_password, params->sae_password_length);
+	}
+
+	if (params->channel != WIFI_CHANNEL_ANY) {
+		wifi_config.channel.channel = params->channel;
+	}
+
+	wifi_config.ssid.length = params->ssid_length,
+	memcpy(wifi_config.ssid.value, params->ssid, params->ssid_length);
+
+	ret = sl_wifi_connect(SL_WIFI_CLIENT_INTERFACE, &wifi_config, 0);
+	if (ret != SL_STATUS_IN_PROGRESS) {
+		return -EIO;
+	}
+
+	return 0;
+}
+
+static int siwx917_disconnect(const struct device *dev)
+{
+	struct siwx917_dev *sidev = dev->data;
+	int ret;
+
+	ret = sl_wifi_disconnect(SL_WIFI_CLIENT_INTERFACE);
+	if (ret) {
+		return -EIO;
+	}
+	sidev->state = WIFI_STATE_INACTIVE;
+	return 0;
+}
 
 static void siwx917_report_scan_res(struct siwx917_dev *sidev, sl_wifi_scan_result_t *result,
 				    int item)
@@ -125,6 +280,7 @@ static void siwx917_iface_init(struct net_if *iface)
 	sidev->iface = iface;
 
 	sl_wifi_set_scan_callback(siwx917_on_scan, sidev);
+	sl_wifi_set_join_callback(siwx917_on_join, sidev);
 	sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
 	net_if_set_link_addr(iface, mac_addr.octet, sizeof(mac_addr.octet), NET_LINK_ETHERNET);
 
@@ -148,6 +304,8 @@ static enum offloaded_net_if_types siwx917_get_type(void)
 
 static const struct wifi_mgmt_ops siwx917_mgmt = {
 	.scan         = siwx917_scan,
+	.connect      = siwx917_connect,
+	.disconnect   = siwx917_disconnect,
 	.iface_status = siwx917_status,
 };
 
