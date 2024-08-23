@@ -30,6 +30,10 @@ jobs:
         app-path: zephyr-silabs
         toolchains: arm-zephyr-eabi
 
+    - name: Install compliance-specific python dependencies
+      run: |
+        pip3 install python-magic lxml junitparser gitlint pylint pykwalify yamllint clang-format unidiff
+
     - name: Run Compliance Tests
       continue-on-error: true
       id: compliance
