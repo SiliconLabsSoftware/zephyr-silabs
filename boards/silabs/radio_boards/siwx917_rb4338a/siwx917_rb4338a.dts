@@ -6,6 +6,8 @@
 
 /dts-v1/;
 #include <silabs/siwg917m111mgtba.dtsi>
+#include <dt-bindings/gpio/gpio.h>
+#include <dt-bindings/input/input-event-codes.h>
 
 / {
 	model = "Silicon Labs BRD4338A (SiWG917 Radio Board)";
@@ -16,6 +18,36 @@
 		zephyr,flash = &flash0;
 		zephyr,console = &ulpuart0;
 		zephyr,shell-uart = &ulpuart0;
+	};
+
+	aliases {
+		led0 = &led0;
+		led1 = &led1;
+		sw0 = &button0;
+		sw1 = &button1;
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		led0: led_0 {
+			gpios = <&ulpgpio 2 GPIO_ACTIVE_HIGH>;
+		};
+
+		led1: led_1 {
+			gpios = <&gpioa 10 GPIO_ACTIVE_HIGH>;
+		};
+	};
+
+	buttons {
+		compatible = "gpio-keys";
+		button0: button_0 {
+			gpios = <&uulpgpio 2 GPIO_ACTIVE_LOW>;
+			zephyr,code = <INPUT_KEY_0>;
+		};
+		button1: button_1 {
+			gpios = <&gpioa 11 GPIO_ACTIVE_LOW>;
+			zephyr,code = <INPUT_KEY_1>;
+		};
 	};
 };
 

@@ -1,0 +1,21 @@
+# Copyright (c) 2024 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig GPIO_SILABS_SIWX917
+	bool "Silabs SiWx917 GPIO driver"
+	default y
+	depends on DT_HAS_SILABS_SIWX917_GPIO_ENABLED
+	help
+	  Enable the HP/ULP GPIO driver for the Silabs SiWx917 SoC series.
+
+config GPIO_SILABS_SIWX917_COMMON_INIT_PRIORITY
+	int "Common initialization priority"
+	depends on GPIO_SILABS_SIWX917
+	default 39
+
+config GPIO_SILABS_SIWX917_UULP
+	bool "Silabs SiWx917 UULP GPIO driver"
+	default y
+	depends on DT_HAS_SILABS_SIWX917_GPIO_UULP_ENABLED
+	help
+	  Enable the UULP GPIO driver for the Silabs SiWx917 SoC series.

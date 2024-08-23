@@ -1,0 +1,17 @@
+description: Silabs SiWx917 GPIO node
+
+compatible: "silabs,siwx917-gpio"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
+
+  interrupts:
+    required: true
+
+  silabs,ulp:
+    type: boolean
+    description: |
+      If this property is set, the GPIO controller uses ULP (ultra low power) pads.
