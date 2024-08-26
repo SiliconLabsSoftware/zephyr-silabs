@@ -5,6 +5,6 @@
 #ifndef SIWG917_SOC_H
 #define SIWG917_SOC_H
 
-#include "RS1xxxx.h"
+#include "si91x_device.h"
 
 #endif
