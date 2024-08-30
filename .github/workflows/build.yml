@@ -43,4 +43,4 @@ jobs:
         if [ "${{ runner.os }}" = "Windows" ]; then
           EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
         fi
-        west twister -T ../zephyr/samples -s sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
+        west twister --test sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
