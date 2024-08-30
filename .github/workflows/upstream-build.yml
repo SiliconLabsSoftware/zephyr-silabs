@@ -47,7 +47,7 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west build -b xg27_dk2602a/efr32bg27c140f768im40 ../zephyr/samples/bluetooth/peripheral_hr
+          west twister -K -p xg27_dk2602a --test sample.bluetooth.peripheral_hr
 
       - name: Build hello world for siwx917_rb4338a
         working-directory: zephyr-silabs
