@@ -10,6 +10,7 @@
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/logging/log.h>
 
+#include "sl_si91x_socket.h"
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi.h"
 #include "sl_net_si91x.h"
@@ -22,6 +23,9 @@ struct siwx917_dev {
 	enum wifi_iface_state state;
 	scan_result_cb_t scan_res_cb;
 };
+
+NET_BUF_POOL_FIXED_DEFINE(siwx917_tx_pool, 1, NET_ETH_MTU, 0, NULL);
+NET_BUF_POOL_FIXED_DEFINE(siwx917_rx_pool, 10, NET_ETH_MTU, 0, NULL);
 
 static void siwx917_on_join_ipv4(struct siwx917_dev *sidev)
 {
@@ -266,7 +270,235 @@ static int siwx917_status(const struct device *dev, struct wifi_iface_status *st
 	return 0;
 }
 
+/* SiWx917 uses Little Endian for port number while Posix uses Big Endian */
+static void siwx917_sock_swap_port_endian(struct sockaddr *out,
+					  const struct sockaddr *in, socklen_t in_len)
+{
+	/* In Zephyr, size of sockaddr == size of sockaddr_storage
+	 * (while in Posix sockaddr is smaller than sockaddr_storage).
+	 */
+	memcpy(out, in, in_len);
+	((struct sockaddr_in *)out)->sin_port = ntohs(((struct sockaddr_in *)in)->sin_port);
+}
+
+static int siwx917_sock_get(sa_family_t family, enum net_sock_type type,
+			    enum net_ip_protocol ip_proto, struct net_context **context)
+{
+	int sockfd;
+
+	sockfd = sl_si91x_socket(family, type, ip_proto);
+	if (sockfd < 0) {
+		return -errno;
+	}
+	(*context)->offload_context = (void *)sockfd;
+	return sockfd;
+}
+
+static int siwx917_sock_put(struct net_context *context)
+{
+	int sockfd = (int)context->offload_context;
+	int ret;
+
+	ret = sl_si91x_shutdown(sockfd, 0);
+	if (ret < 0) {
+		ret = -errno;
+	}
+	return ret;
+}
+
+static int siwx917_sock_bind(struct net_context *context,
+			     const struct sockaddr *addr, socklen_t addrlen)
+{
+	int sockfd = (int)context->offload_context;
+	struct sockaddr addr_le;
+	int ret;
+
+	/* Zephyr tends to call bind() even if the TCP socket is a client. 917
+	 * return an error in this case.
+	 */
+	if (net_context_get_proto(context) == IPPROTO_TCP &&
+	    !((struct sockaddr_in *)addr)->sin_port) {
+		return 0;
+	}
+	siwx917_sock_swap_port_endian(&addr_le, addr, addrlen);
+	ret = sl_si91x_bind(sockfd, &addr_le, addrlen);
+	if (ret) {
+		return -errno;
+	}
+	return 0;
+}
+
+static int siwx917_sock_connect(struct net_context *context,
+				const struct sockaddr *addr, socklen_t addrlen,
+				net_context_connect_cb_t cb, int32_t timeout, void *user_data)
+{
+	int sockfd = (int)context->offload_context;
+	struct sockaddr addr_le;
+	int ret;
+
+	/* sl_si91x_connect() always return immediately, so we ignore timeout */
+	siwx917_sock_swap_port_endian(&addr_le, addr, addrlen);
+	ret = sl_si91x_connect(sockfd, &addr_le, addrlen);
+	if (ret) {
+		ret = -errno;
+	}
+	if (cb) {
+		cb(context, ret, user_data);
+	}
+	return ret;
+}
+
+static int siwx917_sock_listen(struct net_context *context, int backlog)
+{
+	int sockfd = (int)context->offload_context;
+	int ret;
+
+	ret = sl_si91x_listen(sockfd, backlog);
+	if (ret) {
+		return -errno;
+	}
+	return 0;
+}
+
+static int siwx917_sock_accept(struct net_context *context,
+			       net_tcp_accept_cb_t cb, int32_t timeout, void *user_data)
+{
+	int sockfd = (int)context->offload_context;
+	struct net_context *newcontext;
+	struct sockaddr addr_le;
+	int ret;
+
+	/* TODO: support timeout != K_FOREVER */
+	assert(timeout < 0);
+
+	ret = net_context_get(net_context_get_family(context),
+			      net_context_get_type(context),
+			      net_context_get_proto(context), &newcontext);
+	if (ret < 0) {
+		return ret;
+	}
+	/* net_context_get() calls siwx917_sock_get() but sl_si91x_accept() also
+	 * allocates a socket.
+	 */
+	ret = siwx917_sock_put(newcontext);
+	if (ret < 0) {
+		return ret;
+	}
+	/* The iface is reset when getting a new context. */
+	newcontext->iface = context->iface;
+	ret = sl_si91x_accept(sockfd, &addr_le, sizeof(addr_le));
+	if (ret < 0) {
+		return -errno;
+	}
+	newcontext->flags |= NET_CONTEXT_REMOTE_ADDR_SET;
+	newcontext->offload_context = (void *)ret;
+	siwx917_sock_swap_port_endian(&newcontext->remote, &addr_le, sizeof(addr_le));
+	if (cb) {
+		cb(newcontext, &addr_le, sizeof(addr_le), 0, user_data);
+	}
+
+	return 0;
+}
+
+static int siwx917_sock_sendto(struct net_pkt *pkt,
+			       const struct sockaddr *addr, socklen_t addrlen,
+			       net_context_send_cb_t cb, int32_t timeout, void *user_data)
+{
+	struct net_context *context = pkt->context;
+	int sockfd = (int)context->offload_context;
+	struct sockaddr addr_le;
+	struct net_buf *buf;
+	int ret;
+
+	/* struct net_pkt use fragmented buffers while SiWx917 API need a
+	 * continuous buffer.
+	 */
+	if (net_pkt_get_len(pkt) > NET_ETH_MTU) {
+		LOG_ERR("unexpected buffer size");
+		ret = -ENOBUFS;
+		goto out_cb;
+	}
+	buf = net_buf_alloc(&siwx917_tx_pool, K_FOREVER);
+	if (!buf) {
+		ret = -ENOBUFS;
+		goto out_cb;
+	}
+	if (net_pkt_read(pkt, buf->data, net_pkt_get_len(pkt))) {
+		ret = -ENOBUFS;
+		goto out_release_buf;
+	}
+	net_buf_add(buf, net_pkt_get_len(pkt));
+
+	/* sl_si91x_sendto() always return immediately, so we ignore timeout */
+	siwx917_sock_swap_port_endian(&addr_le, addr, addrlen);
+	ret = sl_si91x_sendto(sockfd, buf->data, net_pkt_get_len(pkt), 0, &addr_le, addrlen);
+	if (ret < 0) {
+		ret = -errno;
+		goto out_release_buf;
+	}
+	net_pkt_unref(pkt);
+
+out_release_buf:
+	net_buf_unref(buf);
+
+out_cb:
+	if (cb) {
+		cb(pkt->context, ret, user_data);
+	}
+	return ret;
+}
+
+static int siwx917_sock_send(struct net_pkt *pkt,
+			     net_context_send_cb_t cb, int32_t timeout, void *user_data)
+{
+	return siwx917_sock_sendto(pkt, NULL, 0, cb, timeout, user_data);
+}
+
+static int siwx917_sock_recv(struct net_context *context,
+			     net_context_recv_cb_t cb, int32_t timeout, void *user_data)
+{
+	struct net_if *iface = net_context_get_iface(context);
+	int sockfd = (int)context->offload_context;
+	struct net_pkt *pkt;
+	struct net_buf *buf;
+	struct sockaddr addr_le;
+	socklen_t addrlen;
+	int ret;
+
+	pkt = net_pkt_rx_alloc_on_iface(iface, K_MSEC(100));
+	if (!pkt)
+		return -ENOBUFS;
+	buf = net_buf_alloc(&siwx917_rx_pool, K_MSEC(100));
+	if (!buf) {
+		net_pkt_unref(pkt);
+		return -ENOBUFS;
+	}
+	net_pkt_append_buffer(pkt, buf);
+
+	ret = sl_si91x_recvfrom(sockfd, buf->data, NET_ETH_MTU, 0, &addr_le, &addrlen);
+	if (ret >= 0) {
+		net_buf_add(buf, ret);
+		net_pkt_cursor_init(pkt);
+		ret = 0;
+	} else {
+		net_pkt_unref(pkt);
+		ret = -errno;
+	}
+	if (cb)
+		cb(context, pkt, NULL, NULL, ret, user_data);
+	return ret;
+}
+
 static struct net_offload siwx917_offload = {
+	.get      = siwx917_sock_get,
+	.put      = siwx917_sock_put,
+	.bind     = siwx917_sock_bind,
+	.listen   = siwx917_sock_listen,
+	.connect  = siwx917_sock_connect,
+	.accept   = siwx917_sock_accept,
+	.sendto   = siwx917_sock_sendto,
+	.send     = siwx917_sock_send,
+	.recv     = siwx917_sock_recv,
 };
 
 static void siwx917_iface_init(struct net_if *iface)
