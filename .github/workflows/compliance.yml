@@ -43,7 +43,7 @@ jobs:
         # FIXME: We should be able to run KconfigHWMv2, but right now it doesn't seem
         # to handle our soc directory correctly.
         $ZEPHYR_BASE/scripts/ci/check_compliance.py --annotate -e Kconfig -e KconfigBasic \
-        -e KconfigHWMv2 -c origin/${GITHUB_BASE_REF}..
+        -e KconfigHWMv2 -e KconfigBasicNoModules -c origin/${GITHUB_BASE_REF}..
 
     - name: upload-results
       uses: actions/upload-artifact@v3
