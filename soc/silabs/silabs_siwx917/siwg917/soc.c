@@ -29,8 +29,11 @@ int silabs_siwx917_init(void)
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(ulpuart0), okay)
 	RSI_ULPSS_UlpUartClkConfig(ULPCLK, ENABLE_STATIC_CLK, 0, ULP_UART_ULP_32MHZ_RC_CLK, 1);
 #endif
-#if DT_NODE_HAS_STATUS(DT_NODELABEL(uart0), okay)
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(uart1), okay)
 	RSI_CLK_UsartClkConfig(M4CLK, ENABLE_STATIC_CLK, 0, USART1, 0, 1);
+#endif
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(uart2), okay)
+	RSI_CLK_UsartClkConfig(M4CLK, ENABLE_STATIC_CLK, 0, USART2, 0, 1);
 #endif
 
 	return 0;

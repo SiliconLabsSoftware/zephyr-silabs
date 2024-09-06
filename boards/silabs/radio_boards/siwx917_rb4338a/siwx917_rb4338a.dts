@@ -8,6 +8,7 @@
 #include <silabs/siwg917m111mgtba.dtsi>
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input-event-codes.h>
+#include <dt-bindings/pinctrl/silabs/siwx917-pinctrl.h>
 
 / {
 	model = "Silicon Labs BRD4338A (SiWG917 Radio Board)";
@@ -53,15 +54,17 @@
 
 &ulpuart0 {
 	status = "okay";
-	pinctrl-0 = <&ulpuart_rx_default &ulpuart_tx_default>;
+	pinctrl-0 = <&ulpuart0_default>;
 	pinctrl-names = "default";
 };
 
 &pinctrl0 {
-	ulpuart_rx_default: ulpuart_rx_default {
-		pinmux = <1 0 9 3 0>;
-	};
-	ulpuart_tx_default: ulpuart_tx_default {
-		pinmux = <1 0 11 3 0>;
+	ulpuart0_default: ulpuart0_default {
+		out {
+			pinmux = <ULPUART_TX_ULP11>;
+		};
+		in {
+			pinmux = <ULPUART_RX_ULP9>;
+		};
 	};
 };
