@@ -278,9 +278,12 @@ static int siwx917_scan(const struct device *dev, struct wifi_scan_params *z_sca
 static int siwx917_status(const struct device *dev, struct wifi_iface_status *status)
 {
 	struct siwx917_dev *sidev = dev->data;
+	int32_t rssi = -1;
 
 	memset(status, 0, sizeof(*status));
 	status->state = sidev->state;
+	sl_wifi_get_signal_strength(SL_WIFI_CLIENT_INTERFACE, &rssi);
+	status->rssi = rssi;
 	return 0;
 }
 
