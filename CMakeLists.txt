@@ -5,3 +5,5 @@
 # as the module CMake entry point (see zephyr/module.yml).
 
 add_subdirectory(drivers)
+
+zephyr_include_directories(include)
