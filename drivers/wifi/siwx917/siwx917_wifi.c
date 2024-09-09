@@ -9,12 +9,18 @@
 #include <zephyr/net/net_offload.h>
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/kernel.h>
+#include <assert.h>
 
 #include "sl_si91x_socket.h"
+#include "sl_si91x_socket_utility.h"
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi.h"
 #include "sl_net_si91x.h"
 #include "sl_net.h"
+
+BUILD_ASSERT(NUMBER_OF_BSD_SOCKETS < sizeof(uint32_t) * 8);
+BUILD_ASSERT(NUMBER_OF_BSD_SOCKETS < SIZEOF_FIELD(sl_si91x_fd_set, __fds_bits) * 8);
 
 LOG_MODULE_REGISTER(siwx917_wifi);
 
@@ -22,6 +28,14 @@ struct siwx917_dev {
 	struct net_if *iface;
 	enum wifi_iface_state state;
 	scan_result_cb_t scan_res_cb;
+
+	struct k_event fds_recv_event;
+	sl_si91x_fd_set fds_watch;
+	struct {
+		net_context_recv_cb_t cb;
+		void *user_data;
+		struct net_context *context;
+	} fds_cb[NUMBER_OF_BSD_SOCKETS];
 };
 
 NET_BUF_POOL_FIXED_DEFINE(siwx917_tx_pool, 1, NET_ETH_MTU, 0, NULL);
@@ -281,24 +295,89 @@ static void siwx917_sock_swap_port_endian(struct sockaddr *out,
 	((struct sockaddr_in *)out)->sin_port = ntohs(((struct sockaddr_in *)in)->sin_port);
 }
 
+static int siwx917_sock_recv_sync(struct net_context *context,
+				  net_context_recv_cb_t cb, void *user_data)
+{
+	struct net_if *iface = net_context_get_iface(context);
+	int sockfd = (int)context->offload_context;
+	struct net_pkt *pkt;
+	struct net_buf *buf;
+	int ret;
+
+	pkt = net_pkt_rx_alloc_on_iface(iface, K_MSEC(100));
+	if (!pkt) {
+		return -ENOBUFS;
+	}
+	buf = net_buf_alloc(&siwx917_rx_pool, K_MSEC(100));
+	if (!buf) {
+		net_pkt_unref(pkt);
+		return -ENOBUFS;
+	}
+	net_pkt_append_buffer(pkt, buf);
+
+	ret = sl_si91x_recvfrom(sockfd, buf->data, NET_ETH_MTU, 0, NULL, NULL);
+	if (ret < 0) {
+		net_pkt_unref(pkt);
+		ret = -errno;
+	} else {
+		net_buf_add(buf, ret);
+		net_pkt_cursor_init(pkt);
+		ret = 0;
+	}
+	if (cb) {
+		cb(context, pkt, NULL, NULL, ret, user_data);
+	}
+	return ret;
+}
+
+static void siwx917_sock_on_recv(sl_si91x_fd_set *read_fd, sl_si91x_fd_set *write_fd,
+				 sl_si91x_fd_set *except_fd, int status)
+{
+	/* When CONFIG_NET_SOCKETS_OFFLOAD is set, only one interface exist */
+	struct siwx917_dev *sidev = net_if_get_default()->if_dev->dev->data;
+
+	ARRAY_FOR_EACH(sidev->fds_cb, i) {
+		if (SL_SI91X_FD_ISSET(i, read_fd)) {
+			if (sidev->fds_cb[i].cb) {
+				siwx917_sock_recv_sync(sidev->fds_cb[i].context,
+						       sidev->fds_cb[i].cb,
+						       sidev->fds_cb[i].user_data);
+			} else {
+				SL_SI91X_FD_CLR(i, &sidev->fds_watch);
+				k_event_post(&sidev->fds_recv_event, 1U << i);
+			}
+		}
+	}
+
+	sl_si91x_select(NUMBER_OF_BSD_SOCKETS, &sidev->fds_watch, NULL, NULL, NULL,
+			siwx917_sock_on_recv);
+}
+
 static int siwx917_sock_get(sa_family_t family, enum net_sock_type type,
 			    enum net_ip_protocol ip_proto, struct net_context **context)
 {
+	struct siwx917_dev *sidev = net_if_get_default()->if_dev->dev->data;
 	int sockfd;
 
 	sockfd = sl_si91x_socket(family, type, ip_proto);
 	if (sockfd < 0) {
 		return -errno;
 	}
+	assert(!sidev->fds_cb[sockfd].cb);
 	(*context)->offload_context = (void *)sockfd;
 	return sockfd;
 }
 
 static int siwx917_sock_put(struct net_context *context)
 {
+	struct siwx917_dev *sidev = net_context_get_iface(context)->if_dev->dev->data;
 	int sockfd = (int)context->offload_context;
 	int ret;
 
+	SL_SI91X_FD_CLR(sockfd, &sidev->fds_watch);
+	memset(&sidev->fds_cb[sockfd], 0, sizeof(sidev->fds_cb[sockfd]));
+	sl_si91x_select(NUMBER_OF_BSD_SOCKETS, &sidev->fds_watch, NULL, NULL, NULL,
+			siwx917_sock_on_recv);
 	ret = sl_si91x_shutdown(sockfd, 0);
 	if (ret < 0) {
 		ret = -errno;
@@ -309,6 +388,7 @@ static int siwx917_sock_put(struct net_context *context)
 static int siwx917_sock_bind(struct net_context *context,
 			     const struct sockaddr *addr, socklen_t addrlen)
 {
+	struct siwx917_dev *sidev = net_context_get_iface(context)->if_dev->dev->data;
 	int sockfd = (int)context->offload_context;
 	struct sockaddr addr_le;
 	int ret;
@@ -325,6 +405,12 @@ static int siwx917_sock_bind(struct net_context *context,
 	if (ret) {
 		return -errno;
 	}
+	/* WiseConnect refuses to run select on TCP listening sockets */
+	if (net_context_get_proto(context) == IPPROTO_UDP) {
+		SL_SI91X_FD_SET(sockfd, &sidev->fds_watch);
+		sl_si91x_select(NUMBER_OF_BSD_SOCKETS, &sidev->fds_watch, NULL, NULL, NULL,
+				siwx917_sock_on_recv);
+	}
 	return 0;
 }
 
@@ -332,6 +418,7 @@ static int siwx917_sock_connect(struct net_context *context,
 				const struct sockaddr *addr, socklen_t addrlen,
 				net_context_connect_cb_t cb, int32_t timeout, void *user_data)
 {
+	struct siwx917_dev *sidev = net_context_get_iface(context)->if_dev->dev->data;
 	int sockfd = (int)context->offload_context;
 	struct sockaddr addr_le;
 	int ret;
@@ -342,6 +429,9 @@ static int siwx917_sock_connect(struct net_context *context,
 	if (ret) {
 		ret = -errno;
 	}
+	SL_SI91X_FD_SET(sockfd, &sidev->fds_watch);
+	sl_si91x_select(NUMBER_OF_BSD_SOCKETS, &sidev->fds_watch, NULL, NULL, NULL,
+			siwx917_sock_on_recv);
 	if (cb) {
 		cb(context, ret, user_data);
 	}
@@ -363,6 +453,7 @@ static int siwx917_sock_listen(struct net_context *context, int backlog)
 static int siwx917_sock_accept(struct net_context *context,
 			       net_tcp_accept_cb_t cb, int32_t timeout, void *user_data)
 {
+	struct siwx917_dev *sidev = net_context_get_iface(context)->if_dev->dev->data;
 	int sockfd = (int)context->offload_context;
 	struct net_context *newcontext;
 	struct sockaddr addr_le;
@@ -393,6 +484,10 @@ static int siwx917_sock_accept(struct net_context *context,
 	newcontext->flags |= NET_CONTEXT_REMOTE_ADDR_SET;
 	newcontext->offload_context = (void *)ret;
 	siwx917_sock_swap_port_endian(&newcontext->remote, &addr_le, sizeof(addr_le));
+
+	SL_SI91X_FD_SET(ret, &sidev->fds_watch);
+	sl_si91x_select(NUMBER_OF_BSD_SOCKETS, &sidev->fds_watch, NULL, NULL, NULL,
+			siwx917_sock_on_recv);
 	if (cb) {
 		cb(newcontext, &addr_le, sizeof(addr_le), 0, user_data);
 	}
@@ -458,34 +553,28 @@ static int siwx917_sock_recv(struct net_context *context,
 			     net_context_recv_cb_t cb, int32_t timeout, void *user_data)
 {
 	struct net_if *iface = net_context_get_iface(context);
+	struct siwx917_dev *sidev = iface->if_dev->dev->data;
 	int sockfd = (int)context->offload_context;
-	struct net_pkt *pkt;
-	struct net_buf *buf;
-	struct sockaddr addr_le;
-	socklen_t addrlen;
 	int ret;
 
-	pkt = net_pkt_rx_alloc_on_iface(iface, K_MSEC(100));
-	if (!pkt)
-		return -ENOBUFS;
-	buf = net_buf_alloc(&siwx917_rx_pool, K_MSEC(100));
-	if (!buf) {
-		net_pkt_unref(pkt);
-		return -ENOBUFS;
-	}
-	net_pkt_append_buffer(pkt, buf);
-
-	ret = sl_si91x_recvfrom(sockfd, buf->data, NET_ETH_MTU, 0, &addr_le, &addrlen);
-	if (ret >= 0) {
-		net_buf_add(buf, ret);
-		net_pkt_cursor_init(pkt);
-		ret = 0;
+	ret = k_event_wait(&sidev->fds_recv_event, 1U << sockfd, false,
+			   timeout < 0 ? K_FOREVER : K_MSEC(timeout));
+	if (timeout == 0) {
+		sidev->fds_cb[sockfd].context = context;
+		sidev->fds_cb[sockfd].cb = cb;
+		sidev->fds_cb[sockfd].user_data = user_data;
 	} else {
-		net_pkt_unref(pkt);
-		ret = -errno;
+		memset(&sidev->fds_cb[sockfd], 0, sizeof(sidev->fds_cb[sockfd]));
 	}
-	if (cb)
-		cb(context, pkt, NULL, NULL, ret, user_data);
+
+	if (ret) {
+		k_event_clear(&sidev->fds_recv_event, 1U << sockfd);
+		ret = siwx917_sock_recv_sync(context, cb, user_data);
+		SL_SI91X_FD_SET(sockfd, &sidev->fds_watch);
+	}
+
+	sl_si91x_select(NUMBER_OF_BSD_SOCKETS, &sidev->fds_watch, NULL, NULL, NULL,
+			siwx917_sock_on_recv);
 	return ret;
 }
 
@@ -510,6 +599,7 @@ static void siwx917_iface_init(struct net_if *iface)
 	iface->if_dev->offload = &siwx917_offload;
 	sidev->state = WIFI_STATE_INTERFACE_DISABLED;
 	sidev->iface = iface;
+	k_event_init(&sidev->fds_recv_event);
 
 	sl_wifi_set_scan_callback(siwx917_on_scan, sidev);
 	sl_wifi_set_join_callback(siwx917_on_join, sidev);
