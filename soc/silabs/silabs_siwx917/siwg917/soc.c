@@ -35,6 +35,18 @@ int silabs_siwx917_init(void)
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(uart2), okay)
 	RSI_CLK_UsartClkConfig(M4CLK, ENABLE_STATIC_CLK, 0, USART2, 0, 1);
 #endif
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(i2c0), okay)
+	RSI_PS_M4ssPeriPowerUp(M4SS_PWRGATE_ULP_EFUSE_PERI);
+	RSI_CLK_I2CClkConfig(M4CLK, true, 0);
+#endif
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(i2c1), okay)
+	RSI_PS_M4ssPeriPowerUp(M4SS_PWRGATE_ULP_EFUSE_PERI);
+	RSI_CLK_I2CClkConfig(M4CLK, true, 1);
+#endif
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(ulpi2c), okay)
+	RSI_PS_UlpssPeriPowerUp(ULPSS_PWRGATE_ULP_I2C);
+	RSI_ULPSS_PeripheralEnable(ULPCLK, ULP_I2C_CLK, ENABLE_STATIC_CLK);
+#endif
 
 	return 0;
 }
