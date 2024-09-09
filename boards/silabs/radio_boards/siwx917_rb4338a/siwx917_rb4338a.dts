@@ -9,6 +9,7 @@
 #include <dt-bindings/gpio/gpio.h>
 #include <dt-bindings/input/input-event-codes.h>
 #include <dt-bindings/pinctrl/silabs/siwx917-pinctrl.h>
+#include <common/freq.h>
 
 / {
 	model = "Silicon Labs BRD4338A (SiWG917 Radio Board)";
@@ -58,6 +59,19 @@
 	pinctrl-names = "default";
 };
 
+&ulpi2c {
+	status = "disabled";
+	pinctrl-0 = <&ulpi2c_default>;
+	pinctrl-names = "default";
+	clock-frequency = <DT_FREQ_K(100)>;
+
+	si7021: si7021@40 {
+		compatible = "silabs,si7006";
+		reg = <0x40>;
+		status = "disabled";
+	};
+};
+
 &pinctrl0 {
 	ulpuart0_default: ulpuart0_default {
 		out {
@@ -65,6 +79,11 @@
 		};
 		in {
 			pinmux = <ULPUART_RX_ULP9>;
+		};
+	};
+	ulpi2c_default: ulpi2c_default {
+		group {
+			pinmux = <ULPI2C_SDA_ULP6>, <ULPI2C_SCL_ULP7>;
 		};
 	};
 };

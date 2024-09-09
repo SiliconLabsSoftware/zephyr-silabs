@@ -167,6 +167,36 @@
 			ngpios = <5>;
 			status = "okay";
 		};
+
+		i2c0: i2c@44010000 {
+			compatible = "snps,designware-i2c";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x44010000 0x100>;
+			interrupts = <42 0>;
+			interrupt-names = "i2c0";
+			status = "disabled";
+		};
+
+		i2c1: i2c@47040000 {
+			compatible = "snps,designware-i2c";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x47040000 0x100>;
+			interrupts = <61 0>;
+			interrupt-names = "i2c1";
+			status = "disabled";
+		};
+
+		ulpi2c: i2c@24040000 {
+			compatible = "snps,designware-i2c";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x24040000 0x100>;
+			interrupts = <13 0>;
+			interrupt-names = "i2c2";
+			status = "disabled";
+		};
 	};
 };
 
