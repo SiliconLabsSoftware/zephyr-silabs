@@ -15,7 +15,7 @@ manifest:
       path: modules/hal/silabs
     - name: zephyr
       remote: zephyrproject-rtos
-      revision: 7cf124b4a96414dcf72eb564e700e8d3a895f222
+      revision: 9d9089edd09919c90c4224222fc2c560410e6c85
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
