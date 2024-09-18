@@ -3,3 +3,15 @@
 
 config SOC_SERIES_SIWG917
 	select SOC_FAMILY_SILABS_SIWX917
+
+choice SIWX917_FLASH_MODE
+	bool "Flash Mode"
+	default SIWX917_FLASH_MODE_COMMON
+
+config SIWX917_FLASH_MODE_COMMON
+	bool "Common Flash"
+
+config SIWX917_FLASH_MODE_DUAL
+	bool "Dual Flash"
+
+endchoice
