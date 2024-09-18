@@ -40,10 +40,7 @@ jobs:
       working-directory: zephyr-silabs
       run: |
         export ZEPHYR_BASE="$(dirname "$(pwd)")/zephyr"
-        # FIXME: We should be able to run KconfigHWMv2, but right now it doesn't seem
-        # to handle our soc directory correctly.
-        $ZEPHYR_BASE/scripts/ci/check_compliance.py --annotate -e Kconfig -e KconfigBasic \
-        -e KconfigHWMv2 -e KconfigBasicNoModules -c origin/${GITHUB_BASE_REF}..
+        $ZEPHYR_BASE/scripts/ci/check_compliance.py --annotate -c origin/${GITHUB_BASE_REF}..
 
     - name: upload-results
       uses: actions/upload-artifact@v3
