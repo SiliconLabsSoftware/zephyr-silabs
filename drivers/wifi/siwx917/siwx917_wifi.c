@@ -41,6 +41,33 @@ struct siwx917_dev {
 NET_BUF_POOL_FIXED_DEFINE(siwx917_tx_pool, 1, NET_ETH_MTU, 0, NULL);
 NET_BUF_POOL_FIXED_DEFINE(siwx917_rx_pool, 10, NET_ETH_MTU, 0, NULL);
 
+/* SiWx917 does not use the standard struct sockaddr (despite it uses the same
+ * name):
+ *   - uses Little Endian for port number while Posix uses big endian
+ *   - IPv6 addresses are bytes swapped
+ * Note: this function allows to have in == out.
+ */
+static void siwx917_sockaddr_swap_bytes(struct sockaddr *out,
+					const struct sockaddr *in, socklen_t in_len)
+{
+	const struct sockaddr_in6 *in6 = (const struct sockaddr_in6 *)in;
+	struct sockaddr_in6 *out6 = (struct sockaddr_in6 *)out;
+	int i;
+
+	/* In Zephyr, size of sockaddr == size of sockaddr_storage
+	 * (while in Posix sockaddr is smaller than sockaddr_storage).
+	 */
+	memcpy(out, in, in_len);
+	if (in->sa_family == AF_INET6) {
+		for (i = 0; i < ARRAY_SIZE(in6->sin6_addr.s6_addr32); i++) {
+			out6->sin6_addr.s6_addr32[i] = ntohl(in6->sin6_addr.s6_addr32[i]);
+		}
+		out6->sin6_port = ntohs(in6->sin6_port);
+	} else if (in->sa_family == AF_INET) {
+		out6->sin6_port = ntohs(in6->sin6_port);
+	}
+}
+
 static void siwx917_on_join_ipv4(struct siwx917_dev *sidev)
 {
 #ifdef CONFIG_NET_IPV4
@@ -71,12 +98,18 @@ static void siwx917_on_join_ipv6(struct siwx917_dev *sidev)
 		.type = SL_IPV6,
 	};
 	struct in6_addr addr6 = { };
-	int ret;
+	int ret, i;
 
 	/* FIXME: support for static IP configuration */
 	ret = sl_si91x_configure_ip_address(&ip_config6, SL_SI91X_WIFI_CLIENT_VAP_ID);
 	if (!ret) {
-		memcpy(addr6.s6_addr, ip_config6.ip.v6.global_address.bytes, sizeof(addr6.s6_addr));
+		for (i = 0; i < ARRAY_SIZE(addr6.s6_addr32); i++) {
+			addr6.s6_addr32[i] = ntohl(ip_config6.ip.v6.global_address.value[i]);
+		}
+		/* SiWx917 already take care of DAD and sending ND is not
+		 * supported anyway.
+		 */
+		net_if_flag_set(sidev->iface, NET_IF_IPV6_NO_ND);
 		/* FIXME: also report gateway and link local address */
 		net_if_ipv6_addr_add(sidev->iface, &addr6, NET_ADDR_AUTOCONF, 0);
 	} else {
@@ -287,17 +320,6 @@ static int siwx917_status(const struct device *dev, struct wifi_iface_status *st
 	return 0;
 }
 
-/* SiWx917 uses Little Endian for port number while Posix uses Big Endian */
-static void siwx917_sock_swap_port_endian(struct sockaddr *out,
-					  const struct sockaddr *in, socklen_t in_len)
-{
-	/* In Zephyr, size of sockaddr == size of sockaddr_storage
-	 * (while in Posix sockaddr is smaller than sockaddr_storage).
-	 */
-	memcpy(out, in, in_len);
-	((struct sockaddr_in *)out)->sin_port = ntohs(((struct sockaddr_in *)in)->sin_port);
-}
-
 static int siwx917_sock_recv_sync(struct net_context *context,
 				  net_context_recv_cb_t cb, void *user_data)
 {
@@ -403,7 +425,7 @@ static int siwx917_sock_bind(struct net_context *context,
 	    !((struct sockaddr_in *)addr)->sin_port) {
 		return 0;
 	}
-	siwx917_sock_swap_port_endian(&addr_le, addr, addrlen);
+	siwx917_sockaddr_swap_bytes(&addr_le, addr, addrlen);
 	ret = sl_si91x_bind(sockfd, &addr_le, addrlen);
 	if (ret) {
 		return -errno;
@@ -426,8 +448,9 @@ static int siwx917_sock_connect(struct net_context *context,
 	struct sockaddr addr_le;
 	int ret;
 
+	printk("foo\n");
 	/* sl_si91x_connect() always return immediately, so we ignore timeout */
-	siwx917_sock_swap_port_endian(&addr_le, addr, addrlen);
+	siwx917_sockaddr_swap_bytes(&addr_le, addr, addrlen);
 	ret = sl_si91x_connect(sockfd, &addr_le, addrlen);
 	if (ret) {
 		ret = -errno;
@@ -486,7 +509,7 @@ static int siwx917_sock_accept(struct net_context *context,
 	}
 	newcontext->flags |= NET_CONTEXT_REMOTE_ADDR_SET;
 	newcontext->offload_context = (void *)ret;
-	siwx917_sock_swap_port_endian(&newcontext->remote, &addr_le, sizeof(addr_le));
+	siwx917_sockaddr_swap_bytes(&newcontext->remote, &addr_le, sizeof(addr_le));
 
 	SL_SI91X_FD_SET(ret, &sidev->fds_watch);
 	sl_si91x_select(NUMBER_OF_BSD_SOCKETS, &sidev->fds_watch, NULL, NULL, NULL,
@@ -528,7 +551,7 @@ static int siwx917_sock_sendto(struct net_pkt *pkt,
 	net_buf_add(buf, net_pkt_get_len(pkt));
 
 	/* sl_si91x_sendto() always return immediately, so we ignore timeout */
-	siwx917_sock_swap_port_endian(&addr_le, addr, addrlen);
+	siwx917_sockaddr_swap_bytes(&addr_le, addr, addrlen);
 	ret = sl_si91x_sendto(sockfd, buf->data, net_pkt_get_len(pkt), 0, &addr_le, addrlen);
 	if (ret < 0) {
 		ret = -errno;
