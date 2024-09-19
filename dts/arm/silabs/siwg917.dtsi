@@ -24,6 +24,11 @@
 		reg = <0x00000000 DT_SIZE_K(191)>;
 	};
 
+	bt_hci_silabs_siwx917: bt_hci_silabs_siwx917 {
+		compatible = "silabs,bt-hci-siwx917";
+		status = "disabled";
+	};
+
 	flash0: flash@8202000 {
 		compatible = "soc-nv-flash";
 		reg = <0x8202000 DT_SIZE_K(2040)>;
