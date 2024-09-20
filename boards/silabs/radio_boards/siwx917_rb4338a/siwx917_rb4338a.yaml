@@ -11,4 +11,5 @@ toolchain:
 supported:
   - gpio
   - i2c
+  - wifi
 vendor: silabs
