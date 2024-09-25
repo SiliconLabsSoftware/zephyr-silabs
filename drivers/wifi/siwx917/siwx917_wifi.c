@@ -458,6 +458,7 @@ static int siwx917_sock_connect(struct net_context *context,
 	SL_SI91X_FD_SET(sockfd, &sidev->fds_watch);
 	sl_si91x_select(NUMBER_OF_BSD_SOCKETS, &sidev->fds_watch, NULL, NULL, NULL,
 			siwx917_sock_on_recv);
+	net_context_set_state(context, NET_CONTEXT_CONNECTED);
 	if (cb) {
 		cb(context, ret, user_data);
 	}
@@ -473,6 +474,7 @@ static int siwx917_sock_listen(struct net_context *context, int backlog)
 	if (ret) {
 		return -errno;
 	}
+	net_context_set_state(context, NET_CONTEXT_LISTENING);
 	return 0;
 }
 
