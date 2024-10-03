@@ -11,9 +11,6 @@
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(bt_hci_driver_siwg917);
 
-#include "sl_wifi.h"
-#include "sl_wifi_callback_framework.h"
-#include "rsi_ble_common_config.h"
 #include "rsi_ble.h"
 
 static void bt_siwg917_resp_rcvd(uint16_t status, rsi_ble_event_rcp_rcvd_info_t *resp_buf);
@@ -23,54 +20,11 @@ struct hci_data {
 	rsi_data_packet_t rsi_data_packet;
 };
 
-static const sl_wifi_device_configuration_t network_config = {
-	.boot_option = LOAD_NWP_FW,
-	.mac_address = NULL,
-	.band = SL_SI91X_WIFI_BAND_2_4GHZ,
-	.region_code = DEFAULT_REGION,
-	.boot_config = {
-		.oper_mode = SL_SI91X_CLIENT_MODE,
-		.coex_mode = SL_SI91X_BLE_MODE,
-		.feature_bit_map =
-			SL_SI91X_FEAT_SECURITY_OPEN |
-			SL_SI91X_FEAT_WPS_DISABLE,
-		.tcp_ip_feature_bit_map =
-			SL_SI91X_TCP_IP_FEAT_DHCPV4_CLIENT |
-			SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID,
-		.ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
-		.custom_feature_bit_map = SL_SI91X_CUSTOM_FEAT_EXTENSION_VALID,
-		.ext_custom_feature_bit_map =
-			MEMORY_CONFIG |
-			SL_SI91X_EXT_FEAT_XTAL_CLK |
-			SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0 |
-			SL_SI91X_EXT_FEAT_BT_CUSTOM_FEAT_ENABLE,
-		.config_feature_bit_map = SL_SI91X_ENABLE_ENHANCED_MAX_PSP,
-		.bt_feature_bit_map =
-			SL_SI91X_BT_RF_TYPE |
-			SL_SI91X_ENABLE_BLE_PROTOCOL,
-		.ble_feature_bit_map =
-			SL_SI91X_BLE_MAX_NBR_PERIPHERALS(RSI_BLE_MAX_NBR_PERIPHERALS) |
-			SL_SI91X_BLE_MAX_NBR_CENTRALS(RSI_BLE_MAX_NBR_CENTRALS) |
-			SL_SI91X_BLE_MAX_NBR_ATT_SERV(RSI_BLE_MAX_NBR_ATT_SERV) |
-			SL_SI91X_BLE_MAX_NBR_ATT_REC(RSI_BLE_MAX_NBR_ATT_REC) |
-			SL_SI91X_BLE_PWR_INX(RSI_BLE_PWR_INX) |
-			SL_SI91X_BLE_PWR_SAVE_OPTIONS(RSI_BLE_PWR_SAVE_OPTIONS) |
-			SL_SI91X_916_BLE_COMPATIBLE_FEAT_ENABLE |
-			SL_SI91X_FEAT_BLE_CUSTOM_FEAT_EXTENSION_VALID,
-		.ble_ext_feature_bit_map =
-			SL_SI91X_BLE_NUM_CONN_EVENTS(RSI_BLE_NUM_CONN_EVENTS) |
-			SL_SI91X_BLE_NUM_REC_BYTES(RSI_BLE_NUM_REC_BYTES) |
-			SL_SI91X_BLE_ENABLE_ADV_EXTN |
-			SL_SI91X_BLE_AE_MAX_ADV_SETS(RSI_BLE_AE_MAX_ADV_SETS),
-	}};
-
 static int bt_siwg917_open(const struct device *dev, bt_hci_recv_t recv)
 {
 	struct hci_data *hci = dev->data;
-
-	int status = sl_wifi_init(&network_config, NULL, sl_wifi_default_event_handler);
-	status |= rsi_ble_enhanced_gap_extended_register_callbacks(RSI_BLE_ON_RCP_EVENT,
-								   (void *)bt_siwg917_resp_rcvd);
+	int status = rsi_ble_enhanced_gap_extended_register_callbacks(RSI_BLE_ON_RCP_EVENT,
+								      (void *)bt_siwg917_resp_rcvd);
 
 	if (!status) {
 		hci->recv = recv;
@@ -162,6 +116,3 @@ static const struct bt_hci_driver_api drv = {
 
 /* Only one instance supported right now */
 HCI_DEVICE_INIT(0)
-
-/* IRQn 74 is used for communication with co-processor */
-Z_ISR_DECLARE(74, ISR_FLAG_DIRECT, IRQ074_Handler, 0);

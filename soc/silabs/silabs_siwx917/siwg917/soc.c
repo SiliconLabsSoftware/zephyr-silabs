@@ -53,19 +53,6 @@ int silabs_siwx917_init(void)
 }
 SYS_INIT(silabs_siwx917_init, PRE_KERNEL_1, 0);
 
-/* Co-processor will use value stored in IVT to store its stack.
- *
- * FIXME: We can't use Z_ISR_DECLARE() to declare this entry
- * FIXME: Allow to configure size of buffer
- */
-uint8_t __aligned(4) siwx917_coprocessor_stack[10 * 1024];
-static Z_DECL_ALIGN(struct _isr_list) Z_GENERIC_SECTION(.intList)
-	__used __isr_siwx917_coprocessor_stack_irq = {
-		.irq = 30,
-		.flags = ISR_FLAG_DIRECT,
-		.func = siwx917_coprocessor_stack + sizeof(siwx917_coprocessor_stack),
-	};
-
 /* SiWx917's bootloader requires IRQn 32 to hold payload's entry point address. */
 extern void z_arm_reset(void);
 Z_ISR_DECLARE(32, ISR_FLAG_DIRECT, z_arm_reset, 0);

@@ -620,7 +620,6 @@ static void siwx917_iface_init(struct net_if *iface)
 {
 	struct siwx917_dev *sidev = iface->if_dev->dev->data;
 	sl_mac_address_t mac_addr;
-	sl_status_t status;
 
 	iface->if_dev->offload = &siwx917_offload;
 	sidev->state = WIFI_STATE_INTERFACE_DISABLED;
@@ -631,12 +630,6 @@ static void siwx917_iface_init(struct net_if *iface)
 	sl_wifi_set_join_callback(siwx917_on_join, sidev);
 	sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
 	net_if_set_link_addr(iface, mac_addr.octet, sizeof(mac_addr.octet), NET_LINK_ETHERNET);
-
-	status = sl_net_init(SL_NET_WIFI_CLIENT_INTERFACE, NULL, NULL, NULL);
-	if (status) {
-		LOG_ERR("sl_net_init(): %#04x", status);
-		return;
-	}
 	sidev->state = WIFI_STATE_INACTIVE;
 }
 
@@ -666,6 +659,3 @@ static const struct net_wifi_mgmt_offload siwx917_api = {
 static struct siwx917_dev siwx917_dev;
 NET_DEVICE_DT_INST_OFFLOAD_DEFINE(0, siwx917_dev_init, NULL, &siwx917_dev, NULL,
 				  CONFIG_WIFI_INIT_PRIORITY, &siwx917_api, NET_ETH_MTU);
-
-/* IRQn 74 is used for communication with co-processor */
-Z_ISR_DECLARE(74, ISR_FLAG_DIRECT, IRQ074_Handler, 0);
