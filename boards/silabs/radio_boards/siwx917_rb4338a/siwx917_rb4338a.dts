@@ -17,7 +17,6 @@
 
 	chosen {
 		zephyr,sram = &sram0;
-		zephyr,flash = &flash0;
 		zephyr,console = &ulpuart0;
 		zephyr,shell-uart = &ulpuart0;
 		zephyr,bt-hci = &bt_hci_silabs_siwx917;
