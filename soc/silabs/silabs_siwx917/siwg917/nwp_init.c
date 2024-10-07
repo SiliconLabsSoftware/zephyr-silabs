@@ -43,7 +43,9 @@ static int silabs_siwx917_nwp_init(void)
 			.config_feature_bit_map = SL_SI91X_ENABLE_ENHANCED_MAX_PSP,
 			.custom_feature_bit_map = SL_SI91X_CUSTOM_FEAT_EXTENSION_VALID,
 			.ext_custom_feature_bit_map =
-				MEMORY_CONFIG | SL_SI91X_EXT_FEAT_XTAL_CLK |
+				MEMORY_CONFIG |
+				SL_SI91X_EXT_FEAT_XTAL_CLK |
+				SL_SI91X_EXT_FEAT_IEEE_80211W |
 				SL_SI91X_EXT_FEAT_FRONT_END_SWITCH_PINS_ULP_GPIO_4_5_0,
 		}};
 	sl_si91x_boot_configuration_t *cfg = &network_config.boot_config;
