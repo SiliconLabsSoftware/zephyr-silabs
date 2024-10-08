@@ -26,6 +26,7 @@ LOG_MODULE_REGISTER(siwx917_wifi);
 
 struct siwx917_dev {
 	struct net_if *iface;
+	sl_mac_address_t macaddr;
 	enum wifi_iface_state state;
 	scan_result_cb_t scan_res_cb;
 
@@ -621,7 +622,6 @@ static struct net_offload siwx917_offload = {
 static void siwx917_iface_init(struct net_if *iface)
 {
 	struct siwx917_dev *sidev = iface->if_dev->dev->data;
-	sl_mac_address_t mac_addr;
 
 	iface->if_dev->offload = &siwx917_offload;
 	sidev->state = WIFI_STATE_INTERFACE_DISABLED;
@@ -630,8 +630,15 @@ static void siwx917_iface_init(struct net_if *iface)
 
 	sl_wifi_set_scan_callback(siwx917_on_scan, sidev);
 	sl_wifi_set_join_callback(siwx917_on_join, sidev);
-	sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &mac_addr);
-	net_if_set_link_addr(iface, mac_addr.octet, sizeof(mac_addr.octet), NET_LINK_ETHERNET);
+
+	status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &sidev->macaddr);
+	if (status) {
+		LOG_ERR("sl_wifi_get_mac_address(): %#04x", status);
+		return;
+	}
+	net_if_set_link_addr(iface, sidev->macaddr.octet, sizeof(sidev->macaddr.octet),
+			     NET_LINK_ETHERNET);
+
 	sidev->state = WIFI_STATE_INACTIVE;
 }
 
