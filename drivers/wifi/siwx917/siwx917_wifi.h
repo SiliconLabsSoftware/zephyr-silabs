@@ -20,6 +20,7 @@ struct siwx917_dev {
 	enum wifi_iface_state state;
 	scan_result_cb_t scan_res_cb;
 
+#ifdef CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
 	struct k_event fds_recv_event;
 	sl_si91x_fd_set fds_watch;
 	struct {
@@ -27,6 +28,7 @@ struct siwx917_dev {
 		void *user_data;
 		struct net_context *context;
 	} fds_cb[NUMBER_OF_BSD_SOCKETS];
+#endif
 };
 
 #endif
