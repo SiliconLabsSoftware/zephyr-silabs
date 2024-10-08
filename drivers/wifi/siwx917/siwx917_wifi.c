@@ -10,6 +10,7 @@
 #include "siwx917_wifi.h"
 #include "siwx917_wifi_socket.h"
 
+#include "sl_rsi_utility.h"
 #include "sl_net_constants.h"
 #include "sl_wifi_types.h"
 #include "sl_wifi_callback_framework.h"
@@ -17,6 +18,8 @@
 #include "sl_net.h"
 
 LOG_MODULE_REGISTER(siwx917_wifi);
+
+NET_BUF_POOL_FIXED_DEFINE(siwx917_tx_pool, 1, NET_ETH_MTU, 0, NULL);
 
 static unsigned int siwx917_on_join(sl_wifi_event_t event,
 				    char *result, uint32_t result_size, void *arg)
@@ -32,6 +35,9 @@ static unsigned int siwx917_on_join(sl_wifi_event_t event,
 
 	wifi_mgmt_raise_connect_result_event(sidev->iface, WIFI_STATUS_CONN_SUCCESS);
 	sidev->state = WIFI_STATE_COMPLETED;
+#ifndef CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
+	net_eth_carrier_on(sidev->iface);
+#endif
 
 	siwx917_on_join_ipv4(sidev);
 	siwx917_on_join_ipv6(sidev);
@@ -124,6 +130,9 @@ static int siwx917_disconnect(const struct device *dev)
 	if (ret) {
 		return -EIO;
 	}
+#ifndef CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
+	net_eth_carrier_off(sidev->iface);
+#endif
 	sidev->state = WIFI_STATE_INACTIVE;
 	return 0;
 }
@@ -220,6 +229,83 @@ static int siwx917_status(const struct device *dev, struct wifi_iface_status *st
 	return 0;
 }
 
+#ifndef CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
+
+static int siwx917_send(const struct device *dev, struct net_pkt *pkt)
+{
+	size_t pkt_len = net_pkt_get_len(pkt);
+	struct net_buf *buf = NULL;
+	int ret;
+
+	if (net_pkt_get_len(pkt) > NET_ETH_MTU) {
+		LOG_ERR("unexpected buffer size");
+		return -ENOBUFS;
+	}
+	buf = net_buf_alloc(&siwx917_tx_pool, K_FOREVER);
+	if (!buf) {
+		return -ENOBUFS;
+	}
+	if (net_pkt_read(pkt, buf->data, pkt_len)) {
+		net_buf_unref(buf);
+		return -ENOBUFS;
+	}
+	net_buf_add(buf, pkt_len);
+
+	ret = sl_wifi_send_raw_data_frame(SL_WIFI_CLIENT_INTERFACE, buf->data, pkt_len);
+	if (ret) {
+		return -EIO;
+	}
+
+	net_pkt_unref(pkt);
+	net_buf_unref(buf);
+
+	return 0;
+}
+
+/* Receive callback. Keep the name as it is declared weak in WiseConnect */
+sl_status_t sl_si91x_host_process_data_frame(sl_wifi_interface_t interface,
+					     sl_wifi_buffer_t *buffer)
+{
+	sl_si91x_packet_t *si_pkt = sl_si91x_host_get_buffer_data(buffer, 0, NULL);
+	struct net_if *iface = net_if_get_default();
+	struct net_pkt *pkt;
+	int ret;
+
+	pkt = net_pkt_rx_alloc_with_buffer(iface, buffer->length, AF_UNSPEC, 0, K_NO_WAIT);
+	if (!pkt) {
+		LOG_ERR("net_pkt_rx_alloc_with_buffer() failed");
+		return SL_STATUS_FAIL;
+	}
+	ret = net_pkt_write(pkt, si_pkt->data, si_pkt->length);
+	if (ret < 0) {
+		LOG_ERR("net_pkt_write(): %d", ret);
+		goto unref;
+	}
+	ret = net_recv_data(iface, pkt);
+	if (ret < 0) {
+		LOG_ERR("net_recv_data((): %d", ret);
+		goto unref;
+	}
+	return 0;
+
+unref:
+	net_pkt_unref(pkt);
+	return SL_STATUS_FAIL;
+}
+
+#endif
+
+static void siwx917_ethernet_init(struct net_if *iface)
+{
+#ifndef CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
+	struct ethernet_context *eth_ctx;
+
+	eth_ctx = net_if_l2_data(iface);
+	eth_ctx->eth_if_type = L2_ETH_IF_TYPE_WIFI;
+	ethernet_init(iface);
+#endif
+}
+
 static void siwx917_iface_init(struct net_if *iface)
 {
 	struct siwx917_dev *sidev = iface->if_dev->dev->data;
@@ -228,7 +314,6 @@ static void siwx917_iface_init(struct net_if *iface)
 	sidev->state = WIFI_STATE_INTERFACE_DISABLED;
 	sidev->iface = iface;
 
-	siwx917_sock_init(iface);
 	sl_wifi_set_scan_callback(siwx917_on_scan, sidev);
 	sl_wifi_set_join_callback(siwx917_on_join, sidev);
 
@@ -239,6 +324,8 @@ static void siwx917_iface_init(struct net_if *iface)
 	}
 	net_if_set_link_addr(iface, sidev->macaddr.octet, sizeof(sidev->macaddr.octet),
 			     NET_LINK_ETHERNET);
+	siwx917_sock_init(iface);
+	siwx917_ethernet_init(iface);
 
 	sidev->state = WIFI_STATE_INACTIVE;
 }
@@ -257,10 +344,19 @@ static const struct wifi_mgmt_ops siwx917_mgmt = {
 
 static const struct net_wifi_mgmt_offload siwx917_api = {
 	.wifi_iface.iface_api.init = siwx917_iface_init,
+#ifdef CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
 	.wifi_iface.get_type = siwx917_get_type,
+#else
+	.wifi_iface.send = siwx917_send,
+#endif
 	.wifi_mgmt_api = &siwx917_mgmt,
 };
 
 static struct siwx917_dev siwx917_dev;
+#ifdef CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
 NET_DEVICE_DT_INST_OFFLOAD_DEFINE(0, siwx917_dev_init, NULL, &siwx917_dev, NULL,
 				  CONFIG_WIFI_INIT_PRIORITY, &siwx917_api, NET_ETH_MTU);
+#else
+ETH_NET_DEVICE_DT_INST_DEFINE(0, siwx917_dev_init, NULL, &siwx917_dev, NULL,
+			      CONFIG_WIFI_INIT_PRIORITY, &siwx917_api, NET_ETH_MTU);
+#endif
