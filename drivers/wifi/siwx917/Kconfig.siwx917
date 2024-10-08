@@ -7,12 +7,30 @@ config WIFI_SIWX917
 	depends on DT_HAS_SILABS_SIWX917_WIFI_ENABLED
 	select WISECONNECT_NETWORK_STACK
 	select EVENTS
-	select WIFI_OFFLOAD
 	select NET_L2_WIFI_MGMT
 	help
 	  Enable WiFi driver for the Silabs SiWx917 SoC series.
 
 if WIFI_SIWX917
+
+choice
+	prompt "Network stack"
+	default WIFI_SIWX917_NET_STACK_NATIVE
+	help
+	  Choose "Native" stack if you want a better compatibility with Zephyr
+	  features. "Offloaded" stack may provide better resource (power and
+	  memory) consumption.
+
+config WIFI_SIWX917_NET_STACK_NATIVE
+	bool "Native"
+	select WIFI_USE_NATIVE_NETWORKING
+	select NET_L2_ETHERNET
+
+config WIFI_SIWX917_NET_STACK_OFFLOAD
+	bool "Offloaded"
+	select WIFI_OFFLOAD
+
+endchoice
 
 config NET_TCP_WORKQ_STACK_SIZE
 	default 2048
