@@ -59,7 +59,6 @@ static void siwx917_sockaddr_swap_bytes(struct sockaddr *out,
 
 void siwx917_on_join_ipv4(struct siwx917_dev *sidev)
 {
-#ifdef CONFIG_NET_IPV4
 	sl_net_ip_configuration_t ip_config4 = {
 		.mode = SL_IP_MANAGEMENT_DHCP,
 		.type = SL_IPV4,
@@ -67,6 +66,9 @@ void siwx917_on_join_ipv4(struct siwx917_dev *sidev)
 	struct in_addr addr4 = { };
 	int ret;
 
+	if (!IS_ENABLED(CONFIG_NET_IPV4)) {
+		return;
+	}
 	/* FIXME: support for static IP configuration */
 	ret = sl_si91x_configure_ip_address(&ip_config4, SL_SI91X_WIFI_CLIENT_VAP_ID);
 	if (!ret) {
@@ -76,12 +78,10 @@ void siwx917_on_join_ipv4(struct siwx917_dev *sidev)
 	} else {
 		LOG_ERR("sl_si91x_configure_ip_address(): %#04x", ret);
 	}
-#endif
 }
 
 void siwx917_on_join_ipv6(struct siwx917_dev *sidev)
 {
-#ifdef CONFIG_NET_IPV6
 	sl_net_ip_configuration_t ip_config6 = {
 		.mode = SL_IP_MANAGEMENT_DHCP,
 		.type = SL_IPV6,
@@ -89,6 +89,9 @@ void siwx917_on_join_ipv6(struct siwx917_dev *sidev)
 	struct in6_addr addr6 = { };
 	int ret, i;
 
+	if (!IS_ENABLED(CONFIG_NET_IPV6)) {
+		return;
+	}
 	/* FIXME: support for static IP configuration */
 	ret = sl_si91x_configure_ip_address(&ip_config6, SL_SI91X_WIFI_CLIENT_VAP_ID);
 	if (!ret) {
@@ -104,7 +107,6 @@ void siwx917_on_join_ipv6(struct siwx917_dev *sidev)
 	} else {
 		LOG_ERR("sl_si91x_configure_ip_address(): %#04x", ret);
 	}
-#endif
 }
 
 static int siwx917_sock_recv_sync(struct net_context *context,
