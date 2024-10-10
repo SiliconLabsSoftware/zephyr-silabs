@@ -1,0 +1,8 @@
+sample:
+  description: Present basic features of the Silicon Labs Radio Library (RAIL).
+  name: Silabs Rail sample app
+tests:
+  sample.rail.simple_txrx:
+    platform_allow:
+      - sltb010a@2
+      - xg24_dk2601b

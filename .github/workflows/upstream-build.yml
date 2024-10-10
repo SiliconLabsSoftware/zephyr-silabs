@@ -59,3 +59,4 @@ jobs:
           west twister -T ../zephyr/samples -s sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
           west twister -T ../zephyr/samples -s sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
           west twister -T ../zephyr/samples -s sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
+          west twister -T samples           -s sample.rail.simple_txrx -v --inline-logs $EXTRA_TWISTER_FLAGS
