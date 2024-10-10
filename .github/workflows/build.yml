@@ -50,3 +50,4 @@ jobs:
         west twister --test sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
         west twister --test sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
         west twister --test sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
+        west twister --test sample.rail.simple_txrx -T samples -v --inline-logs $EXTRA_TWISTER_FLAGS
