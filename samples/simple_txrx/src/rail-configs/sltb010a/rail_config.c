@@ -59,11 +59,13 @@ static const uint8_t irCalConfig[] = {25, 63, 1, 6, 4,  16, 1, 0, 0, 1, 1, 6, 0,
 static const int32_t timingConfig[] = {0, 0, 0};
 
 static const uint8_t hfxoRetimingConfigEntries[] = {
-	2, 0, 0,    0,    0x00, 0xf0, 0x49, 0x02, 6,    20,   0, 0, 0x00, 0xe0, 0x93, 0x04, 5, 56,
-	0, 0, 0xa0, 0x08, 0,    0,    0,    0,    0x58, 0x09, 1, 4, 7,    6,    0x10, 0x0a, 1, 4,
-	7, 7, 0xc8, 0x0a, 0,    4,    8,    7,    0x80, 0x0b, 0, 4, 8,    8,    0x38, 0x0c, 0, 4,
-	9, 8, 0x61, 0x08, 0,    0,    0,    0,    0x68, 0x08, 0, 0, 0,    0,    0xc7, 0x09, 1, 4,
-	4, 3, 0x2c, 0x0b, 1,    4,    4,    4,    0x92, 0x0c, 1, 4, 5,    4};
+	   2,    0,    0,    0, 0x00, 0xf0, 0x49, 0x02,    6,   20,    0,    0, 0x00, 0xe0, 0x93,
+	0x04,    5,   56,    0,    0, 0xa0, 0x08,    0,    0,    0,    0, 0x58, 0x09,    1,    4,
+	   7,    6, 0x10, 0x0a,    1,    4,    7,    7, 0xc8, 0x0a,    0,    4,    8,    7, 0x80,
+	0x0b,    0,    4,    8,    8, 0x38, 0x0c,    0,    4,    9,    8, 0x61, 0x08,    0,    0,
+	   0,    0, 0x68, 0x08,    0,    0,    0,    0, 0xc7, 0x09,    1,    4,    4,    3, 0x2c,
+	0x0b,    1,    4,    4,    4, 0x92, 0x0c,    1,    4,    5,    4
+};
 
 static RAIL_ChannelConfigEntryAttr_t channelConfigEntryAttr = {
 #if RAIL_SUPPORTS_OFDM_PA
