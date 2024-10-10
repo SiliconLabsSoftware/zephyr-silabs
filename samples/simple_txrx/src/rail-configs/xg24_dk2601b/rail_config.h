@@ -47,6 +47,6 @@ extern uint32_t protocolAccelerationBuffer[];
 extern const RAIL_ChannelConfig_t *channelConfigs[];
 
 #ifdef RADIO_CONFIG_ENABLE_STACK_INFO
-#endif // RADIO_CONFIG_ENABLE_STACK_INFO
+#endif
 
-#endif // __RAIL_CONFIG_H__
+#endif
