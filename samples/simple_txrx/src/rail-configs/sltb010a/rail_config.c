@@ -68,14 +68,14 @@ static const uint8_t hfxoRetimingConfigEntries[] = {
 static RAIL_ChannelConfigEntryAttr_t channelConfigEntryAttr = {
 #if RAIL_SUPPORTS_OFDM_PA
 	{{0xFFFFFFFFUL}, {0xFFFFFFFFUL, 0xFFFFFFFFUL}}
-#else  // RAIL_SUPPORTS_OFDM_PA
+#else
 	{0xFFFFFFFFUL},
-#endif // RAIL_SUPPORTS_OFDM_PA
+#endif
 };
 
 static const uint32_t phyInfo[] = {
 	13UL,
-	0x00924924UL, // 146.28571428571428
+	0x00924924UL, /* 146.28571428571428 */
 	(uint32_t)NULL,
 	(uint32_t)irCalConfig,
 	(uint32_t)timingConfig,
@@ -328,6 +328,6 @@ const RAIL_ChannelConfig_t Protocol_Configuration_channelConfig = {
 const RAIL_ChannelConfig_t *channelConfigs[] = {&Protocol_Configuration_channelConfig, NULL};
 
 #ifdef RADIO_CONFIG_ENABLE_STACK_INFO
-#endif // RADIO_CONFIG_ENABLE_STACK_INFO
+#endif
 
 uint32_t protocolAccelerationBuffer[303];
