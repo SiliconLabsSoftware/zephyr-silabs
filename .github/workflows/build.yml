@@ -3,10 +3,10 @@ name: Build
 on:
   pull_request:
     types:
-    - edited
-    - opened
-    - reopened
-    - synchronize
+      - edited
+      - opened
+      - reopened
+      - synchronize
 
 jobs:
   build:
@@ -16,34 +16,34 @@ jobs:
         os: [ubuntu-22.04, macos-14, windows-2022]
     runs-on: ${{ matrix.os }}
     steps:
-    - name: Checkout
-      uses: actions/checkout@v4
-      with:
-        path: zephyr-silabs
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: zephyr-silabs
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.11
 
-    - name: Setup Zephyr project
-      uses: zephyrproject-rtos/action-zephyr-setup@v1
-      with:
-        app-path: zephyr-silabs
-        toolchains: arm-zephyr-eabi
+      - name: Setup Zephyr project
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          app-path: zephyr-silabs
+          toolchains: arm-zephyr-eabi
 
-    - name: Fetch blobs
-      run: |
-        west blobs fetch hal_silabs
+      - name: Fetch blobs
+        run: |
+          west blobs fetch hal_silabs
 
-    - name: Build hello world
-      working-directory: zephyr-silabs
-      shell: bash
-      run: |
-        if [ "${{ runner.os }}" = "Windows" ]; then
-          EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
-        fi
-        west twister --test sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
-        west twister --test sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
-        west twister --test sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
-        west twister --test sample.rail.simple_txrx -T samples -v --inline-logs $EXTRA_TWISTER_FLAGS
+      - name: Build hello world
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          if [ "${{ runner.os }}" = "Windows" ]; then
+            EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
+          fi
+          west twister --test sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
+          west twister --test sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
+          west twister --test sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
+          west twister --test sample.rail.simple_txrx -T samples -v --inline-logs $EXTRA_TWISTER_FLAGS
