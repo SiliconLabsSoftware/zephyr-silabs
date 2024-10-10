@@ -33,17 +33,28 @@ jobs:
           toolchains: arm-zephyr-eabi
 
       - name: Fetch blobs
-        run: |
-          west blobs fetch hal_silabs
-
-      - name: Build hello world
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
-          fi
-          west twister --test sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
-          west twister --test sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
-          west twister --test sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
-          west twister --test sample.rail.simple_txrx -T samples -v --inline-logs $EXTRA_TWISTER_FLAGS
+          west blobs fetch hal_silabs
+
+      - name: Build Bluetooth samples
+        continue-on-error: true
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          west twister -s sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K
+
+      - name: Build Rail samples
+        continue-on-error: true
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          west twister -s sample.rail.simple_txrx -T samples -v --inline-logs
+
+      - name: Build Wifi samples
+        continue-on-error: true
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          west twister -s sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K

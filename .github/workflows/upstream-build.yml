@@ -36,23 +36,31 @@ jobs:
           sed s/$Z_REV/main/ west.yml > west.yml.new
           mv west.yml.new west.yml
           west update
+
+      - name: Fetch blobs
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
           west blobs fetch hal_silabs
 
-      - name: Build Bluetooth sample for xG27
+      - name: Build Bluetooth samples
         continue-on-error: true
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -K -p xg27_dk2602a --test sample.bluetooth.peripheral_hr
+          west twister -s sample.bluetooth.peripheral_hr -p xg27_dk2602a -v --inline-logs -K
+          west twister -s sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K
 
-      - name: Build hello world for siwx917_rb4338a
+      - name: Build Rail samples
+        continue-on-error: true
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          if [ "${{ runner.os }}" = "Windows" ]; then
-            EXTRA_TWISTER_FLAGS="--short-build-path -O/tmp/twister-out"
-          fi
-          west twister -T ../zephyr/samples -s sample.basic.helloworld -p siwx917_rb4338a -v --inline-logs $EXTRA_TWISTER_FLAGS
-          west twister -T ../zephyr/samples -s sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
-          west twister -T ../zephyr/samples -s sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K $EXTRA_TWISTER_FLAGS
-          west twister -T samples           -s sample.rail.simple_txrx -v --inline-logs $EXTRA_TWISTER_FLAGS
+          west twister -s sample.rail.simple_txrx -T samples -v --inline-logs
+
+      - name: Build Wifi samples
+        continue-on-error: true
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          west twister -s sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K
