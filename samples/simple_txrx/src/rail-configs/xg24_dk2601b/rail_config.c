@@ -72,21 +72,21 @@ static RAIL_ChannelConfigEntryAttr_t channelConfigEntryAttr = {
     { 0xFFFFFFFFUL, 0xFFFFFFFFUL, },
 #else
     { 0xFFFFFFFFUL },
-#endif // RADIO_CONFIG_ENABLE_IRCAL_MULTIPLE_RF_PATHS
+#endif
     { 0xFFFFFFFFUL, 0xFFFFFFFFUL }
   }
-#else // RAIL_SUPPORTS_OFDM_PA
+#else
 #ifdef RADIO_CONFIG_ENABLE_IRCAL_MULTIPLE_RF_PATHS
   { 0xFFFFFFFFUL, 0xFFFFFFFFUL, },
 #else
   { 0xFFFFFFFFUL },
-#endif // RADIO_CONFIG_ENABLE_IRCAL_MULTIPLE_RF_PATHS
-#endif // RAIL_SUPPORTS_OFDM_PA
+#endif
+#endif
 };
 
 static const uint32_t phyInfo[] = {
   13UL,
-  0x00444444UL, // 68.26666666666667
+  0x00444444UL, /* 68.26666666666667 */
   (uint32_t) NULL,
   (uint32_t) irCalConfig,
   (uint32_t) timingConfig,
@@ -361,6 +361,6 @@ const RAIL_ChannelConfig_t *channelConfigs[] = {
 
 
 #ifdef RADIO_CONFIG_ENABLE_STACK_INFO
-#endif // RADIO_CONFIG_ENABLE_STACK_INFO
+#endif
 
 uint32_t protocolAccelerationBuffer[435];
