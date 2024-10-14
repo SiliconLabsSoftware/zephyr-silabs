@@ -36,6 +36,10 @@ jobs:
       run: |
         pip3 install crc
 
+    - name: Fetch blobs
+      run: |
+        west blobs fetch hal_silabs
+
     - name: Build hello world
       working-directory: zephyr-silabs
       shell: bash
