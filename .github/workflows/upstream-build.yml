@@ -42,6 +42,15 @@ jobs:
           west update
           west blobs fetch hal_silabs
 
+      - name: Install Silabs Simplicity Commander
+        run: |
+          wget https://www.silabs.com/documents/login/software/SimplicityCommander-Linux.zip
+          unzip SimplicityCommander-Linux.zip
+          mkdir -p /opt/commander
+          tar -C /opt -xvf SimplicityCommander-Linux/Commander_linux_${ARCH}_*.tar.bz
+          chmod a+r -R /opt/commander/
+          ln -sfn /opt/commander/commander /usr/local/bin/
+
       - name: Build Bluetooth sample for xG27
         continue-on-error: true
         working-directory: zephyr-silabs
