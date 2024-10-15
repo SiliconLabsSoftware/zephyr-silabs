@@ -32,10 +32,6 @@ jobs:
         app-path: zephyr-silabs
         toolchains: arm-zephyr-eabi
 
-    - name: Install Silabs-specific python dependencies
-      run: |
-        pip3 install crc
-
     - name: Fetch blobs
       run: |
         west blobs fetch hal_silabs
