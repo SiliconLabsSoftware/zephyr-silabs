@@ -9,6 +9,10 @@
 #include <zephyr/dt-bindings/spi/spi.h>
 
 / {
+	chosen {
+		zephyr,entropy = &rng0;
+	};
+
 	cpus {
 		#address-cells = <1>;
 		#size-cells = <0>;
@@ -201,6 +205,11 @@
 			interrupts = <13 0>;
 			interrupt-names = "i2c2";
 			status = "disabled";
+		};
+
+		rng0: rng@45090000 {
+			compatible = "silabs,siwx917-rng";
+			reg = <0x45090000 0x8>;
 		};
 	};
 };
