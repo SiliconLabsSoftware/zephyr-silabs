@@ -1,0 +1,12 @@
+# Copyright (c) 2024 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+description: Hardware Random Number Generator embedded on Silabs SiWx917 chips
+
+compatible: "silabs,siwx917-rng"
+
+include: base.yaml
+
+properties:
+  reg:
+    required: true
