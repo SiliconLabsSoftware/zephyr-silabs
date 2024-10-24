@@ -3,6 +3,7 @@
 
 add_subdirectory(bluetooth)
 add_subdirectory(entropy)
+add_subdirectory(flash)
 add_subdirectory(gpio)
 add_subdirectory(pinctrl)
 add_subdirectory(wifi)

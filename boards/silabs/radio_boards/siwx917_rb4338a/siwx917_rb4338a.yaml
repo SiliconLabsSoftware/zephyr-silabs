@@ -13,4 +13,5 @@ supported:
   - i2c
   - wifi
   - bluetooth
+  - flash
 vendor: silabs
