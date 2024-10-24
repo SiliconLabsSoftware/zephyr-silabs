@@ -18,16 +18,6 @@
 #include "rsi_ble_common_config.h"
 #endif
 
-#if defined(CONFIG_WIFI_SIWX917) && defined(CONFIG_BT_SIWX917)
-#define NWP_INIT_COEX_MODE SL_SI91X_WLAN_BLE_MODE
-#elif defined(CONFIG_WIFI_SIWX917)
-#define NWP_INIT_COEX_MODE SL_SI91X_WLAN_ONLY_MODE
-#elif defined(CONFIG_BT_SIWX917)
-#define NWP_INIT_COEX_MODE SL_SI91X_BLE_MODE
-#else
-#error "Not supported configuration!"
-#endif
-
 static int silabs_siwx917_nwp_init(void)
 {
 	sl_wifi_device_configuration_t network_config = {
@@ -36,7 +26,6 @@ static int silabs_siwx917_nwp_init(void)
 		.region_code = DEFAULT_REGION,
 		.boot_config = {
 			.oper_mode = SL_SI91X_CLIENT_MODE,
-			.coex_mode = NWP_INIT_COEX_MODE,
 			.tcp_ip_feature_bit_map = SL_SI91X_TCP_IP_FEAT_EXTENSION_VALID,
 			.ext_tcp_ip_feature_bit_map = SL_SI91X_CONFIG_FEAT_EXTENSION_VALID,
 			.config_feature_bit_map = SL_SI91X_ENABLE_ENHANCED_MAX_PSP,
@@ -48,6 +37,19 @@ static int silabs_siwx917_nwp_init(void)
 		}
 	};
 	sl_si91x_boot_configuration_t *cfg = &network_config.boot_config;
+
+	if (IS_ENABLED(CONFIG_WIFI_SIWX917) && IS_ENABLED(CONFIG_BT_SIWX917)) {
+		cfg->coex_mode = SL_SI91X_WLAN_BLE_MODE;
+	} else if (IS_ENABLED(CONFIG_WIFI_SIWX917)) {
+		cfg->coex_mode = SL_SI91X_WLAN_ONLY_MODE;
+	} else if (IS_ENABLED(CONFIG_BT_SIWX917)) {
+		cfg->coex_mode = SL_SI91X_BLE_MODE;
+	} else {
+		/*
+		 * Even if neither WiFi or BLE is used we have to specify a Coex mode
+		 */
+		cfg->coex_mode = SL_SI91X_BLE_MODE;
+	}
 
 #ifdef CONFIG_WIFI_SIWX917
 	cfg->feature_bit_map |= SL_SI91X_FEAT_SECURITY_OPEN | SL_SI91X_FEAT_WPS_DISABLE,
