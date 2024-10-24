@@ -10,4 +10,7 @@ config FLASH_BASE_ADDRESS
 config NUM_IRQS
 	default 99
 
+config BUILD_OUTPUT_HEX
+	default y
+
 endif
