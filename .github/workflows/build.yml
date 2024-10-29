@@ -44,6 +44,12 @@ jobs:
         run: |
           west twister -s drivers.entropy -p siwx917_rb4338a -v --inline-logs
 
+      - name: Build Flash test
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          west twister -s drivers.flash.common.default -p siwx917_rb4338a -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/flash/common/boards/siwx917_rb4338a.overlay -v --inline-logs
+
       - name: Build Bluetooth samples
         working-directory: zephyr-silabs
         shell: bash
