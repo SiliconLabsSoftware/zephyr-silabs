@@ -44,14 +44,12 @@ jobs:
           west blobs fetch hal_silabs
 
       - name: Build Entropy test
-        continue-on-error: true
         working-directory: zephyr-silabs
         shell: bash
         run: |
           west twister -s drivers.entropy -p siwx917_rb4338a -v --inline-logs -K
 
       - name: Build Bluetooth samples
-        continue-on-error: true
         working-directory: zephyr-silabs
         shell: bash
         run: |
@@ -59,14 +57,12 @@ jobs:
           west twister -s sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K
 
       - name: Build Rail samples
-        continue-on-error: true
         working-directory: zephyr-silabs
         shell: bash
         run: |
           west twister -s sample.rail.simple_txrx -T samples -v --inline-logs
 
       - name: Build Wifi samples
-        continue-on-error: true
         working-directory: zephyr-silabs
         shell: bash
         run: |
