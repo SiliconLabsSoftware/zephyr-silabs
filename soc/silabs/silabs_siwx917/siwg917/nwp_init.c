@@ -18,7 +18,7 @@
 #include "rsi_ble_common_config.h"
 #endif
 
-static int silabs_siwx917_nwp_init(void)
+static int siwx917_nwp_init(void)
 {
 	sl_wifi_device_configuration_t network_config = {
 		.boot_option = LOAD_NWP_FW,
@@ -92,7 +92,7 @@ static int silabs_siwx917_nwp_init(void)
 	 */
 	return sl_wifi_init(&network_config, NULL, sl_wifi_default_event_handler);
 }
-SYS_INIT(silabs_siwx917_nwp_init, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
+SYS_INIT(siwx917_nwp_init, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
 
 /* IRQn 74 is used for communication with co-processor */
 Z_ISR_DECLARE(74, ISR_FLAG_DIRECT, IRQ074_Handler, 0);
