@@ -26,11 +26,7 @@ documentation[2].
 
 TL;DR:
 
-    wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/zephyr-sdk-0.16.8_linux-x86_64.tar.xz
-    wget -O - https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.8/sha256.sum | shasum --check --ignore-missing
-    tar -xvf zephyr-sdk-0.16.8_linux-x86_64.tar.xz
-    cd zephyr-sdk-0.16.8
-    ./setup.sh
+    west sdk install
 
 [Install J-Link software pack][3]:
 
