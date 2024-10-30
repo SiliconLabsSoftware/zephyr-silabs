@@ -28,7 +28,7 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          Z_REV=`grep -A 2 'name: zephyr$' west.yml|grep revision:|sed 's/^.*revision: //'`
+          Z_REV=`west list zephyr -f {revision}`
           sed s/$Z_REV/main/ west.yml > west.yml.new
           mv west.yml.new west.yml
           west update
