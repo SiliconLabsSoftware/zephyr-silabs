@@ -1,3 +1,8 @@
+[![Silabs upstream daily build][badge]][recipe]
+
+[badge]:  https://github.com/SiliconLabsSoftware/zephyr-silabs/actions/workflows/upstream-build.yml/badge.svg
+[recipe]: https://github.com/SiliconLabsSoftware/zephyr-silabs/actions/workflows/upstream-build.yml
+
 Silicon Labs Zephyr repository
 ==============================
 
