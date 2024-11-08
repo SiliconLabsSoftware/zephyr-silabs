@@ -22,6 +22,10 @@ jobs:
         with:
           python-version: 3.11
 
+      - name: Install Silabs-specific python dependencies
+        run: |
+          pip3 install crc
+
       - name: Setup Zephyr project
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
