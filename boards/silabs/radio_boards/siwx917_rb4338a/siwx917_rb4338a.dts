@@ -17,6 +17,7 @@
 
 	chosen {
 		zephyr,sram = &sram0;
+		zephyr,code-partition = &code_partition;
 		zephyr,console = &ulpuart0;
 		zephyr,shell-uart = &ulpuart0;
 		zephyr,bt-hci = &bt_hci_silabs_siwx917;
@@ -93,6 +94,19 @@
 	ulpi2c_default: ulpi2c_default {
 		group {
 			pinmux = <ULPI2C_SDA_ULP6>, <ULPI2C_SCL_ULP7>;
+		};
+	};
+};
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		code_partition: partition@0 {
+			label = "code_partition";
+			reg = <0x0000000 DT_SIZE_K(2048-8)>;
 		};
 	};
 };

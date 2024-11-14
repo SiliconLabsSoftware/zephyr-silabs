@@ -54,7 +54,6 @@
 
 			flash0: flash@8202000 {
 				compatible = "soc-nv-flash";
-				reg = <0x8202000 DT_SIZE_K(2040)>;
 				write-block-size = <1>;
 				erase-block-size = <4096>;
 			};
