@@ -50,6 +50,15 @@ jobs:
         run: |
           west twister -s drivers.flash.common.default -p siwx917_rb4338a -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/flash/common/boards/siwx917_rb4338a.overlay -v --inline-logs
 
+      - name: Build DMA test
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          west twister -s drivers.dma.chan_blen_transfer -p siwx917_rb4338a -- \
+            -DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.overlay \
+            -DEXTRA_CONF_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.conf \
+            -v --inline-logs
+
       - name: Build Bluetooth samples
         working-directory: zephyr-silabs
         shell: bash

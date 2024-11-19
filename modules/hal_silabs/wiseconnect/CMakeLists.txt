@@ -58,6 +58,14 @@ zephyr_library_sources_ifdef(CONFIG_ENTROPY_SILABS_SIWX917
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_rng.c
 )
 
+zephyr_library_sources_ifdef(CONFIG_DMA_SILABS_SIWX917
+  ${DEVICE_DIR}/silabs/si91x/mcu/drivers/rom_driver/src/rsi_rom_table_si91x.c
+)
+
+zephyr_compile_definitions_ifdef(CONFIG_DMA_SILABS_SIWX917
+  UDMA_ROMDRIVER_PRESENT
+)
+
 if(CONFIG_WIFI_SIWX917)
 
 zephyr_compile_definitions_ifdef(CONFIG_NET_IPV6
