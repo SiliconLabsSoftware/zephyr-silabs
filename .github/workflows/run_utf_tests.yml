@@ -1,0 +1,54 @@
+name: Clone External Repo
+
+on:
+  workflow_run:
+    workflows:
+      - Build
+    types:
+      - completed
+jobs:
+  run_utf_tests:
+    env:
+      SDK_BUILD_NUM: ${{ github.event.workflow_run.id || '12162629306' }}
+      STACK_NAME: 'zephyr'
+      BASE_PATH: ${{ github.workspace }}/utf_repo/
+      PYTHON3_VENV_DIR: /opt/venv 
+    runs-on: silabs-internal
+    container: artifactory-bud.silabs.net/gsdk-docker-production/sqa-testnode-lite
+    steps:
+      - name: Clone external repository
+        env:
+          TOKEN: ${{ secrets.EXTERNAL_REPO_TOKEN }}
+          USER: ${{ secrets.EXTERNAL_REPO_USER }}
+          WORKSPACE: ${{ env.BASE_PATH }}
+          WORKSPACE_ROOT: ${{ env.BASE_PATH }}utf_app_ble/ 
+        run: |
+          git clone https://$USER:$TOKEN@stash.silabs.com/scm/utf/utf_app_ble.git utf_repo
+      - name: Checkout zephyr branch
+        working-directory: ./utf_repo
+        run: |
+          git checkout feature/zephyr-btp
+      - name: Init Submodules
+        working-directory: ./utf_repo
+        run: |
+          git submodule update --init --recursive
+      - name: Workspace setup
+        env:
+          WORKSPACE: ${{ env.BASE_PATH }}
+          WORKSPACE_ROOT: ${{ env.BASE_PATH }}utf_app_ble/ 
+          UBAI: True
+          HW_MUX_TOKEN: ${{ secrets.HW_MUX_TOKEN }}
+          HWMUX_RESERVE: True
+          HWMUX_GROUP: 'bud-ble-opn-16'
+          BRANCH_NAME: 'zephyr'
+          PYTHON3_VENV_DIR: /opt/venv 
+        working-directory: /
+        run: |
+          echo "Running build now for SDK_BUILD_NUM $SDK_BUILD_NUM"
+          . "$PYTHON3_VENV_DIR/bin/activate"
+          export PATH="$PYTHON3_VENV_DIR/bin:$PATH"
+          cd $BASE_PATH
+          python3 -m pip install --upgrade pip
+          python3 -m pip install wheel pyyaml deprecated simpleeval 
+          ./workspace_setup.sh
+          ./executor/launch_utf_tests.sh --harness dynamic_harness.yaml --executor_type local --publish_test_results False --pytest_command "pytest --tb=native tests -m zephyr --board_id brd4187c,brd4187c"
