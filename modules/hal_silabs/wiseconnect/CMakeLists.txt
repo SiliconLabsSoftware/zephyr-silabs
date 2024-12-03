@@ -72,10 +72,6 @@ if(CONFIG_WIFI_SIWX917)
 zephyr_compile_definitions_ifdef(CONFIG_NET_IPV6
   SLI_SI91X_ENABLE_IPV6
 )
-zephyr_compile_definitions_ifdef(CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
-  SLI_SI91X_OFFLOAD_NETWORK_STACK
-  SLI_SI91X_SOCKETS
-)
 zephyr_include_directories(
   ${DEFAULTS_DIR}
 )
@@ -84,11 +80,19 @@ zephyr_library_sources(
   ${DEVICE_DIR}/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.c
   ${DEVICE_DIR}/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c
   ${DEVICE_DIR}/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c
-  ${DEVICE_DIR}/silabs/si91x/wireless/socket/src/sl_si91x_socket_utility.c
-  ${DEVICE_DIR}/silabs/si91x/wireless/asynchronous_socket/src/sl_si91x_socket.c
   ${SERVICE_DIR}/network_manager/si91x/sl_net_si91x.c
   ${SERVICE_DIR}/network_manager/src/sl_net_basic_credentials.c
   ${SERVICE_DIR}/network_manager/src/sl_net_basic_profiles.c
+)
+
+zephyr_compile_definitions_ifdef(CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
+  SLI_SI91X_OFFLOAD_NETWORK_STACK
+  SLI_SI91X_SOCKETS
+)
+zephyr_library_sources_ifdef(CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
+  ${DEVICE_DIR}/silabs/si91x/wireless/socket/src/sl_si91x_socket_utility.c
+  ${DEVICE_DIR}/silabs/si91x/wireless/asynchronous_socket/src/sl_si91x_socket.c
+  ${DEVICE_DIR}/silabs/si91x/wireless/src/sl_si91x_callback_framework.c
   ${SERVICE_DIR}/network_manager/src/sl_net.c
 )
 
@@ -136,7 +140,6 @@ zephyr_library_sources_ifdef(CONFIG_WISECONNECT_NETWORK_STACK
   ${DEVICE_DIR}/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c
   ${DEVICE_DIR}/silabs/si91x/wireless/memory/malloc_buffers.c
   ${DEVICE_DIR}/silabs/si91x/wireless/src/sl_rsi_utility.c
-  ${DEVICE_DIR}/silabs/si91x/wireless/src/sl_si91x_callback_framework.c
   ${DEVICE_DIR}/silabs/si91x/wireless/src/sl_si91x_driver.c
   ${DEVICE_DIR}/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c
   ${PROTOCOL_DIR}/wifi/si91x/sl_wifi.c
