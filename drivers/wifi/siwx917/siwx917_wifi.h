@@ -27,7 +27,7 @@ struct siwx917_dev {
 		net_context_recv_cb_t cb;
 		void *user_data;
 		struct net_context *context;
-	} fds_cb[NUMBER_OF_BSD_SOCKETS];
+	} fds_cb[NUMBER_OF_SOCKETS];
 #endif
 };
 
