@@ -6,10 +6,10 @@ set(DEVICE_DIR       ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect/components/devi
 set(SERVICE_DIR      ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect/components/service)
 set(PROTOCOL_DIR     ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect/components/protocol)
 set(DEFAULTS_DIR     ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect/resources/defaults)
-set(GECKO_COMMON_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/gecko/common)
+set(SISDK_COMMON_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/common)
 
 zephyr_include_directories(
-  ${GECKO_COMMON_DIR}/inc
+  ${SISDK_COMMON_DIR}/inc
   ${DEVICE_DIR}/silabs/si91x/mcu/core/config
   ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/inc
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/rom_driver/inc
