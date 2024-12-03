@@ -32,7 +32,7 @@ static int siwx917_clock_on(const struct device *dev, clock_control_subsys_t sys
 	case SIWX917_CLK_ULP_UART:
 		RSI_PS_UlpssPeriPowerUp(ULPSS_PWRGATE_ULP_UART);
 		RSI_ULPSS_UlpUartClkConfig(ULPCLK, ENABLE_STATIC_CLK,
-					   false, ULP_UART_ULP_32MHZ_RC_CLK, 1);
+					   false, ULP_UART_ULP_MHZ_RC_CLK, 1);
 		break;
 	case SIWX917_CLK_ULP_I2C:
 		RSI_PS_UlpssPeriPowerUp(ULPSS_PWRGATE_ULP_I2C);
