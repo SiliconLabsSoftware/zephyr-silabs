@@ -59,8 +59,11 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s sample.bluetooth.peripheral_hr -p xg27_dk2602a -v --inline-logs -K
-          west twister -s sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K
+          west twister -v --inline-logs -K \
+            -p xg27_dk2602a \
+            -p siwx917_rb4338a \
+            -s sample.bluetooth.peripheral_hr \
+            -s sample.bluetooth.observer
 
       - name: Build Rail samples
         working-directory: zephyr-silabs
