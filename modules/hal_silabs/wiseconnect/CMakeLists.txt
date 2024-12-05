@@ -6,10 +6,12 @@ set(DEVICE_DIR       ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect/components/devi
 set(SERVICE_DIR      ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect/components/service)
 set(PROTOCOL_DIR     ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect/components/protocol)
 set(DEFAULTS_DIR     ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect/resources/defaults)
-set(GECKO_COMMON_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/gecko/common)
+set(SISDK_COMMON_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/common)
+set(SISDK_EMLIB_DIR  ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/emlib)
 
 zephyr_include_directories(
-  ${GECKO_COMMON_DIR}/inc
+  ${SISDK_COMMON_DIR}/inc
+  ${SISDK_COMMON_DIR}/config
   ${DEVICE_DIR}/silabs/si91x/mcu/core/config
   ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/inc
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/rom_driver/inc
@@ -42,6 +44,7 @@ zephyr_compile_definitions_ifdef(CONFIG_SIWX917_FLASH_MODE_COMMON
 )
 
 zephyr_library_sources(
+  ${SISDK_COMMON_DIR}/src/sl_core_cortexm.c
   ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c
   ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/src/system_si91x.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c
@@ -63,23 +66,25 @@ if(CONFIG_WIFI_SIWX917)
 zephyr_compile_definitions_ifdef(CONFIG_NET_IPV6
   SLI_SI91X_ENABLE_IPV6
 )
-zephyr_compile_definitions_ifdef(CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
-  SLI_SI91X_OFFLOAD_NETWORK_STACK
-  SLI_SI91X_SOCKETS
-)
-zephyr_include_directories(
-  ${DEFAULTS_DIR}
-)
 zephyr_library_sources(
   ${DEVICE_DIR}/silabs/si91x/wireless/sl_net/src/sl_si91x_net_credentials.c
   ${DEVICE_DIR}/silabs/si91x/wireless/sl_net/src/sl_si91x_net_internal_stack.c
   ${DEVICE_DIR}/silabs/si91x/wireless/sl_net/src/sl_net_si91x_integration_handler.c
   ${DEVICE_DIR}/silabs/si91x/wireless/sl_net/src/sl_net_rsi_utility.c
+  ${PROTOCOL_DIR}/wifi/src/sl_wifi_basic_credentials.c
+  ${SERVICE_DIR}/network_manager/si91x/sl_net_si91x.c
+  ${SERVICE_DIR}/network_manager/src/sl_net_basic_profiles.c
+  ${SERVICE_DIR}/network_manager/src/sl_net_credentials.c
+)
+
+zephyr_compile_definitions_ifdef(CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
+  SLI_SI91X_OFFLOAD_NETWORK_STACK
+  SLI_SI91X_SOCKETS
+)
+zephyr_library_sources_ifdef(CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
   ${DEVICE_DIR}/silabs/si91x/wireless/socket/src/sl_si91x_socket_utility.c
   ${DEVICE_DIR}/silabs/si91x/wireless/asynchronous_socket/src/sl_si91x_socket.c
-  ${SERVICE_DIR}/network_manager/si91x/sl_net_si91x.c
-  ${SERVICE_DIR}/network_manager/src/sl_net_basic_credentials.c
-  ${SERVICE_DIR}/network_manager/src/sl_net_basic_profiles.c
+  ${DEVICE_DIR}/silabs/si91x/wireless/sl_net/src/sl_net_si91x_callback_framework.c
   ${SERVICE_DIR}/network_manager/src/sl_net.c
 )
 
@@ -101,6 +106,8 @@ zephyr_include_directories_ifdef(CONFIG_WISECONNECT_NETWORK_STACK
   # FIXME: find why this directory is not included when CMSIS_RTOS_V2=y
   ${ZEPHYR_BASE}/include/zephyr/posix
   ${ZEPHYR_BASE}/include/zephyr/portability
+  ${SISDK_EMLIB_DIR}/inc
+  ${DEFAULTS_DIR}
   ${COMMON_DIR}/inc
   ${DEVICE_DIR}/silabs/si91x/wireless/inc
   ${DEVICE_DIR}/silabs/si91x/wireless/sl_net/inc
@@ -127,7 +134,6 @@ zephyr_library_sources_ifdef(CONFIG_WISECONNECT_NETWORK_STACK
   ${DEVICE_DIR}/silabs/si91x/wireless/host_mcu/si91x/siwx917_soc_ncp_host.c
   ${DEVICE_DIR}/silabs/si91x/wireless/memory/malloc_buffers.c
   ${DEVICE_DIR}/silabs/si91x/wireless/src/sl_rsi_utility.c
-  ${DEVICE_DIR}/silabs/si91x/wireless/src/sl_si91x_callback_framework.c
   ${DEVICE_DIR}/silabs/si91x/wireless/src/sl_si91x_driver.c
   ${DEVICE_DIR}/silabs/si91x/wireless/threading/sli_si91x_multithreaded.c
   ${PROTOCOL_DIR}/wifi/si91x/sl_wifi.c
