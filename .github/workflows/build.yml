@@ -42,7 +42,7 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -v --inline-logs \
+          west twister -v --inline-logs -K \
             -s drivers.entropy \
             -p siwx917_rb4338a
 
@@ -71,6 +71,7 @@ jobs:
         run: |
           west twister -v --inline-logs -K \
             -s sample.bluetooth.peripheral_hr \
+            -s sample.bluetooth.observer \
             -p siwx917_rb4338a
 
       - name: Build Rail samples
