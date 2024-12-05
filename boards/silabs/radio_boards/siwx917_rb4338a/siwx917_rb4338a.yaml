@@ -11,6 +11,7 @@ toolchain:
 supported:
   - gpio
   - i2c
+  - dma
   - wifi
   - bluetooth
   - flash

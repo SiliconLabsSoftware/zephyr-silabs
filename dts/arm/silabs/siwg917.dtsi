@@ -221,6 +221,32 @@
 			compatible = "silabs,siwx917-rng";
 			reg = <0x45090000 0x8>;
 		};
+
+		udma0: dma@44030000 {
+			compatible = "silabs,siwx917-dma";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x44030000 0x82C>;
+			interrupts = <33 0>;
+			interrupt-names = "udma0";
+			silabs,sram-desc-addr = <0x2fc00>;
+			#dma-cells = < 1>;
+			dma-channels = <32>;
+			status = "disabled";
+		};
+
+		udma1: dma@24078000 {
+			compatible = "silabs,siwx917-dma";
+			#address-cells = <1>;
+			#size-cells = <0>;
+			reg = <0x24078000 0x82C>;
+			interrupts = <10 0>;
+			interrupt-names = "udma1";
+			silabs,sram-desc-addr = <0x24061c00>;
+			#dma-cells = < 1>;
+			dma-channels = <12>;
+			status = "disabled";
+		};
 	};
 };
 
