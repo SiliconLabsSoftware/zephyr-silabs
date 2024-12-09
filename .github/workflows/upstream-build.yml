@@ -22,20 +22,17 @@ jobs:
         run: |
           pip3 install crc
 
+      - name: Update manifest to point at upstream main branch
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          yq -i '(.manifest.projects[] | select(.name == "zephyr") | .revision) = "main"' west.yml
+
       - name: Setup Zephyr project
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
           app-path: zephyr-silabs
           toolchains: arm-zephyr-eabi
-
-      - name: Update manifest to point at upstream main branch
-        working-directory: zephyr-silabs
-        shell: bash
-        run: |
-          Z_REV=`west list zephyr -f {revision}`
-          sed s/$Z_REV/main/ west.yml > west.yml.new
-          mv west.yml.new west.yml
-          west update
 
       - name: Fetch blobs
         working-directory: zephyr-silabs
