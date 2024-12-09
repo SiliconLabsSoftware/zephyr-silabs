@@ -5,21 +5,33 @@
 # SPDX-License-Identifier: Apache-2.0
 
 import sys
-import crc as crc_mod
 import argparse
 import struct
 from typing import Union
 import intelhex
 
-crc_cfg = crc_mod.Configuration(
-    width=32,
-    polynomial=0xd95eaae5,
-    init_value=0,
-    final_xor_value=0,
-    reverse_input=True,
-    reverse_output=True
-)
+crc_table = [0] * 256
 
+
+# For reference:
+#     width=32 poly=0xd95eaae5 init=0 refin=true refout=true xorout=0
+def create_table():
+    for b in range(256):
+        register = b
+        for _ in range(8):
+            lsb = register & 1
+            register >>= 1
+            if lsb:
+                # Reflected polynomial: 0xd95eaae5
+                register ^= 0xa7557a9b
+        crc_table[b] = register
+
+def calc_crc32(data: bytes) -> int:
+    create_table()
+    register = 0
+    for b in data:
+        register = crc_table[(b ^ register) & 0xFF] ^ (register >> 8)
+    return register
 
 def calc_checksum(data: Union[bytes, bytearray], size: int, prev_sum: int) -> int:
     # Truncate
@@ -35,12 +47,6 @@ def calc_checksum(data: Union[bytes, bytearray], size: int, prev_sum: int) -> in
     chk = (chk & 0xFFffFFff) + (chk >> 32)
     chk = (~chk) & 0xFFffFFff
     return chk
-
-
-def calc_crc32(data: bytes) -> int:
-    calc = crc_mod.Calculator(crc_cfg, optimized=True)
-    return calc.checksum(data)
-
 
 def set_bits(x: int, off: int, size: int, field: int) -> int:
     field = int(field)
