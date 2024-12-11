@@ -11,19 +11,30 @@
 #include <zephyr/drivers/dma.h>
 #include <zephyr/drivers/clock_control.h>
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/bitarray.h>
 #include <zephyr/types.h>
 #include "rsi_rom_udma_wrapper.h"
+#include "rsi_rom_udma.h"
 #include "rsi_udma.h"
 #include "sl_status.h"
 
-#define DT_DRV_COMPAT          silabs_siwx917_dma
-#define DMA_MAX_TRANSFER_COUNT 1024
-#define DMA_CH_PRIORITY_HIGH   1
-#define DMA_CH_PRIORITY_LOW    0
-#define VALID_BURST_LENGTH     0
-#define UDMA_ADDR_INC_NONE     0X03
+#define DT_DRV_COMPAT                    silabs_siwx917_dma
+#define DMA_MAX_TRANSFER_COUNT           1024
+#define DMA_CH_PRIORITY_HIGH             1
+#define DMA_CH_PRIORITY_LOW              0
+#define VALID_BURST_LENGTH               0
+#define UDMA_ADDR_INC_NONE               0x03
+#define UDMA_MODE_PER_ALT_SCATTER_GATHER 0x07
 
 LOG_MODULE_REGISTER(si91x_dma, CONFIG_DMA_LOG_LEVEL);
+
+struct dma_sg_descriptor_allocator {
+	/* DMA descriptors in contiguous memory */
+	RSI_UDMA_DESC_T sg_transfer_desc_table[CONFIG_DMA_SILABS_SIWX917_SG_BUFFER_COUNT];
+	/* Pointer to bitmap representing the allocation status of descriptors */
+	/* with each bit indicating the status of a single descriptor */
+	sys_bitarray_t *free_desc;
+};
 
 struct dma_siwx917_config {
 	UDMA0_Type *reg;                 /* UDMA register base address */
@@ -37,8 +48,10 @@ struct dma_siwx917_config {
 
 struct dma_siwx917_data {
 	UDMA_Channel_Info *chan_info;
-	dma_callback_t dma_callback;         /* User callback */
-	void *cb_data;                       /* User callback data */
+	dma_callback_t dma_callback; /* User callback */
+	void *cb_data;               /* User callback data */
+	struct dma_sg_descriptor_allocator
+		*sg_transfer_desc_block;     /* Pointer to scatter-gather descriptors block */
 	RSI_UDMA_DATACONTEXT_T dma_rom_buff; /* Buffer to store UDMA handle */
 					     /* related information */
 };
@@ -88,6 +101,144 @@ static inline int siwx917_dma_addr_adjustment(uint32_t adjustment)
 	default:
 		return -EINVAL;
 	}
+}
+
+/* Releases a range of scatter-gather descriptors */
+static inline void release_sg_desc_blocks(sys_bitarray_t *desc_alloc, uint32_t start_index,
+					  uint32_t count)
+{
+	sys_bitarray_clear_region(desc_alloc, count, start_index);
+}
+
+/* Requests the index of contiguous memory for scatter-gather descriptor table */
+static int request_sg_desc_base_addr(sys_bitarray_t *desc_alloc, uint32_t block_count)
+{
+	uint32_t index;
+
+	/* Find contiguous free blocks */
+	for (index = 0; index <= CONFIG_DMA_SILABS_SIWX917_SG_BUFFER_COUNT - block_count; index++) {
+		if (sys_bitarray_is_region_cleared(desc_alloc, block_count, index)) {
+			break;
+		}
+	}
+	if (index > CONFIG_DMA_SILABS_SIWX917_SG_BUFFER_COUNT - block_count) {
+		/* No contiguous free blocks present */
+		return -EINVAL;
+	}
+	/* Mark the blocks as allocated */
+	if (sys_bitarray_set_region(desc_alloc, block_count, index) < 0) {
+		return -EINVAL;
+	}
+	return index;
+}
+
+/* Sets up the scatter-gather descriptor table for a DMA transfer */
+static int set_scatter_gather_desc(RSI_UDMA_DESC_T *sg_desc_base_addr, struct dma_config *config,
+				   uint8_t *transfer_type)
+{
+	int peripheral_request = siwx917_dma_is_peripheral_request(config->channel_direction);
+	struct dma_block_config *block_addr = config->head_block;
+
+	if (peripheral_request < 0) {
+		return -EINVAL;
+	} else if (peripheral_request) {
+		*transfer_type = UDMA_MODE_PER_SCATTER_GATHER;
+	}
+	for (int index = 0; index < config->block_count; index++) {
+		/* Set the source and destination end addresses */
+		sg_desc_base_addr[index].pSrcEndAddr =
+			(uint32_t *)(block_addr->source_address +
+				     (block_addr->block_size - config->source_data_size));
+		sg_desc_base_addr[index].pDstEndAddr =
+			(uint32_t *)(block_addr->dest_address +
+				     (block_addr->block_size - config->dest_data_size));
+		/* Set the source and destination data sizes */
+		sg_desc_base_addr[index].vsUDMAChaConfigData1.srcSize =
+			siwx917_dma_data_width(config->source_data_size);
+		sg_desc_base_addr[index].vsUDMAChaConfigData1.dstSize =
+			siwx917_dma_data_width(config->dest_data_size);
+		/* Calculate the number of DMA transfers required */
+		block_addr->block_size /= config->source_data_size;
+		if (block_addr->block_size > DMA_MAX_TRANSFER_COUNT) {
+			return -EINVAL;
+		}
+		/* Set the total number of DMA transfers */
+		sg_desc_base_addr[index].vsUDMAChaConfigData1.totalNumOfDMATrans =
+			block_addr->block_size - 1;
+		/* Set the transfer type based on whether it is a peripheral request */
+		sg_desc_base_addr[index].vsUDMAChaConfigData1.transferType =
+			peripheral_request ? UDMA_MODE_PER_ALT_SCATTER_GATHER
+					   : UDMA_MODE_MEM_ALT_SCATTER_GATHER;
+		/* Set the arbitration size */
+		sg_desc_base_addr[index].vsUDMAChaConfigData1.rPower = ARBSIZE_1;
+		if (siwx917_dma_addr_adjustment(block_addr->source_addr_adj) < 0 ||
+		    siwx917_dma_addr_adjustment(block_addr->dest_addr_adj) < 0) {
+			return -EINVAL;
+		}
+		/* Set source and destination address increments */
+		sg_desc_base_addr[index].vsUDMAChaConfigData1.srcInc =
+			siwx917_dma_addr_adjustment(block_addr->source_addr_adj)
+				? UDMA_SRC_INC_NONE
+				: siwx917_dma_data_width(config->source_data_size);
+		sg_desc_base_addr[index].vsUDMAChaConfigData1.dstInc =
+			siwx917_dma_addr_adjustment(block_addr->dest_addr_adj)
+				? UDMA_DST_INC_NONE
+				: siwx917_dma_data_width(config->dest_data_size);
+		/* Move to the next block */
+		block_addr = block_addr->next_block;
+	}
+	/* Set the transfer type for the last descriptor */
+	sg_desc_base_addr[config->block_count - 1].vsUDMAChaConfigData1.transferType =
+		peripheral_request ? UDMA_MODE_BASIC : UDMA_MODE_AUTO;
+	return 0;
+}
+
+/* Configure DMA for scatter-gather transfer */
+static int dma_scatter_gather_config(const struct device *dev, RSI_UDMA_HANDLE_T udma_handle,
+				     uint32_t channel, struct dma_config *config)
+{
+	uint8_t transfer_type = UDMA_MODE_MEM_SCATTER_GATHER;
+	const struct dma_siwx917_config *cfg = dev->config;
+	struct dma_siwx917_data *data = dev->data;
+	RSI_UDMA_DESC_T *sg_desc_base_addr = NULL;
+	int block_alloc_start_index;
+
+	if (siwx917_dma_data_width(config->source_data_size) < 0 ||
+	    siwx917_dma_data_width(config->dest_data_size) < 0) {
+		return -EINVAL;
+	}
+	if (config->block_count > CONFIG_DMA_SILABS_SIWX917_SG_BUFFER_COUNT) {
+		return -EINVAL;
+	}
+	/* Request start index for scatter-gather descriptor table */
+	block_alloc_start_index = request_sg_desc_base_addr(data->sg_transfer_desc_block->free_desc,
+							    config->block_count);
+	if (block_alloc_start_index < 0) {
+		return -EIO;
+	}
+	sg_desc_base_addr =
+		&data->sg_transfer_desc_block->sg_transfer_desc_table[block_alloc_start_index];
+	if (set_scatter_gather_desc(sg_desc_base_addr, config, &transfer_type)) {
+		return -EINVAL;
+	}
+	/* This channel information is used to distinguish scatter-gather transfers and */
+	/* free the allocated descriptors in sg_transfer_desc_block */
+	data->chan_info[channel].SrcAddr = 0;
+	data->chan_info[channel].DestAddr = 0;
+	data->chan_info[channel].Cnt = config->block_count;
+	data->chan_info[channel].Size = block_alloc_start_index;
+	RSI_UDMA_InterruptClear(udma_handle, channel);
+	RSI_UDMA_ErrorStatusClear(udma_handle);
+	if (cfg->reg == UDMA0) {
+		M4SS_UDMA_INTR_SEL |= BIT(channel);
+	} else {
+		cfg->reg->UDMA_INTR_MASK_REG |= BIT(channel);
+	}
+	cfg->reg->CHNL_PRI_ALT_SET = BIT(channel);
+	cfg->reg->CHNL_REQ_MASK_CLR = BIT(channel);
+	RSI_UDMA_SetChannelScatterGatherTransfer(udma_handle, channel, config->block_count,
+						 sg_desc_base_addr, transfer_type);
+	return 0;
 }
 
 static int dma_channel_config(const struct device *dev, RSI_UDMA_HANDLE_T udma_handle,
@@ -152,11 +303,10 @@ static int dma_channel_config(const struct device *dev, RSI_UDMA_HANDLE_T udma_h
 	} else {
 		channel_control.dstInc = UDMA_DST_INC_NONE;
 	}
-	status = UDMAx_ChannelConfigure(&udma_resources, (uint8_t)channel,
-					config->head_block->source_address,
-					config->head_block->dest_address,
-					config->head_block->block_size, channel_control,
-					&channel_config, NULL, channel_info, udma_handle);
+	status = UDMAx_ChannelConfigure(
+		&udma_resources, (uint8_t)channel, config->head_block->source_address,
+		config->head_block->dest_address, config->head_block->block_size, channel_control,
+		&channel_config, NULL, channel_info, udma_handle);
 	if (status) {
 		return -EIO;
 	}
@@ -187,8 +337,15 @@ static int dma_siwx917_configure(const struct device *dev, uint32_t channel,
 		return -EINVAL;
 	}
 
-	/* Configure dma channel for transfer */
-	status = dma_channel_config(dev, udma_handle, channel, config, data->chan_info);
+	if (config->head_block->source_gather_en || config->head_block->dest_scatter_en) {
+		/* Configure DMA for a Scatter-Gather transfer */
+		status = dma_scatter_gather_config(dev, udma_handle, channel, config);
+	} else {
+		/* Configure dma channel for transfer */
+		status = dma_channel_config(dev, udma_handle, channel, config, data->chan_info);
+	}
+	data->dma_callback = config->dma_callback;
+	data->cb_data = config->user_data;
 	if (status) {
 		return status;
 	}
@@ -262,7 +419,6 @@ static int dma_siwx917_start(const struct device *dev, uint32_t channel)
 	if (RSI_UDMA_ChannelEnable(udma_handle, channel) != 0) {
 		return -EINVAL;
 	}
-
 	/* Check if the transfer type is memory-memory */
 	if (udma_table[channel].vsUDMAChaConfigData1.srcInc != UDMA_SRC_INC_NONE &&
 	    udma_table[channel].vsUDMAChaConfigData1.dstInc != UDMA_DST_INC_NONE) {
@@ -335,6 +491,7 @@ static int dma_siwx917_init(const struct device *dev)
 	if (ret) {
 		return ret;
 	}
+	size_t offset;
 
 	udma_handle = UDMAx_Initialize(&udma_resources, udma_resources.desc, NULL,
 				       (uint32_t *)&data->dma_rom_buff);
@@ -347,6 +504,15 @@ static int dma_siwx917_init(const struct device *dev)
 
 	if (UDMAx_DMAEnable(&udma_resources, udma_handle) != 0) {
 		return -EBUSY;
+	}
+	/* Allocate the bitmap for representing the allocation status of SG descriptors */
+	if (sys_bitarray_alloc(data->sg_transfer_desc_block->free_desc,
+			       CONFIG_DMA_SILABS_SIWX917_SG_BUFFER_COUNT, &offset) < 0) {
+		return -EINVAL;
+	}
+	if (sys_bitarray_clear_region(data->sg_transfer_desc_block->free_desc,
+				      CONFIG_DMA_SILABS_SIWX917_SG_BUFFER_COUNT, offset) < 0) {
+		return -EINVAL;
 	}
 	return 0;
 }
@@ -372,12 +538,14 @@ static void dma_siwx917_isr(const struct device *dev)
 	}
 	/* find_lsb_set() returns 1 indexed value */
 	channel -= 1;
+	if (data->chan_info[channel].SrcAddr == 0 && data->chan_info[channel].DestAddr == 0) {
+		/* A Scatter-Gather transfer is completed, free the allocated descriptors */
+		release_sg_desc_blocks(data->sg_transfer_desc_block->free_desc,
+				       data->chan_info[channel].Size, data->chan_info[channel].Cnt);
+		goto out;
+	}
 	if (data->chan_info[channel].Cnt == data->chan_info[channel].Size) {
-		if (data->dma_callback) {
-			/* Transfer complete, call user callback */
-			data->dma_callback(dev, data->cb_data, channel, 0);
-		}
-		cfg->reg->UDMA_DONE_STATUS_REG = BIT(channel);
+		goto out;
 	} else {
 		/* Call UDMA ROM IRQ handler. */
 		ROMAPI_UDMA_WRAPPER_API->uDMAx_IRQHandler(&udma_resources, udma_resources.desc,
@@ -390,6 +558,11 @@ static void dma_siwx917_isr(const struct device *dev)
 		}
 	}
 out:
+	if (data->dma_callback) {
+		/* Transfer complete, call user callback */
+		data->dma_callback(dev, data->cb_data, channel, 0);
+	}
+	cfg->reg->UDMA_DONE_STATUS_REG = BIT(channel);
 	/* Enable the IRQ to restore interrupt functionality for other DMA channels */
 	irq_enable(cfg->irq_number);
 }
@@ -405,8 +578,13 @@ static const struct dma_driver_api siwx917_dma_driver_api = {
 
 #define SIWX917_DMA_INIT(inst)                                                                     \
 	static UDMA_Channel_Info dma##inst##_channel_info[DT_INST_PROP(inst, dma_channels)];       \
+	SYS_BITARRAY_DEFINE_STATIC(free_desc##inst, CONFIG_DMA_SILABS_SIWX917_SG_BUFFER_COUNT);    \
+	static struct dma_sg_descriptor_allocator dma##inst##_desc_allocator = {                   \
+		.free_desc = &free_desc##inst,                                                     \
+	};                                                                                         \
 	static struct dma_siwx917_data dma##inst##_data = {                                        \
 		.chan_info = dma##inst##_channel_info,                                             \
+		.sg_transfer_desc_block = &dma##inst##_desc_allocator,                             \
 	};                                                                                         \
 	static void siwx917_dma##inst##_irq_configure(void)                                        \
 	{                                                                                          \
