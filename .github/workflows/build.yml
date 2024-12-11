@@ -76,3 +76,5 @@ jobs:
         shell: bash
         run: |
           west twister -s sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K
+          west twister -s sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K \
+              -x EXTRA_CONF_FILE=$(pwd)/samples/net/wifi/shell/soc/siwx917_offloaded_sockets.conf
