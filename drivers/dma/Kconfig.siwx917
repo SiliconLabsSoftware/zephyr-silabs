@@ -12,3 +12,8 @@ config DMA_SILABS_SIWX917_COMMON_INIT_PRIORITY
 	int "Common initialization priority"
 	depends on DMA_SILABS_SIWX917
 	default 42
+	
+config SG_BUFFER_COUNT
+	int "The maximum allowable number of buffers for scatter-gather transfers"
+	depends on DMA_SILABS_SIWX917
+	default 10
