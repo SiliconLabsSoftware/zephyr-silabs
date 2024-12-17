@@ -7,6 +7,7 @@
 #include <arm/armv7-m.dtsi>
 #include <zephyr/dt-bindings/i2c/i2c.h>
 #include <zephyr/dt-bindings/spi/spi.h>
+#include <zephyr/dt-bindings/clock/silabs/siwx917-clock.h>
 
 / {
 	chosen {
@@ -41,6 +42,16 @@
 	};
 
 	soc {
+		clock0: clock@46000000 {
+			compatible = "silabs,siwx917-clock";
+			reg = <0x46000000 0x100>,
+			      <0x46000800 0x100>,
+			      <0x24041400 0x100>,
+			      <0x24048000 0x200>;
+			#clock-cells = <1>;
+			status = "okay";
+		};
+
 		pinctrl0: pinctrl@46130000 {
 			compatible = "silabs,siwx917-pinctrl";
 			reg = <0x46130000 0x1000>;
@@ -64,7 +75,7 @@
 			reg = <0x24041800 0x1000>;
 			interrupts = <12 0>;
 			reg-shift = <2>;
-			clock-frequency = <32000000>;
+			clocks = <&clock0 SIWX917_CLK_ULP_UART>;
 			current-speed = <115200>;
 			status = "disabled";
 		};
@@ -74,7 +85,7 @@
 			reg = <0x44000000 0x1000>;
 			interrupts = <38 0>;
 			reg-shift = <2>;
-			clock-frequency = <25000000>;
+			clocks = <&clock0 SIWX917_CLK_UART1>;
 			current-speed = <115200>;
 			status = "disabled";
 		};
@@ -84,7 +95,7 @@
 			reg = <0x45020000 0x1000>;
 			interrupts = <39 0>;
 			reg-shift = <2>;
-			clock-frequency = <20000000>;
+			clocks = <&clock0 SIWX917_CLK_UART2>;
 			current-speed = <115200>;
 			status = "disabled";
 		};
@@ -194,6 +205,7 @@
 			reg = <0x44010000 0x100>;
 			interrupts = <42 0>;
 			interrupt-names = "i2c0";
+			clocks = <&clock0 SIWX917_CLK_I2C0>;
 			status = "disabled";
 		};
 
@@ -204,6 +216,7 @@
 			reg = <0x47040000 0x100>;
 			interrupts = <61 0>;
 			interrupt-names = "i2c1";
+			clocks = <&clock0 SIWX917_CLK_I2C1>;
 			status = "disabled";
 		};
 
@@ -214,6 +227,7 @@
 			reg = <0x24040000 0x100>;
 			interrupts = <13 0>;
 			interrupt-names = "i2c2";
+			clocks = <&clock0 SIWX917_CLK_ULP_I2C>;
 			status = "disabled";
 		};
 
@@ -229,6 +243,7 @@
 			reg = <0x44030000 0x82C>;
 			interrupts = <33 0>;
 			interrupt-names = "dma0";
+			clocks = <&clock0 SIWX917_CLK_DMA0>;
 			silabs,sram-desc-addr = <0x2fc00>;
 			#dma-cells = < 1>;
 			dma-channels = <32>;
@@ -242,6 +257,7 @@
 			reg = <0x24078000 0x82C>;
 			interrupts = <10 0>;
 			interrupt-names = "ulpdma";
+			clocks = <&clock0 SIWX917_CLK_ULP_DMA>;
 			silabs,sram-desc-addr = <0x24061c00>;
 			#dma-cells = < 1>;
 			dma-channels = <12>;
