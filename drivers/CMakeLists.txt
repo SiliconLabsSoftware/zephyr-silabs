@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: Apache-2.0
 
 add_subdirectory(bluetooth)
+add_subdirectory(clock_control)
 add_subdirectory(entropy)
 add_subdirectory(flash)
 add_subdirectory(gpio)
