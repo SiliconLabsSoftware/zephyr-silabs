@@ -1,0 +1,36 @@
+common:
+  tags:
+    - crypto
+    - psa_crypto
+    - drivers
+tests:
+  crypto.psa_crypto.default:
+    platform_allow:
+      - xg24_dk2601b
+      - xg24_rb4187c
+      - xg27_dk2602a
+      - xg29_rb4412a
+    extra_configs:
+      # on devices without hw accel, a bigger stack is needed for mpi math
+      - CONFIG_TEST_EXTRA_STACK_SIZE=512
+  crypto.psa_crypto.sw_only:
+    platform_allow:
+      - xg24_dk2601b
+      - xg24_rb4187c
+      - xg27_dk2602a
+      - xg29_rb4412a
+    extra_configs:
+      - CONFIG_PSA_CRYPTO_SW_ONLY=y
+      # a bigger stack is needed for mpi math
+      - CONFIG_TEST_EXTRA_STACK_SIZE=512
+  crypto.psa_crypto.wrapped_keys:
+    platform_allow:
+      - xg24_dk2601b
+      - xg24_rb4187c
+      - xg29_rb4412a
+    extra_args:
+      - TEST_WRAPPED_KEYS=1
+    extra_configs:
+      # key slot size automagic doesn't take wrappers into account => buffers are too small,
+      # fall back to dynamically allocating key slots
+      - CONFIG_MBEDTLS_PSA_STATIC_KEY_SLOTS=n
