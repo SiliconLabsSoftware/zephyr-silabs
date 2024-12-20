@@ -8,7 +8,7 @@ math(EXPR FLASH_LOAD_ADDRESS "(${CONFIG_FLASH_BASE_ADDRESS}) + (${CONFIG_FLASH_L
 
 set_property(GLOBAL APPEND PROPERTY extra_post_build_commands
     COMMAND ${PYTHON_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/siwx917_isp_prepare.py
-    --rom_addr ${FLASH_LOAD_ADDRESS}
+    --load-addr ${FLASH_LOAD_ADDRESS}
     ${KERNEL_BIN_NAME}
     ${KERNEL_BIN_NAME}.rps
 )
