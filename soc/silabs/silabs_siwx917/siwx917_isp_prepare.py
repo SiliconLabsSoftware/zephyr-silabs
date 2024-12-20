@@ -23,8 +23,9 @@ def create_table():
             register >>= 1
             if lsb:
                 # Reflected polynomial: 0xd95eaae5
-                register ^= 0xa7557a9b
+                register ^= 0xA7557A9B
         crc_table[b] = register
+
 
 def calc_crc32(data: bytes) -> int:
     create_table()
@@ -32,6 +33,7 @@ def calc_crc32(data: bytes) -> int:
     for b in data:
         register = crc_table[(b ^ register) & 0xFF] ^ (register >> 8)
     return register
+
 
 def calc_checksum(data: Union[bytes, bytearray], size: int, prev_sum: int) -> int:
     # Truncate
@@ -44,9 +46,10 @@ def calc_checksum(data: Union[bytes, bytearray], size: int, prev_sum: int) -> in
     # Sum
     chk = prev_sum + sum(ints)
     # Convert to u32 and account each overflow as 1"s complement addition
-    chk = (chk & 0xFFffFFff) + (chk >> 32)
-    chk = (~chk) & 0xFFffFFff
+    chk = (chk & 0xFFFFFFFF) + (chk >> 32)
+    chk = (~chk) & 0xFFFFFFFF
     return chk
+
 
 def set_bits(x: int, off: int, size: int, field: int) -> int:
     field = int(field)
@@ -56,13 +59,16 @@ def set_bits(x: int, off: int, size: int, field: int) -> int:
     return x
 
 
-def get_bootload_entry(ctrl_len: int = 0, ctrl_reserved: int = 0,
-                       ctrl_spi_32bitmode: bool = False,
-                       ctrl_release_ta_softreset: bool = False,
-                       ctrl_start_from_rom_pc: bool = False,
-                       ctrl_spi_8bitmode: bool = False,
-                       ctrl_last_entry: bool = True,
-                       dest_addr: int = 0) -> bytes:
+def get_bootload_entry(
+    ctrl_len: int = 0,
+    ctrl_reserved: int = 0,
+    ctrl_spi_32bitmode: bool = False,
+    ctrl_release_ta_softreset: bool = False,
+    ctrl_start_from_rom_pc: bool = False,
+    ctrl_spi_8bitmode: bool = False,
+    ctrl_last_entry: bool = True,
+    dest_addr: int = 0,
+) -> bytes:
     # Format bootload_entry struct
     ctrl = 0
     ctrl = set_bits(ctrl, 0, 24, ctrl_len)
@@ -75,13 +81,13 @@ def get_bootload_entry(ctrl_len: int = 0, ctrl_reserved: int = 0,
     return struct.pack("<II", ctrl, dest_addr)
 
 
-def get_bootload_ds(offset: int, ivt_offset: int, fixed_pattern: int = 0x5aa5) -> bytes:
+def get_bootload_ds(offset: int, ivt_offset: int, fixed_pattern: int = 0x5AA5) -> bytes:
     ret = b""
     ret += int(fixed_pattern).to_bytes(2, "little")
     ret += int(offset).to_bytes(2, "little")
     ret += int(ivt_offset).to_bytes(4, "little")
     for i in range(7):
-        ret += get_bootload_entry(ctrl_last_entry=i==0)
+        ret += get_bootload_entry(ctrl_last_entry=i == 0)
     return ret
 
 
@@ -89,7 +95,7 @@ def get_fwupreq(flash_location: int, image_size: int) -> bytes:
     # Field values
     cflags = 1
     sha_type = 0
-    magic_no = 0x900d900d
+    magic_no = 0x900D900D
     fw_version = 0
     # Initially CRC value is set to 0, then the CRC is calculated on the
     # whole image (including fwupreq header), and injected here
@@ -117,7 +123,7 @@ def get_fwupreq(flash_location: int, image_size: int) -> bytes:
 def main():
     parser = argparse.ArgumentParser(
         description="Converts raw binary output from Zephyr into an ISP binary for Silabs SiWx917 SoCs",
-        allow_abbrev=False
+        allow_abbrev=False,
     )
     parser.add_argument(
         "ifile",
@@ -136,7 +142,7 @@ def main():
         metavar="ADDRESS",
         help="Address at which the raw binary image begins in the memory",
         type=lambda x: int(x, 0),
-        required=True
+        required=True,
     )
     parser.add_argument(
         "--out-hex",
@@ -180,6 +186,7 @@ def main():
         # len(bl) + len(padding) + len(fwupreq) == 4096
         hx.frombytes(img, args.load_addr - 4096)
         hx.write_hex_file(args.out_hex, byte_count=32)
+
 
 if __name__ == "__main__":
     main()
