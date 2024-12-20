@@ -42,10 +42,6 @@ You can now [install extra Python packages][pydeps] required by Zephyr:
 
      pip install -r zephyr/scripts/requirements.txt
 
-SiGx917 integration also need for the `crc` Python package:
-
-     pip install crc
-
 Retrieve the blobs:
 
     west blobs fetch
