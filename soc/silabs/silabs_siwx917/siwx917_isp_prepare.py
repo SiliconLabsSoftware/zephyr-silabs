@@ -38,12 +38,12 @@ def calc_checksum(data: Union[bytes, bytearray], size: int, prev_sum: int) -> in
     data = data[:size]
     # Zero-pad data to mul of 4 bytes
     nzeros = ((len(data) + 3) // 4 * 4) - len(data)
-    data += b'\0' * nzeros
+    data += b"\0" * nzeros
     # Reinterpret data as LE u32
-    ints = list(x[0] for x in struct.iter_unpack('<I', data))
+    ints = list(x[0] for x in struct.iter_unpack("<I", data))
     # Sum
     chk = prev_sum + sum(ints)
-    # Convert to u32 and account each overflow as 1's complement addition
+    # Convert to u32 and account each overflow as 1"s complement addition
     chk = (chk & 0xFFffFFff) + (chk >> 32)
     chk = (~chk) & 0xFFffFFff
     return chk
@@ -72,14 +72,14 @@ def get_bootload_entry(ctrl_len: int = 0, ctrl_reserved: int = 0,
     ctrl = set_bits(ctrl, 29, 1, ctrl_start_from_rom_pc)
     ctrl = set_bits(ctrl, 30, 1, ctrl_spi_8bitmode)
     ctrl = set_bits(ctrl, 31, 1, ctrl_last_entry)
-    return struct.pack('<II', ctrl, dest_addr)
+    return struct.pack("<II", ctrl, dest_addr)
 
 
 def get_bootload_ds(offset: int, ivt_offset: int, fixed_pattern: int = 0x5aa5) -> bytes:
-    ret = b''
-    ret += int(fixed_pattern).to_bytes(2, 'little')
-    ret += int(offset).to_bytes(2, 'little')
-    ret += int(ivt_offset).to_bytes(4, 'little')
+    ret = b""
+    ret += int(fixed_pattern).to_bytes(2, "little")
+    ret += int(offset).to_bytes(2, "little")
+    ret += int(ivt_offset).to_bytes(4, "little")
     for i in range(7):
         ret += get_bootload_entry(ctrl_last_entry=i==0)
     return ret
@@ -98,51 +98,51 @@ def get_fwupreq(flash_location: int, image_size: int) -> bytes:
     counter = 0
     rsvd = [0, 0, 0, 0, magic_no]
     # Format
-    ret = b''
-    ret += cflags.to_bytes(2, 'little')
-    ret += sha_type.to_bytes(2, 'little')
-    ret += magic_no.to_bytes(4, 'little')
-    ret += image_size.to_bytes(4, 'little')
-    ret += fw_version.to_bytes(4, 'little')
-    ret += flash_location.to_bytes(4, 'little')
-    ret += crc.to_bytes(4, 'little')
+    ret = b""
+    ret += cflags.to_bytes(2, "little")
+    ret += sha_type.to_bytes(2, "little")
+    ret += magic_no.to_bytes(4, "little")
+    ret += image_size.to_bytes(4, "little")
+    ret += fw_version.to_bytes(4, "little")
+    ret += flash_location.to_bytes(4, "little")
+    ret += crc.to_bytes(4, "little")
     for x in mic:
-        ret += x.to_bytes(4, 'little')
-    ret += counter.to_bytes(4, 'little')
+        ret += x.to_bytes(4, "little")
+    ret += counter.to_bytes(4, "little")
     for x in rsvd:
-        ret += x.to_bytes(4, 'little')
+        ret += x.to_bytes(4, "little")
     return ret
 
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Converts raw binary output from Zephyr into an ISP binary for Silabs SiWx917 SoCs',
+        description="Converts raw binary output from Zephyr into an ISP binary for Silabs SiWx917 SoCs",
         allow_abbrev=False
     )
     parser.add_argument(
-        'ifile',
-        metavar='INPUT.BIN',
-        help='Raw binary file to read',
-        type=argparse.FileType('rb'),
+        "ifile",
+        metavar="INPUT.BIN",
+        help="Raw binary file to read",
+        type=argparse.FileType("rb"),
     )
     parser.add_argument(
-        'ofile',
-        metavar='OUTPUT.BIN',
-        help='ISP binary file to write',
-        type=argparse.FileType('wb'),
+        "ofile",
+        metavar="OUTPUT.BIN",
+        help="ISP binary file to write",
+        type=argparse.FileType("wb"),
     )
     parser.add_argument(
-        '--load-addr',
-        metavar='ADDRESS',
-        help='Address at which the raw binary image begins in the memory',
+        "--load-addr",
+        metavar="ADDRESS",
+        help="Address at which the raw binary image begins in the memory",
         type=lambda x: int(x, 0),
         required=True
     )
     parser.add_argument(
-        '--out-hex',
-        metavar='FILE.HEX',
-        help='Generate Intel HEX output in addition to binary one',
-        type=argparse.FileType('w', encoding='ascii'),
+        "--out-hex",
+        metavar="FILE.HEX",
+        help="Generate Intel HEX output in addition to binary one",
+        type=argparse.FileType("w", encoding="ascii"),
     )
     args = parser.parse_args()
 
@@ -150,8 +150,8 @@ def main():
 
     # Calculate and inject checksum
     chk = calc_checksum(img, 236, 1)
-    print(f'ROM checksum: 0x{chk:08x}', file=sys.stderr)
-    img[236:240] = chk.to_bytes(4, 'little')
+    print(f"ROM checksum: 0x{chk:08x}", file=sys.stderr)
+    img[236:240] = chk.to_bytes(4, "little")
 
     # Get bootloader header, pad to 4032 and glue it to the image payload
     bl = bytearray(get_bootload_ds(4032, args.load_addr))
@@ -164,8 +164,8 @@ def main():
 
     # Calculate and inject CRC
     crc = calc_crc32(img)
-    print(f'Image CRC: 0x{crc:08x}', file=sys.stderr)
-    img[20:24] = crc.to_bytes(4, 'little')
+    print(f"Image CRC: 0x{crc:08x}", file=sys.stderr)
+    img[20:24] = crc.to_bytes(4, "little")
 
     args.ofile.write(img)
 
@@ -181,5 +181,5 @@ def main():
         hx.frombytes(img, args.load_addr - 4096)
         hx.write_hex_file(args.out_hex, byte_count=32)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
