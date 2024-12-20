@@ -59,7 +59,7 @@
 			};
 		};
 
-		ulpuart0: uart@24041800 {
+		ulpuart: uart@24041800 {
 			compatible = "ns16550";
 			reg = <0x24041800 0x1000>;
 			interrupts = <12 0>;
