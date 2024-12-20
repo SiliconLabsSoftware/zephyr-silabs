@@ -27,7 +27,7 @@ int silabs_siwx917_init(void)
 					    PLL_REF_CLK_VAL_XTAL);
 
 	/* FIXME: do not hardcode UART instances */
-#if DT_NODE_HAS_STATUS(DT_NODELABEL(ulpuart0), okay)
+#if DT_NODE_HAS_STATUS(DT_NODELABEL(ulpuart), okay)
 	RSI_ULPSS_UlpUartClkConfig(ULPCLK, ENABLE_STATIC_CLK, 0, ULP_UART_ULP_32MHZ_RC_CLK, 1);
 #endif
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(uart1), okay)

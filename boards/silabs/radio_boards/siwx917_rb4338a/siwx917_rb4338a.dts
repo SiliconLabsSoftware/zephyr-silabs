@@ -18,8 +18,8 @@
 	chosen {
 		zephyr,sram = &sram0;
 		zephyr,code-partition = &code_partition;
-		zephyr,console = &ulpuart0;
-		zephyr,shell-uart = &ulpuart0;
+		zephyr,console = &ulpuart;
+		zephyr,shell-uart = &ulpuart;
 		zephyr,bt-hci = &bt_hci_silabs_siwx917;
 	};
 
@@ -63,9 +63,9 @@
 	status = "okay";
 };
 
-&ulpuart0 {
+&ulpuart {
 	status = "okay";
-	pinctrl-0 = <&ulpuart0_default>;
+	pinctrl-0 = <&ulpuart_default>;
 	pinctrl-names = "default";
 };
 
@@ -83,7 +83,7 @@
 };
 
 &pinctrl0 {
-	ulpuart0_default: ulpuart0_default {
+	ulpuart_default: ulpuart_default {
 		out {
 			pinmux = <ULPUART_TX_ULP11>;
 		};
