@@ -18,10 +18,6 @@ jobs:
         with:
           python-version: 3.13
 
-      - name: Install Silabs-specific python dependencies
-        run: |
-          pip3 install crc
-
       - name: Update manifest to point at upstream main branch
         working-directory: zephyr-silabs
         shell: bash
