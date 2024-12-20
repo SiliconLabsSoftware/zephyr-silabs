@@ -116,13 +116,13 @@ def get_fwupreq(flash_location: int, image_size: int) -> bytes:
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Converts ROM binary into an ISP binary for SiLabs SiWx917 SoCs',
+        description='Converts raw binary output from Zephyr into an ISP binary for Silabs SiWx917 SoCs',
         allow_abbrev=False
     )
     parser.add_argument(
         'ifile',
         metavar='INPUT.BIN',
-        help='ROM binary file to read',
+        help='Raw binary file to read',
         type=argparse.FileType('rb'),
     )
     parser.add_argument(
@@ -132,14 +132,14 @@ def main():
         type=argparse.FileType('wb'),
     )
     parser.add_argument(
-        '--rom_addr',
+        '--load-addr',
         metavar='ADDRESS',
-        help='Address at which FW image begins in the SoC (this understands hex if prefixed with 0x)',
+        help='Address at which the raw binary image begins in the memory',
         type=lambda x: int(x, 0),
         required=True
     )
     parser.add_argument(
-        '--out_hex',
+        '--out-hex',
         metavar='FILE.HEX',
         help='Generate Intel HEX output in addition to binary one',
         type=argparse.FileType('w', encoding='ascii'),
@@ -154,12 +154,12 @@ def main():
     img[236:240] = chk.to_bytes(4, 'little')
 
     # Get bootloader header, pad to 4032 and glue it to the image payload
-    bl = bytearray(get_bootload_ds(4032, args.rom_addr))
+    bl = bytearray(get_bootload_ds(4032, args.load_addr))
     padding = bytearray(4032 - len(bl))
     img = bl + padding + img
 
     # Get fwupreq header and glue it to the bootloader payload
-    fwupreq = bytearray(get_fwupreq(args.rom_addr - 0x8001000, len(img)))
+    fwupreq = bytearray(get_fwupreq(args.load_addr - 0x8001000, len(img)))
     img = fwupreq + img
 
     # Calculate and inject CRC
@@ -178,7 +178,7 @@ def main():
     if args.out_hex:
         hx = intelhex.IntelHex()
         # len(bl) + len(padding) + len(fwupreq) == 4096
-        hx.frombytes(img, args.rom_addr - 4096)
+        hx.frombytes(img, args.load_addr - 4096)
         hx.write_hex_file(args.out_hex, byte_count=32)
 
 if __name__ == '__main__':
