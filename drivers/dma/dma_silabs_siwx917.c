@@ -9,6 +9,7 @@
 #include <zephyr/sys/util.h>
 #include <zephyr/device.h>
 #include <zephyr/drivers/dma.h>
+#include <zephyr/drivers/clock_control.h>
 #include <zephyr/logging/log.h>
 #include <zephyr/types.h>
 #include "rsi_rom_udma_wrapper.h"
@@ -29,6 +30,8 @@ struct dma_siwx917_config {
 	uint8_t channels;                /* UDMA channel count */
 	uint8_t irq_number;              /* IRQ number */
 	RSI_UDMA_DESC_T *sram_desc_addr; /* SRAM Address for UDMA Descriptor Storage */
+	const struct device *clock_dev;
+	clock_control_subsys_t clock_subsys;
 	void (*irq_configure)(void);     /* IRQ configure function */
 };
 
@@ -326,6 +329,12 @@ static int dma_siwx917_init(const struct device *dev)
 		.udma_irq_num = cfg->irq_number,
 		.desc = cfg->sram_desc_addr,
 	};
+	int ret;
+
+	ret = clock_control_on(cfg->clock_dev, cfg->clock_subsys);
+	if (ret) {
+		return ret;
+	}
 
 	udma_handle = UDMAx_Initialize(&udma_resources, udma_resources.desc, NULL,
 				       (uint32_t *)&data->dma_rom_buff);
@@ -406,6 +415,8 @@ static const struct dma_driver_api siwx917_dma_driver_api = {
 		irq_enable(DT_INST_IRQ(inst, irq));                                                \
 	}                                                                                          \
 	static const struct dma_siwx917_config dma##inst##_cfg = {                                 \
+		.clock_dev = DEVICE_DT_GET(DT_INST_CLOCKS_CTLR(inst)),                             \
+		.clock_subsys = (clock_control_subsys_t)DT_INST_PHA(inst, clocks, clkid),          \
 		.reg = (UDMA0_Type *)DT_INST_REG_ADDR(inst),                                       \
 		.channels = DT_INST_PROP(inst, dma_channels),                                      \
 		.irq_number = DT_INST_PROP_BY_IDX(inst, interrupts, 0),                            \

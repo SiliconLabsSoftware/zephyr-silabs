@@ -163,10 +163,6 @@ static int siwx917_clock_init(const struct device *dev)
 	siwx917_clock_on(dev, (clock_control_subsys_t)SIWX917_CLK_ULP_I2C);
 #endif
 
-#if DT_NODE_HAS_STATUS(DT_NODELABEL(ulpdma), okay)
-	siwx917_clock_on(dev, (clock_control_subsys_t)SIWX917_CLK_ULP_DMA);
-#endif
-
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(uart1), okay)
 	siwx917_clock_on(dev, (clock_control_subsys_t)SIWX917_CLK_UART1);
 #endif
@@ -181,10 +177,6 @@ static int siwx917_clock_init(const struct device *dev)
 
 #if DT_NODE_HAS_STATUS(DT_NODELABEL(i2c1), okay)
 	siwx917_clock_on(dev, (clock_control_subsys_t)SIWX917_CLK_I2C1);
-#endif
-
-#if DT_NODE_HAS_STATUS(DT_NODELABEL(udma0), okay)
-	siwx917_clock_on(dev, (clock_control_subsys_t)SIWX917_CLK_DMA0);
 #endif
 
 	return 0;
