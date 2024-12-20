@@ -222,13 +222,13 @@
 			reg = <0x45090000 0x8>;
 		};
 
-		udma0: dma@44030000 {
+		dma0: dma@44030000 {
 			compatible = "silabs,siwx917-dma";
 			#address-cells = <1>;
 			#size-cells = <0>;
 			reg = <0x44030000 0x82C>;
 			interrupts = <33 0>;
-			interrupt-names = "udma0";
+			interrupt-names = "dma0";
 			silabs,sram-desc-addr = <0x2fc00>;
 			#dma-cells = < 1>;
 			dma-channels = <32>;
