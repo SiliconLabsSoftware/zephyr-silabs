@@ -48,7 +48,8 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s drivers.flash.common.default -p siwx917_rb4338a -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/flash/common/boards/siwx917_rb4338a.overlay -v --inline-logs
+          west twister -s drivers.flash.common.default -p siwx917_rb4338a -v --inline-logs \
+              -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/flash/common/boards/siwx917_rb4338a.overlay
 
       - name: Build DMA test
         working-directory: zephyr-silabs
