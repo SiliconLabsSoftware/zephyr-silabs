@@ -9,18 +9,18 @@ description: |
   The pinctrl settings are referenced in a device tree peripheral node. For
   example when configuring a UART:
 
-    &ulpuart0 {
-      pinctrl-0 = <&ulpuart0_default>;
+    &ulpuart {
+      pinctrl-0 = <&ulpuart_default>;
       pinctrl-names = "default";
     }
 
   pinctrl-0 is a phandle that stores the pin settings for the peripheral, in
-  this example &ulpuart0_default. This phandle is defined as a child node of the
+  this example &ulpuart_default. This phandle is defined as a child node of the
   'pinctrl' node, typically in a board-pinctrl.dtsi file in the board directory
   or a device tree overlay in the application:
 
     &pinctrl {
-      ulpuart0_default: ulpuart0_default {
+      ulpuart_default: ulpuart_default {
         out {
           pinmux = <ULPUART_TX_ULP11>; /* Configure ULP pin 11 as ULPUART TX */
         };
@@ -30,7 +30,7 @@ description: |
       };
     };
 
-  The 'ulpuart0_default' child node encodes the pin configurations for a
+  The 'ulpuart_default' child node encodes the pin configurations for a
   particular state of the device, the default (active) state.
 
   Pin configurations are organized in groups within each child node. The name

@@ -29,6 +29,8 @@ struct dma_siwx917_config {
 	uint8_t channels;                /* UDMA channel count */
 	uint8_t irq_number;              /* IRQ number */
 	RSI_UDMA_DESC_T *sram_desc_addr; /* SRAM Address for UDMA Descriptor Storage */
+	const struct device *clock_dev;
+	clock_control_subsys_t clock_subsys;
 	void (*irq_configure)(void);     /* IRQ configure function */
 };
 
@@ -169,7 +171,7 @@ static int dma_siwx917_configure(const struct device *dev, uint32_t channel,
 	void *udma_handle = &data->dma_rom_buff;
 	int status;
 
-	/* Expecting a fixed channel number between 0-31 for udma0 and 0-11 for udma1 */
+	/* Expecting a fixed channel number between 0-31 for dma0 and 0-11 for ulpdma */
 	if (channel >= cfg->channels) {
 		return -EINVAL;
 	}
@@ -204,7 +206,7 @@ static int dma_siwx917_reload(const struct device *dev, uint32_t channel, uint32
 	uint32_t length;
 	RSI_UDMA_DESC_T *udma_table = cfg->sram_desc_addr;
 
-	/* Expecting a fixed channel number between 0-31 for udma0 and 0-11 for udma1 */
+	/* Expecting a fixed channel number between 0-31 for dma0 and 0-11 for ulpdma */
 	if (channel >= cfg->channels) {
 		return -EINVAL;
 	}
@@ -252,7 +254,7 @@ static int dma_siwx917_start(const struct device *dev, uint32_t channel)
 	struct dma_siwx917_data *data = dev->data;
 	void *udma_handle = &data->dma_rom_buff;
 
-	/* Expecting a fixed channel number between 0-31 for udma0 and 0-11 for udma1 */
+	/* Expecting a fixed channel number between 0-31 for dma0 and 0-11 for ulpdma */
 	if (channel >= cfg->channels) {
 		return -EINVAL;
 	}
@@ -276,7 +278,7 @@ static int dma_siwx917_stop(const struct device *dev, uint32_t channel)
 	struct dma_siwx917_data *data = dev->data;
 	void *udma_handle = &data->dma_rom_buff;
 
-	/* Expecting a fixed channel number between 0-31 for udma0 and 0-11 for udma1 */
+	/* Expecting a fixed channel number between 0-31 for dma0 and 0-11 for ulpdma */
 	if (channel >= cfg->channels) {
 		return -EINVAL;
 	}
@@ -293,7 +295,7 @@ static int dma_siwx917_get_status(const struct device *dev, uint32_t channel,
 	const struct dma_siwx917_config *cfg = dev->config;
 	RSI_UDMA_DESC_T *udma_table = cfg->sram_desc_addr;
 
-	/* Expecting a fixed channel number between 0-31 for udma0 and 0-11 for udma1 */
+	/* Expecting a fixed channel number between 0-31 for dma0 and 0-11 for ulpdma */
 	if (channel >= cfg->channels) {
 		return -EINVAL;
 	}
@@ -326,6 +328,12 @@ static int dma_siwx917_init(const struct device *dev)
 		.udma_irq_num = cfg->irq_number,
 		.desc = cfg->sram_desc_addr,
 	};
+	int ret;
+
+	ret = clock_control_on(cfg->clock_dev, cfg->clock_sys);
+	if (ret) {
+		return ret;
+	}
 
 	udma_handle = UDMAx_Initialize(&udma_resources, udma_resources.desc, NULL,
 				       (uint32_t *)&data->dma_rom_buff);
@@ -406,6 +414,8 @@ static const struct dma_driver_api siwx917_dma_driver_api = {
 		irq_enable(DT_INST_IRQ(inst, irq));                                                \
 	}                                                                                          \
 	static const struct dma_siwx917_config dma##inst##_cfg = {                                 \
+		.clock_dev = DEVICE_DT_GET(DT_INST_CLOCKS_CTLR(inst)),                             \
+		.clock_subsys = (clock_control_subsys_t)DT_INST_PHA(inst, clocks, clkid),          \
 		.reg = (UDMA0_Type *)DT_INST_REG_ADDR(inst),                                       \
 		.channels = DT_INST_PROP(inst, dma_channels),                                      \
 		.irq_number = DT_INST_PROP_BY_IDX(inst, interrupts, 0),                            \

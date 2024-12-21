@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-tst_dma0: &udma0 {
+tst_dma0: &dma0 {
 	status = "okay";
 };
 
-tst_dma1: &udma1 {
+tst_dma1: &ulpdma {
 	status = "okay";
 };
