@@ -55,10 +55,9 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s drivers.dma.chan_blen_transfer -p siwx917_rb4338a -- \
-            -DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.overlay \
-            -DEXTRA_CONF_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.conf \
-            -v --inline-logs
+          west twister -s drivers.dma.chan_blen_transfer -p siwx917_rb4338a -v --inline-logs \
+            -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.overlay \
+            -x EXTRA_CONF_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.conf
 
       - name: Build Bluetooth samples
         working-directory: zephyr-silabs
