@@ -42,20 +42,26 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s drivers.entropy -p siwx917_rb4338a -v --inline-logs
+          west twister -v --inline-logs \
+            -s drivers.entropy \
+            -p siwx917_rb4338a
 
       - name: Build Flash test
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s drivers.flash.common.default -p siwx917_rb4338a -v --inline-logs \
-              -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/flash/common/boards/siwx917_rb4338a.overlay
+          west twister -v --inline-logs \
+            -s drivers.flash.common.default \
+            -p siwx917_rb4338a \
+            -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/flash/common/boards/siwx917_rb4338a.overlay
 
       - name: Build DMA test
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s drivers.dma.chan_blen_transfer -p siwx917_rb4338a -v --inline-logs \
+          west twister -v --inline-logs \
+            -s drivers.dma.chan_blen_transfer \
+            -p siwx917_rb4338a \
             -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.overlay \
             -x EXTRA_CONF_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.conf
 
@@ -63,18 +69,25 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s sample.bluetooth.peripheral_hr -p siwx917_rb4338a -v --inline-logs -K
+          west twister -v --inline-logs -K \
+            -s sample.bluetooth.peripheral_hr \
+            -p siwx917_rb4338a
 
       - name: Build Rail samples
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s sample.rail.simple_txrx -T samples -v --inline-logs
+          west twister -v --inline-logs \
+            -s sample.rail.simple_txrx -T samples
 
       - name: Build Wifi samples
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K
-          west twister -s sample.net.wifi -p siwx917_rb4338a -v --inline-logs -K \
-              -x EXTRA_CONF_FILE=$(pwd)/samples/net/wifi/shell/soc/siwx917_offloaded_sockets.conf
+          west twister -v --inline-logs -K \
+            -s sample.net.wifi \
+            -p siwx917_rb4338a
+          west twister -v --inline-logs -K \
+            -s sample.net.wifi \
+            -p siwx917_rb4338a \
+            -x EXTRA_CONF_FILE=$(pwd)/samples/net/wifi/shell/soc/siwx917_offloaded_sockets.conf
