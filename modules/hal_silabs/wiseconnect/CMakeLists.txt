@@ -14,6 +14,7 @@ zephyr_include_directories(
   ${SISDK_COMMON_DIR}/config
   ${DEVICE_DIR}/silabs/si91x/mcu/core/config
   ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/inc
+  ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/config
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/rom_driver/inc
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/peripheral_drivers/inc
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/service/clock_manager/inc
@@ -48,9 +49,11 @@ zephyr_library_sources(
   ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c
   ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/src/system_si91x.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c
+  ${DEVICE_DIR}/silabs/si91x/mcu/drivers/peripheral_drivers/src/rsi_sysrtc.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c
+  ${DEVICE_DIR}/silabs/si91x/mcu/drivers/systemlevel/src/rsi_wwdt.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/service/clock_manager/src/sl_si91x_clock_manager.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/unified_api/src/sl_si91x_driver_gpio.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/unified_peripheral_drivers/src/sl_si91x_peripheral_gpio.c

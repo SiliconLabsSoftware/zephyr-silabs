@@ -71,6 +71,15 @@ jobs:
             -p xg29_rb4412a \
             -T tests/crypto/
 
+      - name: Build Watchdog sample
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          west twister -v --inline-logs -K \
+            -s sample.drivers.watchdog \
+            -p siwx917_rb4338a \
+            -x DTC_OVERLAY_FILE=$(pwd)/samples/drivers/watchdog/board/siwx917_rb4338a.overlay
+
       - name: Build Bluetooth samples
         working-directory: zephyr-silabs
         shell: bash

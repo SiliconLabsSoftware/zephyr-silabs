@@ -12,5 +12,6 @@
 #define SIWX917_CLK_I2C0          5
 #define SIWX917_CLK_I2C1          6
 #define SIWX917_CLK_DMA0          7
+#define SIWX917_CLK_WATCHDOG      8
 
 #endif

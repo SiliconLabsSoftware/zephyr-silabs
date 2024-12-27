@@ -15,4 +15,5 @@ supported:
   - wifi
   - bluetooth
   - flash
+  - watchdog
 vendor: silabs
