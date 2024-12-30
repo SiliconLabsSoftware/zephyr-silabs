@@ -8,7 +8,12 @@ menuconfig DMA_SILABS_SIWX917
 	help
 	  Enable the High Power(HP)/Ultra Low Power(ULP) DMA driver for the Silabs SiWx917 SoC series.
 
-config DMA_SILABS_SIWX917_COMMON_INIT_PRIORITY
-	int "Common initialization priority"
-	depends on DMA_SILABS_SIWX917
-	default 42
+if DMA_SILABS_SIWX917
+	config DMA_SILABS_SIWX917_COMMON_INIT_PRIORITY
+		int "Common initialization priority"
+		default 42
+
+	config DMA_SILABS_SIWX917_SG_BUFFER_COUNT
+		int "The maximum allowable number of buffers for scatter-gather transfers"
+		default 10
+endif
