@@ -44,6 +44,7 @@ zephyr_compile_definitions_ifdef(CONFIG_SIWX917_FLASH_MODE_COMMON
 zephyr_library_sources(
   ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/src/rsi_deepsleep_soc.c
   ${DEVICE_DIR}/silabs/si91x/mcu/core/chip/src/system_si91x.c
+  ${DEVICE_DIR}/silabs/si91x/mcu/drivers/peripheral_drivers/src/clock_update.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ipmu.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/systemlevel/src/rsi_pll.c
   ${DEVICE_DIR}/silabs/si91x/mcu/drivers/systemlevel/src/rsi_ulpss_clk.c
