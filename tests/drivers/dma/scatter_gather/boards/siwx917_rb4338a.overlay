@@ -6,10 +6,10 @@
 
 / {
 	aliases {
-		dma0 = &udma0;
+		dma0 = &dma0;
 	};
 };
 
-&udma0 {
+&dma0 {
 	status = "okay";
 };
