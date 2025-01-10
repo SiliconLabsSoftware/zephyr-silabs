@@ -19,6 +19,24 @@ jobs:
         fetch-depth: 0
         path: zephyr-silabs
 
+    - name: Rebase onto the target branch
+      env:
+        BASE_REF: ${{ github.base_ref }}
+      working-directory: zephyr-silabs
+      run: |
+        git config --global user.email "you@example.com"
+        git config --global user.name "Your Name"
+        git remote -v
+        # Ensure there's no merge commits in the PR
+        [[ "$(git rev-list --merges --count origin/${BASE_REF}..)" == "0" ]] || \
+        (echo "::error ::Merge commits not allowed, rebase instead";false)
+        rm -fr ".git/rebase-apply"
+        rm -fr ".git/rebase-merge"
+        git rebase origin/${BASE_REF}
+        git clean -f -d
+        # debug
+        git log  --pretty=oneline | head -n 10
+
     - name: Set up Python
       uses: actions/setup-python@v5
       with:
