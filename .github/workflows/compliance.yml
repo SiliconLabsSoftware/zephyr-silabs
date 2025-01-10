@@ -31,8 +31,10 @@ jobs:
         toolchains: arm-zephyr-eabi
 
     - name: Install compliance-specific python dependencies
+      working-directory: zephyr-silabs
       run: |
-        pip3 install python-magic lxml junitparser gitlint pylint pykwalify yamllint clang-format unidiff
+        ZEPHYR_BASE="$(west topdir)/zephyr"
+        pip3 install -r $ZEPHYR_BASE/scripts/requirements-compliance.txt
 
     - name: Run Compliance Tests
       continue-on-error: true
