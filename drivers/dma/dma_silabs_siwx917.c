@@ -49,7 +49,7 @@ struct dma_siwx917_data {
 					       */
 };
 
-static inline int siwx917_is_peripheral_request(uint32_t dir)
+static int siwx917_transfer_direction(uint32_t dir)
 {
 	if (dir == MEMORY_TO_MEMORY) {
 		return 0;
@@ -57,10 +57,11 @@ static inline int siwx917_is_peripheral_request(uint32_t dir)
 	if (dir == MEMORY_TO_PERIPHERAL || dir == PERIPHERAL_TO_MEMORY) {
 		return 1;
 	}
+	/* Invalid transfer direction */
 	return -1;
 }
 
-static inline int siwx917_data_width(uint32_t data_width)
+static int siwx917_data_width(uint32_t data_width)
 {
 	switch (data_width) {
 	case 1:
@@ -74,17 +75,17 @@ static inline int siwx917_data_width(uint32_t data_width)
 	}
 }
 
-static inline int siwx917_burst_length(uint32_t blen)
+static bool siwx917_burst_length_is_valid(uint32_t blen)
 {
 	switch (blen / 8) {
 	case 1:
-		return VALID_BURST_LENGTH; /* 8-bit burst */
+		return true; /* 8-bit burst */
 	default:
-		return -EINVAL;
+		return false;
 	}
 }
 
-static inline int siwx917_addr_adjustment(uint32_t adjustment)
+static int siwx917_addr_adjustment(uint32_t adjustment)
 {
 	switch (adjustment) {
 	case 0:
@@ -106,10 +107,10 @@ static int siwx917_sg_fill_desc(RSI_UDMA_DESC_T *descs, const struct dma_config 
 		cfg = &descs[i].vsUDMAChaConfigData1;
 		/* Set the source and destination end addresses */
 		descs[i].pSrcEndAddr =
-			(uint32_t *)(block_addr->source_address +
+			(void *)(block_addr->source_address +
 				     (block_addr->block_size - config->source_data_size));
 		descs[i].pDstEndAddr =
-			(uint32_t *)(block_addr->dest_address +
+			(void *)(block_addr->dest_address +
 				     (block_addr->block_size - config->dest_data_size));
 		/* Set the source and destination data sizes */
 		cfg->srcSize = siwx917_data_width(config->source_data_size);
@@ -122,7 +123,7 @@ static int siwx917_sg_fill_desc(RSI_UDMA_DESC_T *descs, const struct dma_config 
 		/* Set the total number of DMA transfers */
 		cfg->totalNumOfDMATrans = block_addr->block_size - 1;
 		/* Set the transfer type based on whether it is a peripheral request */
-		cfg->transferType = siwx917_is_peripheral_request(config->channel_direction)
+		cfg->transferType = siwx917_transfer_direction(config->channel_direction)
 					    ? UDMA_MODE_PER_ALT_SCATTER_GATHER
 					    : UDMA_MODE_MEM_ALT_SCATTER_GATHER;
 		/* Set the arbitration size */
@@ -147,7 +148,7 @@ static int siwx917_sg_fill_desc(RSI_UDMA_DESC_T *descs, const struct dma_config 
 	}
 	/* Set the transfer type for the last descriptor */
 	descs[config->block_count - 1].vsUDMAChaConfigData1.transferType =
-		siwx917_is_peripheral_request(config->channel_direction) ? UDMA_MODE_BASIC
+		siwx917_transfer_direction(config->channel_direction) ? UDMA_MODE_BASIC
 									 : UDMA_MODE_AUTO;
 	return 0;
 }
@@ -161,9 +162,9 @@ static int siwx917_sg_config(const struct device *dev, RSI_UDMA_HANDLE_T udma_ha
 	struct dma_siwx917_data *data = dev->data;
 	RSI_UDMA_DESC_T *sg_desc_base_addr = NULL;
 
-	if (siwx917_is_peripheral_request(config->channel_direction) == 1) {
+	if (siwx917_transfer_direction(config->channel_direction) == 1) {
 		transfer_type = UDMA_MODE_PER_SCATTER_GATHER;
-	} else if (siwx917_is_peripheral_request(config->channel_direction) < 0) {
+	} else if (siwx917_transfer_direction(config->channel_direction) < 0) {
 		return -EINVAL;
 	}
 	if (siwx917_data_width(config->source_data_size) < 0 ||
@@ -221,10 +222,10 @@ static int siwx917_channel_config(const struct device *dev, RSI_UDMA_HANDLE_T ud
 	int status;
 
 	channel_config.channelPrioHigh = config->channel_priority;
-	if (siwx917_is_peripheral_request(config->channel_direction) < 0) {
+	if (siwx917_transfer_direction(config->channel_direction) < 0) {
 		return -EINVAL;
 	}
-	channel_config.periphReq = siwx917_is_peripheral_request(config->channel_direction);
+	channel_config.periphReq = siwx917_transfer_direction(config->channel_direction);
 	channel_config.dmaCh = channel;
 	if (channel_config.periphReq) {
 		/* Arbitration power for peripheral<->memory transfers */
@@ -245,8 +246,8 @@ static int siwx917_channel_config(const struct device *dev, RSI_UDMA_HANDLE_T ud
 	    siwx917_data_width(config->dest_data_size) < 0) {
 		return -EINVAL;
 	}
-	if (siwx917_burst_length(config->source_burst_length) < 0 ||
-	    siwx917_burst_length(config->dest_burst_length) < 0) {
+	if (siwx917_burst_length_is_valid(config->source_burst_length) == 0 ||
+	    siwx917_burst_length_is_valid(config->dest_burst_length) == 0) {
 		return -EINVAL;
 	}
 	channel_control.srcSize = siwx917_data_width(config->source_data_size);

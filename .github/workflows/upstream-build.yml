@@ -57,8 +57,8 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s drivers.dma.chan_blen_transfer -p siwx917_rb4338a -x \
-            DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.overlay \
+          west twister -s drivers.dma.chan_blen_transfer -p siwx917_rb4338a \
+            -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.overlay \
             -x EXTRA_CONF_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.conf \
             -v --inline-logs
 
@@ -66,8 +66,8 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          west twister -s drivers.dma.scatter_gather -K -p siwx917_rb4338a -x \
-            DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/scatter_gather/boards/siwx917_rb4338a.overlay \
+          west twister -s drivers.dma.scatter_gather -K -p siwx917_rb4338a \
+            -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/scatter_gather/boards/siwx917_rb4338a.overlay \
             -x EXTRA_CONF_FILE=$(pwd)/tests/drivers/dma/scatter_gather/boards/siwx917_rb4338a.conf \
             -v --inline-logs
 
