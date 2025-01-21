@@ -6,6 +6,7 @@
 #define DT_DRV_COMPAT silabs_siwx917_wifi
 
 #include <zephyr/logging/log.h>
+#include <zephyr/sys/__assert.h>
 
 #include "siwx917_wifi.h"
 #include "siwx917_wifi_socket.h"
@@ -199,12 +200,15 @@ static int siwx917_scan(const struct device *dev, struct wifi_scan_params *z_sca
 	struct siwx917_dev *sidev = dev->data;
 	int ret;
 
+	__ASSERT(z_scan_config, "z_scan_config cannot be NULL");
+
 	if (sidev->state != WIFI_STATE_INACTIVE) {
 		return -EBUSY;
 	}
 
-	/* FIXME: fill sl_scan_config with values from z_scan_config */
-	sl_scan_config.type = SL_WIFI_SCAN_TYPE_ACTIVE;
+	/* The enum values are same, no conversion needed */
+	sl_scan_config.type = z_scan_config->scan_type;
+
 	sl_scan_config.channel_bitmap_2g4 = 0xFFFF;
 	memset(sl_scan_config.channel_bitmap_5g, 0xFF, sizeof(sl_scan_config.channel_bitmap_5g));
 
