@@ -95,7 +95,7 @@ static int siwx917_nwp_init(void)
 SYS_INIT(siwx917_nwp_init, POST_KERNEL, CONFIG_KERNEL_INIT_PRIORITY_DEVICE);
 
 /* IRQn 74 is used for communication with co-processor */
-Z_ISR_DECLARE(74, ISR_FLAG_DIRECT, IRQ074_Handler, 0);
+Z_ISR_DECLARE(74, 0, IRQ074_Handler, 0);
 
 /* Co-processor will use value stored in IVT to store its stack.
  *
