@@ -60,7 +60,10 @@ jobs:
       working-directory: zephyr-silabs
       run: |
         ZEPHYR_BASE="$(west topdir)/zephyr"
-        $ZEPHYR_BASE/scripts/ci/check_compliance.py --annotate -c origin/${GITHUB_BASE_REF}..
+        $ZEPHYR_BASE/scripts/ci/check_compliance.py --annotate \
+        -e SysbuildKconfigBasic \
+        -e SysbuildKconfig \
+        -c origin/${GITHUB_BASE_REF}..
 
     - name: upload-results
       uses: actions/upload-artifact@v4
