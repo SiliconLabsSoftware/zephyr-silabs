@@ -1,0 +1,28 @@
+# Copyright (c) 2025 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+if SOC_FAMILY_SILABS_S2
+if MBEDTLS
+
+config PSA_CRYPTO_SW_ONLY
+	bool "PSA Crypto software implementation only"
+
+config PSA_CRYPTO_DRIVER_SILABS_HSE
+	bool "PSA Crypto Driver for Secure Engine"
+	depends on $(dt_has_compat,$(DT_COMPAT_SILABS_GECKO_SEMAILBOX))
+	default y if !PSA_CRYPTO_SW_ONLY
+
+config PSA_CRYPTO_DRIVER_SILABS_VSE
+	bool "PSA Crypto Driver for Virtual Secure Engine"
+	depends on $(dt_has_compat,$(DT_COMPAT_SILABS_GECKO_TRNG))
+	# default y if !PSA_CRYPTO_SW_ONLY
+
+config MBEDTLS_USER_CONFIG_ENABLE
+	default y if (PSA_CRYPTO_DRIVER_SILABS_HSE || PSA_CRYPTO_DRIVER_SILABS_VSE)
+
+config MBEDTLS_USER_CONFIG_FILE
+	default "sl_mbedtls_config_zephyr.h" \
+		if (PSA_CRYPTO_DRIVER_SILABS_HSE || PSA_CRYPTO_DRIVER_SILABS_VSE)
+
+endif
+endif
