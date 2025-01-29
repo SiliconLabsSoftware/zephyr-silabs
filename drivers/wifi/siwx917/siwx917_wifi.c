@@ -20,7 +20,7 @@
 
 LOG_MODULE_REGISTER(siwx917_wifi);
 
-NET_BUF_POOL_FIXED_DEFINE(siwx917_tx_pool, 1, NET_ETH_MTU, 0, NULL);
+NET_BUF_POOL_FIXED_DEFINE(siwx917_tx_pool, 1, _NET_ETH_MAX_FRAME_SIZE, 0, NULL);
 
 static unsigned int siwx917_on_join(sl_wifi_event_t event,
 				    char *result, uint32_t result_size, void *arg)
@@ -242,7 +242,7 @@ static int siwx917_send(const struct device *dev, struct net_pkt *pkt)
 	struct net_buf *buf = NULL;
 	int ret;
 
-	if (net_pkt_get_len(pkt) > NET_ETH_MTU) {
+	if (net_pkt_get_len(pkt) > _NET_ETH_MAX_FRAME_SIZE) {
 		LOG_ERR("unexpected buffer size");
 		return -ENOBUFS;
 	}
