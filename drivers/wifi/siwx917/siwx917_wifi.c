@@ -17,10 +17,27 @@
 #include "sl_wifi_callback_framework.h"
 #include "sl_wifi.h"
 #include "sl_net.h"
+#include "sl_net_default_values.h"
 
 LOG_MODULE_REGISTER(siwx917_wifi);
 
 NET_BUF_POOL_FIXED_DEFINE(siwx917_tx_pool, 1, _NET_ETH_MAX_FRAME_SIZE, 0, NULL);
+
+static inline int siwx917_bandwidth(enum wifi_frequency_bandwidths bandwidth)
+{
+
+	switch (bandwidth) {
+	case WIFI_FREQ_BANDWIDTH_20MHZ:
+		return SL_WIFI_BANDWIDTH_20MHz;
+	case WIFI_FREQ_BANDWIDTH_40MHZ:
+		return SL_WIFI_BANDWIDTH_40MHz;
+	case WIFI_FREQ_BANDWIDTH_80MHZ:
+		return SL_WIFI_BANDWIDTH_80MHz;
+	default:
+		LOG_ERR("Invalid bandwidth");
+		return -EAGAIN;
+	}
+}
 
 static unsigned int siwx917_on_join(sl_wifi_event_t event,
 				    char *result, uint32_t result_size, void *arg)
@@ -367,6 +384,112 @@ static void siwx917_ethernet_init(struct net_if *iface)
 	}
 }
 
+static int siwx917_ap_enable(const struct device *dev, struct wifi_connect_req_params *params)
+{
+	struct siwx917_dev *sidev = dev->data;
+	int ret;
+
+	sl_wifi_ap_configuration_t configuration = {
+		.encryption = SL_WIFI_DEFAULT_ENCRYPTION,
+		.credential_id = SL_NET_DEFAULT_WIFI_AP_CREDENTIAL_ID,
+		.rate_protocol = SL_WIFI_RATE_PROTOCOL_AUTO,
+		.options = 0,
+		.keepalive_type = SL_SI91X_AP_NULL_BASED_KEEP_ALIVE,
+		.beacon_interval = 100,
+		.client_idle_timeout = 0xFF,
+		.dtim_beacon_count = 3,
+		.maximum_clients = 4,
+		.beacon_stop = 0,
+		.tdi_flags = SL_WIFI_TDI_NONE,
+		.is_11n_enabled = 1,
+		.ssid.length = params->ssid_length,
+	};
+
+	if (params->band != WIFI_FREQ_BAND_UNKNOWN && params->band != WIFI_FREQ_BAND_2_4_GHZ) {
+		return -ENOTSUP;
+	}
+
+	if (params->channel == WIFI_CHANNEL_ANY) {
+		configuration.channel.channel = SL_WIFI_AUTO_CHANNEL;
+	} else {
+		configuration.channel.channel = params->channel;
+	}
+
+	if (siwx917_bandwidth(params->bandwidth) < 0 ) {
+		return -EINVAL;
+	}
+
+	configuration.channel.bandwidth = siwx917_bandwidth(params->bandwidth);
+	strncpy(configuration.ssid.value, params->ssid, params->ssid_length);
+
+	switch (params->security) {
+	case WIFI_SECURITY_TYPE_NONE:
+		configuration.security = SL_WIFI_OPEN;
+		sl_net_set_credential(configuration.credential_id,
+					default_wifi_ap_credential.type,
+					(const void *)default_wifi_ap_credential.data,
+					default_wifi_ap_credential.data_length);
+		break;
+
+	case WIFI_SECURITY_TYPE_PSK:
+		configuration.security = SL_WIFI_WPA2;
+		break;
+
+	case WIFI_SECURITY_TYPE_PSK_SHA256:
+		configuration.security = SL_WIFI_WPA2;
+		if (params->mfp != WIFI_MFP_REQUIRED) {
+			LOG_ERR("MFP required");
+			return -EINVAL;
+		}
+
+		sl_si91x_set_join_configuration(SL_WIFI_AP_INTERFACE,
+						SL_SI91X_JOIN_FEAT_MFP_CAPABLE_REQUIRED);
+		break;
+
+	case WIFI_SECURITY_TYPE_SAE:
+		configuration.security = SL_WIFI_WPA3;
+		break;
+
+	default:
+		LOG_ERR("Unsupported security type");
+		return -EINVAL;
+	}
+
+	if (params->security != WIFI_SECURITY_TYPE_NONE) {
+		ret = sl_net_set_credential(configuration.credential_id,
+					SL_NET_WIFI_PSK, params->psk,
+					params->psk_length);
+		if (ret) {
+			LOG_ERR("Failed to set credentials: 0x%x", ret);
+			return -EINVAL;
+		}
+	}
+
+	ret = sl_wifi_start_ap(SL_WIFI_AP_2_4GHZ_INTERFACE, &configuration);
+	if (ret) {
+		LOG_ERR("Failed to enable AP mode: 0x%x", ret);
+		return -EIO;
+	}
+
+	sidev->state = WIFI_STATE_COMPLETED;
+	return ret;
+}
+
+static int siwx917_ap_disable(const struct device *dev)
+{
+	struct siwx917_dev *sidev = dev->data;
+	int ret;
+
+	ret = sl_wifi_stop_ap(SL_WIFI_AP_2_4GHZ_INTERFACE);
+	if (ret) {
+		LOG_ERR("Failed to disable Wi-Fi AP mode: 0x%x", ret);
+		return -EIO;
+	}
+
+	sidev->state = WIFI_STATE_INTERFACE_DISABLED;
+	return ret;
+}
+
 static void siwx917_iface_init(struct net_if *iface)
 {
 	struct siwx917_dev *sidev = iface->if_dev->dev->data;
@@ -378,7 +501,9 @@ static void siwx917_iface_init(struct net_if *iface)
 	sl_wifi_set_scan_callback(siwx917_on_scan, sidev);
 	sl_wifi_set_join_callback(siwx917_on_join, sidev);
 
-	status = sl_wifi_get_mac_address(SL_WIFI_CLIENT_INTERFACE, &sidev->macaddr);
+	sidev->interface = sl_wifi_get_default_interface();
+	status = sl_wifi_get_mac_address(FIELD_GET(SIWX917_INTERFACE_MASK, sidev->interface),
+					&sidev->macaddr);
 	if (status) {
 		LOG_ERR("sl_wifi_get_mac_address(): %#04x", status);
 		return;
@@ -400,6 +525,8 @@ static const struct wifi_mgmt_ops siwx917_mgmt = {
 	.scan         = siwx917_scan,
 	.connect      = siwx917_connect,
 	.disconnect   = siwx917_disconnect,
+	.ap_enable = siwx917_ap_enable,
+	.ap_disable = siwx917_ap_disable,
 	.iface_status = siwx917_status,
 };
 
