@@ -19,6 +19,7 @@ struct siwx917_dev {
 	sl_mac_address_t macaddr;
 	enum wifi_iface_state state;
 	scan_result_cb_t scan_res_cb;
+	uint16_t scan_max_bss_cnt;
 
 #ifdef CONFIG_WIFI_SIWX917_NET_STACK_OFFLOAD
 	struct k_event fds_recv_event;
