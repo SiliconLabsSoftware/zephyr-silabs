@@ -490,6 +490,61 @@ static int siwx917_ap_disable(const struct device *dev)
 	return ret;
 }
 
+static int siwx917_ap_sta_disconnect(const struct device *dev, const uint8_t *mac_addr)
+{
+	struct siwx917_dev *sidev = dev->data;
+	sl_mac_address_t mac = { };
+	int ret;
+
+	__ASSERT(mac_addr, "mac_addr cannot be NULL");
+
+	memcpy(mac.octet, mac_addr, ARRAY_SIZE(mac.octet));
+
+	ret = sl_wifi_disconnect_ap_client(sidev->interface, &mac, SL_WIFI_DEAUTH);
+	if (ret) {
+		LOG_ERR("Failed	to disconnect: 0x%x", ret);
+		return -EIO;
+	}
+
+	return ret;
+}
+
+static sl_status_t siwx917_on_connect(sl_wifi_event_t event, void *data,
+					      uint32_t data_length, void *arg)
+{
+	ARG_UNUSED(event);
+	struct siwx917_dev *sidev = arg;
+	struct wifi_ap_sta_info sta_info = { };
+
+	__ASSERT(data, "data cannot be NULL");
+	__ASSERT(arg, "arg cannot be NULL");
+
+	strncpy(sta_info.mac, (uint8_t *)data, data_length);
+	sta_info.mac_length = data_length;
+	sta_info.link_mode = WIFI_LINK_MODE_UNKNOWN;
+
+	wifi_mgmt_raise_ap_sta_connected_event(sidev->iface, &sta_info);
+
+	return SL_STATUS_OK;
+}
+
+static sl_status_t siwx917_on_disconnect(sl_wifi_event_t event, void *data,
+						 uint32_t data_length, void *arg)
+{
+	ARG_UNUSED(event);
+	struct siwx917_dev *sidev = arg;
+	struct wifi_ap_sta_info sta_info = { };
+
+	__ASSERT(data, "data cannot be NULL");
+	__ASSERT(arg, "arg cannot be NULL");
+
+	memcpy(sta_info.mac, (uint8_t *)data, data_length);
+	sta_info.mac_length = data_length;
+	wifi_mgmt_raise_ap_sta_disconnected_event(sidev->iface, &sta_info);
+
+	return SL_STATUS_OK;
+}
+
 static void siwx917_iface_init(struct net_if *iface)
 {
 	struct siwx917_dev *sidev = iface->if_dev->dev->data;
@@ -500,6 +555,9 @@ static void siwx917_iface_init(struct net_if *iface)
 
 	sl_wifi_set_scan_callback(siwx917_on_scan, sidev);
 	sl_wifi_set_join_callback(siwx917_on_join, sidev);
+	sl_wifi_set_callback(SL_WIFI_CLIENT_CONNECTED_EVENTS, siwx917_on_connect, sidev);
+	sl_wifi_set_callback(SL_WIFI_CLIENT_DISCONNECTED_EVENTS, siwx917_on_disconnect,
+			     sidev);
 
 	sidev->interface = sl_wifi_get_default_interface();
 	status = sl_wifi_get_mac_address(FIELD_GET(SIWX917_INTERFACE_MASK, sidev->interface),
@@ -508,6 +566,7 @@ static void siwx917_iface_init(struct net_if *iface)
 		LOG_ERR("sl_wifi_get_mac_address(): %#04x", status);
 		return;
 	}
+
 	net_if_set_link_addr(iface, sidev->macaddr.octet, sizeof(sidev->macaddr.octet),
 			     NET_LINK_ETHERNET);
 	siwx917_sock_init(iface);
@@ -525,8 +584,9 @@ static const struct wifi_mgmt_ops siwx917_mgmt = {
 	.scan         = siwx917_scan,
 	.connect      = siwx917_connect,
 	.disconnect   = siwx917_disconnect,
-	.ap_enable = siwx917_ap_enable,
-	.ap_disable = siwx917_ap_disable,
+	.ap_enable    = siwx917_ap_enable,
+	.ap_disable   = siwx917_ap_disable,
+	.ap_sta_disconnect = siwx917_ap_sta_disconnect,
 	.iface_status = siwx917_status,
 };
 
