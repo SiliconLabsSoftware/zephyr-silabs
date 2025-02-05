@@ -66,12 +66,12 @@ static int siwx917_connect(const struct device *dev, struct wifi_connect_req_par
 		break;
 	case WIFI_SECURITY_TYPE_PSK:
 		wifi_config.security = SL_WIFI_WPA2;
-		wifi_config.encryption = SL_WIFI_TKIP_ENCRYPTION;
+		wifi_config.encryption = SL_WIFI_DEFAULT_ENCRYPTION;
 		wifi_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
 		break;
 	case WIFI_SECURITY_TYPE_PSK_SHA256:
 		wifi_config.security = SL_WIFI_WPA2;
-		wifi_config.encryption = SL_WIFI_CCMP_ENCRYPTION;
+		wifi_config.encryption = SL_WIFI_DEFAULT_ENCRYPTION;
 		wifi_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
 		break;
 	case WIFI_SECURITY_TYPE_SAE:
@@ -80,7 +80,7 @@ static int siwx917_connect(const struct device *dev, struct wifi_connect_req_par
 		wifi_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
 		break;
 	case WIFI_SECURITY_TYPE_WPA_AUTO_PERSONAL:
-		wifi_config.security = SL_WIFI_WPA2;
+		wifi_config.security = SL_WIFI_WPA3;
 		wifi_config.encryption = SL_WIFI_DEFAULT_ENCRYPTION;
 		wifi_config.credential_id = SL_NET_DEFAULT_WIFI_CLIENT_CREDENTIAL_ID;
 		break;
