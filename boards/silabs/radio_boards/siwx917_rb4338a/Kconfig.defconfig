@@ -1,9 +1,0 @@
-# Copyright (c) 2023 Antmicro
-# SPDX-License-Identifier: Apache-2.0
-
-if BOARD_SIWX917_RB4338A
-
-config BOARD
-	default "siwx917_rb4338a"
-
-endif

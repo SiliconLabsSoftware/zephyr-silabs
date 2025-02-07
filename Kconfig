@@ -5,8 +5,4 @@
 # as the module Kconfig entry point (see zephyr/module.yml). You can browse
 # module options by going to Zephyr -> Modules in Kconfig.
 
-rsource "drivers/Kconfig"
-
-config HAS_SILABS_WISECONNECT
-	bool
-	depends on SOC_FAMILY_SILABS_SIWX917
+rsource "*/Kconfig"
