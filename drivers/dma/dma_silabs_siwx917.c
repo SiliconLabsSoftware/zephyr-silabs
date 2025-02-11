@@ -99,11 +99,11 @@ static int siwx917_addr_adjustment(uint32_t adjustment)
 }
 
 static int siwx917_channel_config(const struct device *dev, RSI_UDMA_HANDLE_T udma_handle,
-				  uint32_t channel, const struct dma_config *config,
-				  UDMA_Channel_Info *channel_info)
+				  uint32_t channel, const struct dma_config *config)
 {
 	uint32_t dma_transfer_num = config->head_block->block_size / config->source_data_size;
 	const struct dma_siwx917_config *cfg = dev->config;
+	struct dma_siwx917_data *data = dev->data;
 	UDMA_RESOURCES udma_resources = {
 		.reg = cfg->reg,
 		.udma_irq_num = cfg->irq_number,
@@ -173,7 +173,7 @@ static int siwx917_channel_config(const struct device *dev, RSI_UDMA_HANDLE_T ud
 					config->head_block->source_address,
 					config->head_block->dest_address,
 					dma_transfer_num, channel_control,
-					&channel_config, NULL, channel_info, udma_handle);
+					&channel_config, NULL, data->chan_info, udma_handle);
 	if (status) {
 		return -EIO;
 	}
@@ -206,7 +206,7 @@ static int siwx917_dma_configure(const struct device *dev, uint32_t channel,
 	}
 
 	/* Configure dma channel for transfer */
-	status = siwx917_channel_config(dev, udma_handle, channel, config, data->chan_info);
+	status = siwx917_channel_config(dev, udma_handle, channel, config);
 	if (status) {
 		return status;
 	}
