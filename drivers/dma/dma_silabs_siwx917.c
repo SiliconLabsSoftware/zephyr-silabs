@@ -21,10 +21,14 @@
 #define DMA_MAX_TRANSFER_COUNT 1024
 #define DMA_CH_PRIORITY_HIGH   1
 #define DMA_CH_PRIORITY_LOW    0
-#define VALID_BURST_LENGTH     0
 #define UDMA_ADDR_INC_NONE     0x03
 
 LOG_MODULE_REGISTER(si91x_dma, CONFIG_DMA_LOG_LEVEL);
+
+enum {
+	TRANSFER_MEM_TO_MEM,
+	TRANSFER_TO_OR_FROM_PER,
+};
 
 struct dma_siwx917_config {
 	UDMA0_Type *reg;                 /* UDMA register base address */
@@ -45,17 +49,17 @@ struct dma_siwx917_data {
 					      */
 };
 
-static int siwx917_is_peripheral_request(uint32_t dir)
+static int siwx917_transfer_direction(uint32_t dir)
 {
 	if (dir == MEMORY_TO_MEMORY) {
-		return 0;
+		return TRANSFER_MEM_TO_MEM;
 	}
 
 	if (dir == MEMORY_TO_PERIPHERAL || dir == PERIPHERAL_TO_MEMORY) {
-		return 1;
+		return TRANSFER_TO_OR_FROM_PER;
 	}
 
-	return -1;
+	return -EINVAL;
 }
 
 static int siwx917_data_width(uint32_t data_width)
@@ -72,13 +76,13 @@ static int siwx917_data_width(uint32_t data_width)
 	}
 }
 
-static int siwx917_burst_length(uint32_t blen)
+static bool siwx917_is_burst_length_valid(uint32_t blen)
 {
 	switch (blen / 8) {
 	case 1:
-		return VALID_BURST_LENGTH; /* 8-bit burst */
+		return true; /* 8-bit burst */
 	default:
-		return -EINVAL;
+		return false;
 	}
 }
 
@@ -95,8 +99,8 @@ static int siwx917_addr_adjustment(uint32_t adjustment)
 }
 
 static int siwx917_channel_config(const struct device *dev, RSI_UDMA_HANDLE_T udma_handle,
-			      uint32_t channel, const struct dma_config *config,
-			      UDMA_Channel_Info *channel_info)
+				  uint32_t channel, const struct dma_config *config,
+				  UDMA_Channel_Info *channel_info)
 {
 	uint32_t dma_transfer_num = config->head_block->block_size / config->source_data_size;
 	const struct dma_siwx917_config *cfg = dev->config;
@@ -112,12 +116,12 @@ static int siwx917_channel_config(const struct device *dev, RSI_UDMA_HANDLE_T ud
 	RSI_UDMA_CHA_CFG_T channel_config = {};
 	int status;
 
-	if (siwx917_is_peripheral_request(config->channel_direction) < 0) {
+	if (siwx917_transfer_direction(config->channel_direction) < 0) {
 		return -EINVAL;
 	}
 
 	channel_config.channelPrioHigh = config->channel_priority;
-	channel_config.periphReq = siwx917_is_peripheral_request(config->channel_direction);
+	channel_config.periphReq = siwx917_transfer_direction(config->channel_direction);
 	channel_config.dmaCh = channel;
 
 	if (channel_config.periphReq) {
@@ -141,8 +145,8 @@ static int siwx917_channel_config(const struct device *dev, RSI_UDMA_HANDLE_T ud
 		return -EINVAL;
 	}
 
-	if (siwx917_burst_length(config->source_burst_length) < 0 ||
-	    siwx917_burst_length(config->dest_burst_length) < 0) {
+	if (siwx917_is_burst_length_valid(config->source_burst_length) == false ||
+	    siwx917_is_burst_length_valid(config->dest_burst_length) == false) {
 		return -EINVAL;
 	}
 
