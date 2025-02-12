@@ -1,14 +1,9 @@
 # Copyright (c) 2024 Silicon Laboratories Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-menuconfig DMA_SILABS_SIWX917
+config DMA_SILABS_SIWX917
 	bool "Silabs SiWx917 DMA driver"
 	default y
 	depends on DT_HAS_SILABS_SIWX917_DMA_ENABLED
 	help
 	  Enable the High Power(HP)/Ultra Low Power(ULP) DMA driver for the Silabs SiWx917 SoC series.
-
-config DMA_SILABS_SIWX917_COMMON_INIT_PRIORITY
-	int "Common initialization priority"
-	depends on DMA_SILABS_SIWX917
-	default 42
