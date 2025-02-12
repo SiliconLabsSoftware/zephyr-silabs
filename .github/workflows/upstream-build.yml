@@ -63,6 +63,16 @@ jobs:
             -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.overlay \
             -x EXTRA_CONF_FILE=$(pwd)/tests/drivers/dma/chan_blen_transfer/boards/siwx917_rb4338a.conf
 
+      - name: Build Scatter-Gather DMA test
+        working-directory: zephyr-silabs
+        shell: bash
+        run: |
+          west twister -v --inline-logs \
+            -s drivers.dma.scatter_gather \
+            -p siwx917_rb4338a \
+            -x DTC_OVERLAY_FILE=$(pwd)/tests/drivers/dma/scatter_gather/boards/siwx917_rb4338a.overlay \
+            -x EXTRA_CONF_FILE=$(pwd)/tests/drivers/dma/scatter_gather/boards/siwx917_rb4338a.conf
+
       - name: Build Bluetooth samples
         working-directory: zephyr-silabs
         shell: bash
