@@ -23,7 +23,7 @@ jobs:
         run: |
           python3 -m pip install --upgrade pip
           pip install pyyaml
- 
+
       - name: Update west.yml with modified project revision
         shell: python
         env:
