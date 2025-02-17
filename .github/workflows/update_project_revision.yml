@@ -1,0 +1,114 @@
+name: Build
+
+on:
+  repository_dispatch:
+    types: [update_project_revision]
+
+jobs:
+  build:
+    runs-on: self-hosted
+    name: silabs-internal
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: zephyr-silabs
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: 3.13
+
+      - name: Install dependencies
+        run: |
+          python3 -m pip install --upgrade pip
+          pip install pyyaml
+ 
+      - name: Update west.yml with modified project revision
+        shell: python
+        env:
+          PROJECT_NAME: ${{ github.event.client_payload.project_name }}
+          COMMIT_ID: ${{ github.event.client_payload.commit_id }}
+        run: |
+          import yaml
+
+          with open('zephyr-silabs/west.yml', 'r') as f:
+              data = yaml.safe_load(f)
+
+          project_name = '${{ env.PROJECT_NAME }}'
+          commit_id = '${{ env.COMMIT_ID }}'
+
+          for project in data['manifest'].get('projects', []):
+              if project.get('name') == project_name:
+                  project['revision'] = commit_id
+
+          with open('zephyr-silabs/west.yml', 'w') as f:
+              yaml.dump(data, f, default_flow_style=False, sort_keys=False)
+
+          print(yaml.dump(data, default_flow_style=False, sort_keys=False))
+
+      - name: Setup Zephyr project
+        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        with:
+          app-path: zephyr-silabs
+          toolchains: arm-zephyr-eabi
+
+      - name: Fetch blobs
+        shell: bash
+        run: |
+          west blobs fetch hal_silabs
+
+      - name: Build Entropy test
+        shell: bash
+        run: |
+          west twister -v --inline-logs -K \
+            -s drivers.entropy \
+            -p siwx917_rb4338a
+
+      - name: Build Flash test
+        shell: bash
+        run: |
+          west twister -v --inline-logs \
+            -s drivers.flash.common.default \
+            -p siwx917_rb4338a
+
+      - name: Build DMA test
+        shell: bash
+        run: |
+          west twister -v --inline-logs \
+            -s drivers.dma.chan_blen_transfer \
+            -p siwx917_rb4338a
+
+      - name: Build Crypto tests
+        shell: bash
+        run: |
+          west twister -v --inline-logs \
+            -p xg24_rb4187c \
+            -p xg27_dk2602a \
+            -p xg29_rb4412a \
+            -T zephyr-silabs/tests/crypto/
+
+      - name: Build Bluetooth samples
+        shell: bash
+        run: |
+          west twister -v --inline-logs -K \
+            -s sample.bluetooth.peripheral_hr \
+            -s sample.bluetooth.observer \
+            -p xg27_dk2602a \
+            -p siwx917_rb4338a
+
+      - name: Build Wifi samples
+        shell: bash
+        run: |
+          west twister -v --inline-logs -K \
+            -s sample.net.wifi \
+            -p siwx917_rb4338a
+          west twister -v --inline-logs -K \
+            -s sample.net.wifi.siwx91x_offloaded \
+            -p siwx917_rb4338a
+
+      - name: Build Rail samples
+        shell: bash
+        run: |
+          west twister -v --inline-logs \
+            -s sample.rail.simple_txrx -T zephyr-silabs/samples
