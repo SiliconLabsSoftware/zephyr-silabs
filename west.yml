@@ -11,7 +11,7 @@ manifest:
   projects:
     - name: hal_silabs
       remote: silabs
-      revision: 8d0e99a794f5b770afa4ea4eecb1b0fa0f918f4c
+      revision: 2ad0fd7d56a9142a0479f5745277fda8b21da0db
       path: modules/hal/silabs
     - name: zephyr-mbedtls
       remote: silabs
