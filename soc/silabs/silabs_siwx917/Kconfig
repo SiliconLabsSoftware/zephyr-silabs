@@ -1,0 +1,25 @@
+# Copyright (c) 2025 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+if SOC_FAMILY_SILABS_SIWX91X
+if MBEDTLS
+
+config PSA_CRYPTO_SW_ONLY
+	bool "PSA Crypto software implementation only"
+	select WISECONNECT_NETWORK_STACK
+
+config PSA_CRYPTO_DRIVER_SILABS_SIWX91X
+	bool "PSA Crypto Driver for SiWx91x"
+	default y if !PSA_CRYPTO_SW_ONLY
+	# Crypto is handled by the network coprocessor
+	select WISECONNECT_NETWORK_STACK
+
+config MBEDTLS_USER_CONFIG_ENABLE
+	default y if PSA_CRYPTO_DRIVER_SILABS_SIWX91X
+
+config MBEDTLS_USER_CONFIG_FILE
+	default "sl_mbedtls_config_zephyr.h" \
+		if PSA_CRYPTO_DRIVER_SILABS_SIWX91X
+
+endif
+endif
