@@ -8,7 +8,9 @@ project(psa_crypto)
 target_sources(app PRIVATE
 	src/main.c
 	src/test_vectors.c
+	src/aead.c
 	src/cipher.c
+	src/hash.c
 	src/sign.c
 	src/key_agreement.c
 )
