@@ -14,7 +14,7 @@ uint8_t signature[64];
 size_t pubkey_len;
 size_t signature_len;
 
-#define MESSAGE_SIZE (sizeof(plaintext) / 8)
+#define MESSAGE_SIZE (sizeof(plaintext) / 2)
 
 ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1)
 {
@@ -38,9 +38,6 @@ ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1)
 	zassert_equal(psa_sign_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
 				       MESSAGE_SIZE, signature, sizeof(signature), &signature_len),
 		      PSA_SUCCESS, "Failed to hash-and-sign message");
-	zassert_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
-					 MESSAGE_SIZE, signature, signature_len),
-		      PSA_SUCCESS, "Failed to verify message");
 	zassert_equal(psa_export_public_key(key_id, pubkey, sizeof(pubkey), &pubkey_len),
 		      PSA_SUCCESS, "Failed to export public key");
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy private key");
@@ -55,6 +52,12 @@ ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1)
 		      "Failed to import public key");
 	zassert_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
 					 MESSAGE_SIZE, signature, signature_len),
-		      PSA_SUCCESS, "Failed to verify message");
+		      PSA_SUCCESS, "Failed to verify signature");
+
+	signature[0] += 1;
+	zassert_not_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
+					     MESSAGE_SIZE, signature, signature_len),
+			  PSA_SUCCESS, "Signature incorrectly successfully verified");
+
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }

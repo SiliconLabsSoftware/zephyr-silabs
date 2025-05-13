@@ -8,6 +8,6 @@
 
 #include <stdint.h>
 
-extern const uint8_t plaintext[4096];
+extern const uint8_t plaintext[1024];
 
 #endif
