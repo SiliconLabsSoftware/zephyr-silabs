@@ -72,6 +72,14 @@ jobs:
             -p xg27_dk2602a \
             -p siwx917_rb4338a
 
+      - name: Build Prov sample
+        shell: bash
+        run: |
+          west twister -v --inline-logs -K \
+            -s sample.bluetooth.wifi_provisioning_over_ble \
+            -T zephyr-silabs/samples\
+            -p siwx917_rb4338a
+
       - name: Build Wifi samples
         shell: bash
         run: |
