@@ -1,0 +1,11 @@
+sample:
+  name: wifi provisioning over BLE
+  description: Demonstrates Wi-Fi provisioning using Bluetooth Low Energy (BLE)
+tests:
+  sample.bluetooth.wifi_provisioning_over_ble:
+    harness: bluetooth
+    platform_allow:
+    - siwx917_rb4338a
+    tags: bluetooth
+    integration_platforms:
+    - siwx917_rb4338a
