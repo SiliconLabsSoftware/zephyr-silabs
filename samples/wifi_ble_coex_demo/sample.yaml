@@ -1,0 +1,11 @@
+sample:
+  name: Wifi ble coex
+  description: Demonstrates Wi-Fi and BLE coexistence
+tests:
+  sample.bluetooth.wifi_ble_coex_demo:
+    harness: bluetooth
+    platform_allow:
+      - siwx917_rb4338a
+    tags: bluetooth
+    integration_platforms:
+      - siwx917_rb4338a
