@@ -90,6 +90,14 @@ jobs:
             -s sample.net.wifi.siwx91x_offloaded \
             -p siwx917_rb4338a
 
+      - name: Build Coex sample
+        shell: bash
+        run: |
+          west twister -v --inline-logs -K \
+            -s sample.bluetooth.wifi_ble_coex_demo \
+            -T zephyr-silabs/samples\
+            -p siwx917_rb4338a
+
       - name: Build Rail samples
         shell: bash
         run: |
