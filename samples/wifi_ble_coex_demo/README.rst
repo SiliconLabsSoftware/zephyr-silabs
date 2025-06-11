@@ -16,6 +16,10 @@ Requirements
 * A board with Bluetooth LE and Wi-Fi support.
 * Any mobile Application to check the connectivity of ble and wifi [Eg:- SiConnect].
 
+Socket Support
+**************
+Maximum 2 TLS sockets are supported in Coex mode.
+
 Building and Running
 ********************
 This sample can be found under :zephyr_file:`samples/bluetooth/wifi_ble_coex_throughput`
