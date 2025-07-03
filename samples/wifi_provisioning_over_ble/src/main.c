@@ -464,7 +464,7 @@ int bt_init(void)
  *		these details and also prepares the `current_char2_data` buffer with relevant data
  *		for further use (e.g., sending over Bluetooth).
  **/
-static void dhcp_callback_handler(struct net_mgmt_event_callback *cb, uint32_t mgmt_event,
+static void dhcp_callback_handler(struct net_mgmt_event_callback *cb, uint64_t mgmt_event,
 				  struct net_if *iface)
 {
 	int i = 0;
@@ -684,7 +684,7 @@ static void handle_wifi_disconnect_result(struct net_mgmt_event_callback *cb)
  * handler function to process the event. It supports multiple Wi-Fi-related events and
  * can be extended for additional event handling (e.g., raw scan results, signal changes).
  **/
-static void wifi_mgmt_event_handler(struct net_mgmt_event_callback *cb, uint32_t mgmt_event,
+static void wifi_mgmt_event_handler(struct net_mgmt_event_callback *cb, uint64_t mgmt_event,
 				    struct net_if *iface)
 {
 	switch (mgmt_event) {
