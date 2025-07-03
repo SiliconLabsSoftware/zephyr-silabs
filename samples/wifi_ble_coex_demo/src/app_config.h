@@ -27,5 +27,5 @@ typedef enum wlan_app_state_e {
 
 void application_start(void);
 static void start_dhcpv4_client(struct net_if *iface, void *user_data);
-static void wifi_mgmt_event_handler(struct net_mgmt_event_callback *cb, uint32_t mgmt_event,
+static void wifi_mgmt_event_handler(struct net_mgmt_event_callback *cb, uint64_t mgmt_event,
 				    struct net_if *iface);
