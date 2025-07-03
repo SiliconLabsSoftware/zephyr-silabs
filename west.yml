@@ -11,7 +11,7 @@ manifest:
   projects:
     - name: hal_silabs
       remote: zephyrproject-rtos
-      revision: 389726f350880238b9a1034f575ffd46c4309827
+      revision: 190a144a16bed9a938a94543ed5bbc70c0552e0f
       path: modules/hal/silabs
     - name: zephyr-mbedtls
       remote: silabs
@@ -19,7 +19,7 @@ manifest:
       path: modules/crypto/mbedtls
     - name: zephyr
       remote: zephyrproject-rtos
-      revision: c0a423426f43a31eaf0b821c8433fc110f987bf1
+      revision: 4852719f98b3bac9c05196d9855d897f47e3c82f
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
