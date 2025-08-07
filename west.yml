@@ -9,21 +9,16 @@ manifest:
       url-base: https://github.com/siliconlabssoftware
 
   projects:
-    - name: hal_silabs
-      remote: zephyrproject-rtos
-      revision: 190a144a16bed9a938a94543ed5bbc70c0552e0f
-      path: modules/hal/silabs
     - name: zephyr-mbedtls
       remote: silabs
       revision: 6024c415bf050c09e3990bddb6d53d3b4990a2b1
       path: modules/crypto/mbedtls
     - name: zephyr
       remote: zephyrproject-rtos
-      revision: 4852719f98b3bac9c05196d9855d897f47e3c82f
+      revision: 169b47ce38aef2a7a6c2e0e09430b82c5ce3115b
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
         name-allowlist:
-          - cmsis      # required by the ARM port
           - cmsis_6    # required by the ARM port
           - hal_silabs # required by Silabs boards
