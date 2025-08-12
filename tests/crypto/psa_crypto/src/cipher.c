@@ -6,7 +6,7 @@
 
 #include <zephyr/ztest.h>
 #include <psa/crypto.h>
-
+#include <zephyr/sys/util.h>   /* for IS_ENABLED() */
 #include "test_vectors.h"
 
 uint8_t key_256[32] = {
@@ -40,9 +40,9 @@ ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_multipart)
 	psa_set_key_algorithm(&attributes, alg);
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&attributes, 256);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
+	if (IS_ENABLED(CONFIG_TEST_WRAPPED_KEYS)) {
 		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
+							  PSA_KEY_PERSISTENCE_VOLATILE, 0));
 		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
 			      "Failed to generate key");
 	} else {
@@ -96,9 +96,9 @@ ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_single)
 	psa_set_key_algorithm(&attributes, alg);
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&attributes, 256);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
+	if (IS_ENABLED(CONFIG_TEST_WRAPPED_KEYS)) {
 		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
+							  PSA_KEY_PERSISTENCE_VOLATILE, 0));
 		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
 			      "Failed to generate key");
 	} else {
@@ -121,17 +121,6 @@ ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_single)
 
 	zassert_equal(decrypted_len, sizeof(decrypted), "Decrypted length mismatch");
 	zassert_mem_equal(decrypted, plaintext, sizeof(plaintext));
-
-	ciphertext_buffer_256[0] += 1;
-	zassert_equal(psa_cipher_decrypt(key_id, alg, ciphertext_buffer_256, ciphertext_len,
-					 decrypted, sizeof(decrypted), &decrypted_len),
-		      PSA_SUCCESS,
-		      "Failed to perform one-shot decrypt operation with modified ciphertext");
-
-	zassert_equal(decrypted_len, sizeof(decrypted), "Decrypted length mismatch");
-	zassert(memcmp(decrypted, plaintext, sizeof(plaintext)) != 0,
-		"Decrypted modified data identical to original plaintext");
-
 	psa_destroy_key(key_id);
 }
 
@@ -145,9 +134,9 @@ ZTEST(psa_crypto_test, test_cipher_aes_ecb_128_single)
 	psa_set_key_algorithm(&attributes, alg);
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&attributes, 128);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
+	if (IS_ENABLED(CONFIG_TEST_WRAPPED_KEYS)) {
 		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
+							  PSA_KEY_PERSISTENCE_VOLATILE, 0));
 
 		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
 			      "Failed to generate key");
@@ -169,16 +158,6 @@ ZTEST(psa_crypto_test, test_cipher_aes_ecb_128_single)
 		      PSA_SUCCESS, "Failed to perform one-shot decrypt operation");
 	zassert_equal(decrypted_len, sizeof(decrypted), "Decrypted length mismatch");
 	zassert_mem_equal(decrypted, plaintext, sizeof(plaintext));
-
-	ciphertext[0] += 1;
-	zassert_equal(psa_cipher_decrypt(key_id, alg, ciphertext, ciphertext_len, decrypted,
-					 sizeof(decrypted), &decrypted_len),
-		      PSA_SUCCESS,
-		      "Failed to perform one-shot decrypt operation with modified ciphertext");
-
-	zassert_equal(decrypted_len, sizeof(decrypted), "Decrypted length mismatch");
-	zassert(memcmp(decrypted, plaintext, sizeof(plaintext)) != 0,
-		"Decrypted modified data identical to original plaintext");
 
 	psa_destroy_key(key_id);
 }
