@@ -11,7 +11,7 @@ manifest:
   projects:
     - name: zephyr-mbedtls
       remote: silabs
-      revision: 6024c415bf050c09e3990bddb6d53d3b4990a2b1
+      revision: 43bb1e577e2accfaa135464bac181ed2a0cc0489
       path: modules/crypto/mbedtls
     - name: zephyr
       remote: zephyrproject-rtos
