@@ -17,6 +17,10 @@ Requirements
 * A mobile app or central device to send Wi-Fi credentials over BLE
 * Wi-Fi Access Point for connectivity testing.
 
+Thread Priority Guidelines
+**************************
+* The Wi-Fi application thread must have **lower priority** than the Wi-Fi thread to ensure smooth and uninterrupted Wi-Fi operations.
+
 Building and Running
 ********************
 This sample can be found under :zephyr_file:`samples/wifi_provisioning_over_ble`
