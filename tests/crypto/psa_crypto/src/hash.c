@@ -22,7 +22,8 @@ ZTEST(psa_crypto_test, test_hash_sha256)
 
 	zassert_equal(psa_hash_compute(PSA_ALG_SHA_256, plaintext, sizeof(plaintext), hash_buf,
 				       sizeof(hash_buf), &hash_len),
-		      PSA_SUCCESS, "Failed to compute hash");
+		      PSA_SUCCESS, "Failed to perform hash");
+
 	zassert_equal(hash_len, sizeof(expect_sha256_hash), "Hash length mismatch");
 	zassert_mem_equal(hash_buf, expect_sha256_hash, sizeof(expect_sha256_hash),
 			  "Hash mismatch");
@@ -55,7 +56,10 @@ ZTEST(psa_crypto_test, test_hash_sha256_multipart)
 
 	zassert_equal(psa_hash_finish(&hash_op, hash_buf, sizeof(hash_buf), &hash_len), PSA_SUCCESS,
 		      "Failed to finish hash");
+
 	zassert_equal(hash_len, sizeof(expect_sha256_hash), "Hash length mismatch");
+
 	zassert_mem_equal(hash_buf, expect_sha256_hash, sizeof(expect_sha256_hash),
 			  "Hash mismatch");
+
 }
