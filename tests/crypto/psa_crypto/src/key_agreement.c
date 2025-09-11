@@ -7,10 +7,6 @@
 #include <zephyr/ztest.h>
 #include <psa/crypto.h>
 
-#if defined CONFIG_TEST_WRAPPED_KEYS
-#include "sl_si91x_psa_wrap.h"
-#endif
-
 static const uint8_t client_private_key[] = {
 	0xB0, 0x76, 0x51, 0xEA, 0x20, 0xF0, 0x28, 0xA8, 0x16, 0xEE, 0x01,
 	0xB0, 0xD1, 0x06, 0x2A, 0x7C, 0x81, 0x58, 0xE8, 0x84, 0xE9, 0xBC,
@@ -49,11 +45,6 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
 
-	#if defined(CONFIG_TEST_WRAPPED_KEYS) && CONFIG_TEST_WRAPPED_KEYS
-		printf("Test Wrapper keys enabled\n");
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 0));
-	#endif
 	zassert_equal(psa_import_key(&attributes, client_private_key, sizeof(client_private_key),
 				     &key_id),
 		      PSA_SUCCESS, "Failed to import client key");
@@ -71,10 +62,6 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_MONTGOMERY));
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 0));
-	}
 	zassert_equal(psa_import_key(&attributes, server_private_key, sizeof(server_private_key),
 				     &key_id),
 		      PSA_SUCCESS, "Failed to import server key");

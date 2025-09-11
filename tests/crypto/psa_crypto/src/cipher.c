@@ -7,10 +7,6 @@
 #include <zephyr/ztest.h>
 #include <psa/crypto.h>
 
-#if defined CONFIG_TEST_WRAPPED_KEYS
-#include "sl_si91x_psa_wrap.h"
-#endif
-
 #include "test_vectors.h"
 
 uint8_t key_256[32] = {
@@ -45,16 +41,8 @@ ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_multipart)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&attributes, 256);
 
-	#if defined(CONFIG_TEST_WRAPPED_KEYS) && CONFIG_TEST_WRAPPED_KEYS
-		printf("Test Wrapper keys enabled\n");
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 0));
-		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
-			      "Failed to generate key");
-	#else 
-		zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id),
+	zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id),
 			      PSA_SUCCESS, "Failed to import key");
-	#endif
 	psa_reset_key_attributes(&attributes);
 
 	zassert_equal(psa_cipher_encrypt_setup(&operation, key_id, alg), PSA_SUCCESS,
@@ -110,16 +98,9 @@ ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_single)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&attributes, 256);
 
-	#if defined(CONFIG_TEST_WRAPPED_KEYS) && CONFIG_TEST_WRAPPED_KEYS
-		printf("Test Wrapper keys enabled\n");
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, PSA_KEY_VOLATILE_PERSISTENT_WRAP_IMPORT));
-		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
-			      "Failed to generate key");
-	#else
-		zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id),
+	zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id),
 			      PSA_SUCCESS, "Failed to import key");
-	#endif
+
 	psa_reset_key_attributes(&attributes);
 
 	zassert_equal(psa_cipher_encrypt(key_id, alg, plaintext, sizeof(plaintext),
@@ -152,16 +133,8 @@ ZTEST(psa_crypto_test, test_cipher_aes_ecb_128_single)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&attributes, 128);
 
-	#if defined(CONFIG_TEST_WRAPPED_KEYS) && CONFIG_TEST_WRAPPED_KEYS
-		printf("Test Wrapper keys enabled\n");
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, PSA_KEY_VOLATILE_PERSISTENT_WRAP_IMPORT));
-		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
-			      "Failed to generate key");
-	#else
-		zassert_equal(psa_import_key(&attributes, key_128, sizeof(key_128), &key_id),
+	zassert_equal(psa_import_key(&attributes, key_128, sizeof(key_128), &key_id),
 			      PSA_SUCCESS, "Failed to import key");
-	#endif
 
 	psa_reset_key_attributes(&attributes);
 
@@ -193,12 +166,6 @@ ZTEST(psa_crypto_test, test_cipher_chacha20_single)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_CHACHA20);
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
 	psa_set_key_algorithm(&attributes, alg);
-
-	#if defined(CONFIG_TEST_WRAPPED_KEYS) && CONFIG_TEST_WRAPPED_KEYS
-		printf("Test Wrapper keys enabled\n");
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 0));
-	#endif
 
 	zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id), PSA_SUCCESS,
 		      "Failed to import key");
