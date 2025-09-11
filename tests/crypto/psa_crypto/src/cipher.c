@@ -41,8 +41,8 @@ ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_multipart)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&attributes, 256);
 
-	zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id),
-			      PSA_SUCCESS, "Failed to import key");
+	zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id), PSA_SUCCESS,
+		      "Failed to import key");
 	psa_reset_key_attributes(&attributes);
 
 	zassert_equal(psa_cipher_encrypt_setup(&operation, key_id, alg), PSA_SUCCESS,
@@ -98,8 +98,8 @@ ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_single)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&attributes, 256);
 
-	zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id),
-			      PSA_SUCCESS, "Failed to import key");
+	zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id), PSA_SUCCESS,
+		      "Failed to import key");
 
 	psa_reset_key_attributes(&attributes);
 
@@ -133,8 +133,8 @@ ZTEST(psa_crypto_test, test_cipher_aes_ecb_128_single)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
 	psa_set_key_bits(&attributes, 128);
 
-	zassert_equal(psa_import_key(&attributes, key_128, sizeof(key_128), &key_id),
-			      PSA_SUCCESS, "Failed to import key");
+	zassert_equal(psa_import_key(&attributes, key_128, sizeof(key_128), &key_id), PSA_SUCCESS,
+		      "Failed to import key");
 
 	psa_reset_key_attributes(&attributes);
 

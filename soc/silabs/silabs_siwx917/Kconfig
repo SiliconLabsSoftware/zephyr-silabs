@@ -22,8 +22,7 @@ config MBEDTLS_USER_CONFIG_FILE
 		if PSA_CRYPTO_DRIVER_SILABS_SIWX91X
 
 config TEST_WRAPPED_KEYS
-    bool "wrapper keys"
-    default n
-
+	bool "To enable Wrapper keys"
+s
 endif
 endif

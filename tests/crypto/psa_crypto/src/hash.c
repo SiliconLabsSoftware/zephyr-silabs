@@ -61,5 +61,4 @@ ZTEST(psa_crypto_test, test_hash_sha256_multipart)
 
 	zassert_mem_equal(hash_buf, expect_sha256_hash, sizeof(expect_sha256_hash),
 			  "Hash mismatch");
-
 }
