@@ -23,6 +23,6 @@ config MBEDTLS_USER_CONFIG_FILE
 
 config TEST_WRAPPED_KEYS
 	bool "To enable Wrapper keys"
-s
+
 endif
 endif
