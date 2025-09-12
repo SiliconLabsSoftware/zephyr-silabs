@@ -22,7 +22,7 @@ jobs:
         working-directory: zephyr-silabs
         shell: bash
         run: |
-          yq -i '(.manifest.projects[] | select(.name == "zephyr") | .revision) = "main"' west.yml
+          yq -i '(.manifest.projects[] | select(.name == "zephyr")) |= (.remote = "zephyrproject-rtos" | .revision = "main")' west.yml
 
       - name: Setup Zephyr project
         uses: zephyrproject-rtos/action-zephyr-setup@v1
