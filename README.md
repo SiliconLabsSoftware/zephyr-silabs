@@ -3,121 +3,95 @@
 [badge]:  https://github.com/SiliconLabsSoftware/zephyr-silabs/actions/workflows/upstream-build.yml/badge.svg
 [recipe]: https://github.com/SiliconLabsSoftware/zephyr-silabs/actions/workflows/upstream-build.yml
 
-Silicon Labs Zephyr repository
-==============================
+# Silicon Labs SDK for Zephyr
 
-This repository includes support for devices and features not yet included in
-the Zephyr mainstream for various reasons.
+This repository contains the Silicon Labs SDK for Zephyr, which is Silicon Labs'
+primary downstream enablement for Zephyr.
 
-Quick start guide
------------------
+Silicon Labs is a [Platinum Member][project-members] of the Zephyr Project, and
+is committed to providing upstream support for [Silicon Labs hardware][boards].
+In addition to upstream support, Silicon Labs provides this downstream
+[manifest repository][west-manifest] to provide access to features that are not
+yet available upstream, such as new hardware support, as well as features that
+cannot be upstreamed, such as content that does not have an open source license
+compatible with the upstream. The downstream repository also enables additional
+quality assurance of releases for Silicon Labs platforms.
 
-The steps below applies on common Linux hosts. Please refer to the [full
-documentation][main-doc] for detailed steps.
+Silicon Labs is committed to an upstream-first development methodology. We
+strive to keep the number of patches applied in Silicon Labs SDK for Zephyr
+down by basing the downstream release on upstream stable releases.
 
-First, install packages required for Zephyr development, as described in the
-[Zephyr documentation][sysdeps]:
+[project-members]: https://zephyrproject.org/project-members/
+[boards]: https://docs.zephyrproject.org/latest/boards/silabs/index.html
+[west]: https://docs.zephyrproject.org/latest/develop/west/index.html
+[west-manifest]: https://docs.zephyrproject.org/latest/develop/west/manifest.html
 
-    sudo apt install --no-install-recommends git cmake ninja-build gperf \
-      ccache dfu-util device-tree-compiler wget python3-dev python3-pip  \
-      python3-setuptools python3-tk python3-wheel xz-utils file make gcc \
-      gcc-multilib g++-multilib libsdl2-dev libmagic1
+## Structure
 
-Also [install `west` command][west]. Since no package is provided for `west`, it
-can be done through `pip`:
+This repository is the top-level [manifest repository][west-manifest] for the
+Silicon Labs SDK for Zephyr. The SDK uses the [West][west] tool to check out
+and organize the different repositories that are part of it. The
+[manifest file](./west.yml) tells West which repositories to check out at
+which revision. Important repos include:
 
-    pip install west
+* [zephyr-silabs][repo-zephyr-silabs] - The manifest repository for Silicon
+  Labs SDK for Zephyr. Functions as the entry point for the SDK, and points to
+  a mix of upstream repositories, downstream forks and additional downstream
+  repositories. Filters out HAL repositories not related to Silicon Labs targets
+  to optimize the download size and disk usage of the SDK.
+* [zephyr][repo-zephyr] - Silicon Labs fork of the Zephyr repository. Kept in
+  sync with the upstream for every release. May add additional patches that are
+  not yet available upstream.
+* [hal_silabs][repo-hal-silabs] - Silicon Labs fork of the Silicon Labs HAL for
+  Zephyr. Includes the parts of Simplicity SDK and WiSeConnect used by Zephyr.
 
-Retrieve this repository using `west init`:
+[repo-zephyr-silabs]: https://github.com/SiliconLabsSoftware/zephyr-silabs
+[repo-zephyr]: https://github.com/SiliconLabsSoftware/zephyr
+[repo-hal-silabs]: https://github.com/SiliconLabsSoftware/hal_silabs
 
-    mkdir workspace
-    cd workspace
-    west init -m git@github.com:siliconlabssoftware/zephyr-silabs
+The workspace directory structure looks like this, with additional modules
+as specified by the manifest:
 
-Retrieve modules:
+```
+workspace/
+├── modules/
+│   ├── crypto/
+│   │   └── mbedtls/    # Silicon Labs fork with hardware acceleration
+│   └── hal/
+│       ├── cmsis_6/    # Upstream CMSIS 6 repository
+│       └── silabs/     # Silicon Labs HAL
+├── zephyr/             # Silicon Labs downstream fork of Zephyr
+└── zephyr-silabs/      # Silicon Labs SDK for Zephyr manifest repository
+```
 
-    west update
+## Getting Started
 
-You can now [install extra Python packages][pydeps] required by Zephyr:
+To get started with Silicon Labs SDK for Zephyr, follow the
+[Getting Started Guide from the Zephyr Project][zephyr-getting-started].
+Instead of doing `west init` to initialize a workspace based on the upstream
+manifest, use the following commands, where `silabs_zephyr` is an example name
+for your workspace directory:
 
-     pip install -r zephyr/scripts/requirements.txt
+```
+west init -m https://github.com/SiliconLabsSoftware/zephyr-silabs silabs_zephyr
+cd silabs_zephyr
+west update
+west blobs fetch
+```
 
-Retrieve the blobs:
+It is also possible to clone the repository manually, and use `west init -l` to
+perform initialization from local sources.
 
-    west blobs fetch
+The Getting Started Guide covers setting up the build environment, as well as
+building and flashing an example.
 
-Install [a toolchain][toolchain]. [Zephyr SDK][sdk] is recommended:
+To use Zephyr with Silicon Labs devices, certain pre-built libraries are
+required for the radio. The `west blobs fetch` command downloads these
+libraries.
 
-    west sdk install
+[zephyr-getting-started]: https://docs.zephyrproject.org/latest/develop/getting_started/index.html
 
-Then, [Simplicity Commander][commander] is required to flash some targets (eg.
-SiWG917 can only be flashed using Simplicity Commander):
+### Linux
 
-    ARCH=x86_64 # Also consider "aarch32" or "aarch64"
-    wget https://www.silabs.com/documents/login/software/SimplicityCommander-Linux.zip
-    unzip SimplicityCommander-Linux.zip
-    sudo mkdir -p /opt/commander
-    sudo chown $(id -un):$(id -gn) /opt/commander
-    tar -C /opt -xvf SimplicityCommander-Linux/Commander_linux_${ARCH}_*.tar.bz
-    sudo ln -sfn /opt/commander/commander /usr/local/bin/
-
-In order to debug the target, you will need [J-Link software pack][jlink]:
-
-    ARCH=x86_64 # Also consider "arm" or "arm64"
-    wget --post-data accept_license_agreement=accepted https://www.segger.com/downloads/jlink/JLink_Linux_$ARCH.deb
-    sudo dpkg -i JLink_Linux_$ARCH.deb
-
-Your environment is now installed. You can run all the Zephyr commands, ie.
-build an application:
-
-    west build -b siwx917_rb4338a zephyr/samples/hello_world
-
-... then flash it:
-
-    west flash
-
-... and debug it:
-
-    west attach
-
-[main-doc]:  https://docs.zephyrproject.org/latest/develop/getting_started/index.html
-[sysdeps]:   https://docs.zephyrproject.org/latest/develop/getting_started/index.html#install-dependencies
-[west]:      https://docs.zephyrproject.org/latest/develop/west/install.html
-[pydeps]:    https://docs.zephyrproject.org/latest/develop/getting_started/index.html#get-zephyr-and-install-python-dependencies
-[toolchain]: https://docs.zephyrproject.org/latest/develop/toolchains/index.html
-[sdk]:       https://docs.zephyrproject.org/latest/develop/toolchains/zephyr_sdk.html
-[commander]: https://www.silabs.com/developers/simplicity-studio/simplicity-commander?tab=downloads
-[jlink]:     https://www.segger.com/jlink-software.html
-
-Troubleshooting
----------------
-
-### `pip` says "This environment is externally managed".
-
-On recent version of Debian (>= bookworm) and derivative, you need to use `pipx`
-(or use Python venv) instead of `pip`:
-
-    pipx install west
-    pipx runpip west install crc
-    pipx runpip west install -r zephyr/scripts/requirements.txt
-
-
-### I am not able to install JLink and Simplicity Commander on Raspberry Pi
-
-You probably need to retrieve the binary that match with your architecture. Here
-is a table to identify your system:
-
-  | `uname -m` | `dpkg --print-architecture` | JLink    | Commander |
-  |------------|-----------------------------|----------|-----------|
-  | `x86_64`   | `amd64`                     | `x86_64` | `x86_64`  |
-  | `aarch64`  | `arm64`                     | `arm64`  | `aarch64` |
-  | `arm`      | `armhf`                     | `arm`    | `aarch32` |
-
-
-### I am not able to debug my target
-
-J-Link software package may not support the Silicon Labs parts. Commander is
-generally up to date. You can try to copy Commander J-Link customisation files
-to J-Link software pack:
-
-    sudo cp -fr /opt/commander/resources/jlink/* /opt/SEGGER/JLink_V*/
+For Linux users, see also the more detailed
+[Getting Started on Linux](./doc/getting-started-linux.md) guide.
