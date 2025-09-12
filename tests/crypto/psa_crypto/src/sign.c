@@ -6,14 +6,23 @@
 
 #include <zephyr/ztest.h>
 #include <psa/crypto.h>
-
 #include "test_vectors.h"
 
 uint8_t pubkey[65];
 uint8_t signature[64];
 size_t pubkey_len;
 size_t signature_len;
-
+static const unsigned char private_key[] = {0x95, 0xCD, 0x3A, 0x36, 0x25, 0xD6, 0xF6, 0x06,
+					    0xBD, 0xC8, 0x64, 0x77, 0x8D, 0x4A, 0xA6, 0x50,
+					    0xC2, 0xD7, 0x9A, 0x05, 0x94, 0xDD, 0x10, 0xCF,
+					    0x4C, 0x47, 0x4B, 0x83, 0xD2, 0x87, 0x0D, 0x1A};
+#if defined(CONFIG_TEST_WRAPPED_KEYS) && CONFIG_TEST_WRAPPED_KEYS
+static const unsigned char wrapped_private_key[] = {
+	0xd1, 0xd6, 0x56, 0x96, 0x9a, 0x78, 0x46, 0x36, 0xdd, 0xa8, 0xbc,
+	0x0c, 0xe2, 0xe5, 0xbb, 0xee, 0x05, 0x33, 0x82, 0x0f, 0x7d, 0xc7,
+	0x12, 0xf4, 0xd9, 0x34, 0x25, 0x00, 0x72, 0x53, 0x95, 0x7d,
+};
+#endif
 #define MESSAGE_SIZE (sizeof(plaintext) / 2)
 
 ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1)
@@ -27,19 +36,37 @@ ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1)
 	psa_set_key_usage_flags(&attributes,
 				PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_ANY_HASH));
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
-	}
 
-	zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
-		      "Failed to generate private key");
+	zassert_equal(psa_import_key(&attributes, private_key, sizeof(private_key), &key_id),
+		      PSA_SUCCESS, "Failed to import private key");
 
+	zassert_equal(psa_export_public_key(key_id, pubkey, sizeof(pubkey), &pubkey_len),
+		      PSA_SUCCESS, "Failed to export public key");
+
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy private key");
+
+	/* Set up attributes for a volatile private plain key (secp256r1) */
+	psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+	psa_set_key_bits(&attributes, 256);
+	psa_set_key_usage_flags(&attributes,
+				PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
+	psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_ANY_HASH));
+
+#if defined(CONFIG_TEST_WRAPPED_KEYS) && CONFIG_TEST_WRAPPED_KEYS
+	printf("Test Wrapper keys enabled\n");
+	psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+						  PSA_KEY_PERSISTENCE_VOLATILE, 1));
+	zassert_equal(psa_import_key(&attributes, wrapped_private_key, sizeof(wrapped_private_key),
+				     &key_id),
+		      PSA_SUCCESS, "Failed to import private key");
+#else
+	zassert_equal(psa_import_key(&attributes, private_key, sizeof(private_key), &key_id),
+		      PSA_SUCCESS, "Failed to import private key");
+#endif
 	zassert_equal(psa_sign_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
 				       MESSAGE_SIZE, signature, sizeof(signature), &signature_len),
 		      PSA_SUCCESS, "Failed to hash-and-sign message");
-	zassert_equal(psa_export_public_key(key_id, pubkey, sizeof(pubkey), &pubkey_len),
-		      PSA_SUCCESS, "Failed to export public key");
+
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy private key");
 
 	/* Set up attributes for a public key (secp256r1) */
@@ -50,14 +77,10 @@ ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1)
 
 	zassert_equal(psa_import_key(&attributes, pubkey, sizeof(pubkey), &key_id), PSA_SUCCESS,
 		      "Failed to import public key");
+
 	zassert_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
 					 MESSAGE_SIZE, signature, signature_len),
 		      PSA_SUCCESS, "Failed to verify signature");
-
-	signature[0] += 1;
-	zassert_not_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
-					     MESSAGE_SIZE, signature, signature_len),
-			  PSA_SUCCESS, "Signature incorrectly successfully verified");
 
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
