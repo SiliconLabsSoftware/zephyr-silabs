@@ -1,0 +1,28 @@
+# Copyright (c) 2025 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+mainmenu "SiWx91x OTA Configuration"
+
+menu "SiWx91x OTA application options"
+
+config OTA_WIFI_SSID
+	string "WiFi SSID"
+	default "your_ssid"
+	help
+	  WiFi SSID for the network to connect to.
+
+config OTA_WIFI_PSK
+	string "WiFi PSK"
+	default "your_psk"
+	help
+	  WiFi PSK (password) for the network to connect to.
+
+config OTA_UPDATE_URL
+	string "OTA update URL"
+	default "https://example.com:443/firmware.rps"
+	help
+	  The full URL for the OTA firmware update.
+
+endmenu
+
+source "Kconfig.zephyr"
