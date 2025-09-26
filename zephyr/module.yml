@@ -21,3 +21,7 @@ build:
     # Zephyr will use the `<soc_root>/soc` for additional socs. The `.` is the
     # root of this repository.
     soc_root: .
+samples:
+  - samples
+tests:
+  - tests
