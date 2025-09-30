@@ -1,0 +1,7 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025 Silicon Laboratories Inc.
+
+# soc.yml needs to declare at least one SoC to register as a SoC root in list_hardware.py and make
+# this path get picked up by Kconfig.soc and Kconfig.defconfig
+socs:
+  - extend: efr32mg24b310f1536im48
