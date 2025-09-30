@@ -34,4 +34,18 @@ config MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS
 	  implement mbedtls_psa_platform_get_builtin_key().
 
 endif
+
+if SECURE_STORAGE
+
+config SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_PROVIDER_SILABS
+	bool "Secure Storage ITS transform AEAD key provider using Silicon Labs SE builtin key"
+	default y
+	depends on $(dt_has_compat,$(DT_COMPAT_SILABS_GECKO_SEMAILBOX))
+	select MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS
+	select PSA_WANT_KEY_TYPE_AES
+	select PSA_WANT_ALG_CMAC
+	imply HWINFO
+
+endif
+
 endif
