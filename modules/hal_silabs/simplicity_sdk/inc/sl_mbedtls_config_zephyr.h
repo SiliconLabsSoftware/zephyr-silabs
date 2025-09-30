@@ -5,6 +5,10 @@
 #ifndef SL_MBEDTLS_CONFIG_ZEPHYR_H
 #define SL_MBEDTLS_CONFIG_ZEPHYR_H
 
+#if defined(CONFIG_MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS)
+#define MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS
+#endif
+
 #include "sli_mbedtls_omnipresent.h"
 
 /* Legacy mbed TLS ALT APIs are not accelerated in Zephyr
