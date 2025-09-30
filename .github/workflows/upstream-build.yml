@@ -1,3 +1,6 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025 Silicon Laboratories Inc.
+
 name: Silabs upstream daily build
 
 on:
@@ -55,6 +58,14 @@ jobs:
           west twister -v --inline-logs \
             -s drivers.dma.chan_blen_transfer \
             -p siwx917_rb4338a
+
+      - name: Build Secure Storage samples
+        shell: bash
+        run: |
+          west twister -v --inline-logs -K \
+            -s sample.psa.its.secure_storage.entropy_driver \
+            -p xg24_rb4187c \
+            -p bg29_rb4420a
 
       - name: Build Bluetooth samples
         shell: bash
