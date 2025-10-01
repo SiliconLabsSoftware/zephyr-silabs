@@ -44,10 +44,7 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_MONTGOMERY));
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
-	}
+
 	zassert_equal(psa_import_key(&attributes, client_private_key, sizeof(client_private_key),
 				     &key_id),
 		      PSA_SUCCESS, "Failed to import client key");
@@ -57,6 +54,7 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 					    sizeof(server_public_key), shared_secret_buf,
 					    sizeof(shared_secret_buf), &shared_secret_len),
 		      PSA_SUCCESS, "Failed to perform key agreement with server");
+
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy client key");
 
 	/* Import server key */
@@ -64,10 +62,6 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_MONTGOMERY));
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
-	}
 	zassert_equal(psa_import_key(&attributes, server_private_key, sizeof(server_private_key),
 				     &key_id),
 		      PSA_SUCCESS, "Failed to import server key");
@@ -77,6 +71,7 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 					    sizeof(client_public_key), shared_secret_buf,
 					    sizeof(shared_secret_buf), &shared_secret_len),
 		      PSA_SUCCESS, "Failed to perform key agreement with client");
+
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy server key");
 
 	/* Verify shared secret */
