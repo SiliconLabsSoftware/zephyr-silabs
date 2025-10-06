@@ -12,7 +12,8 @@
 #define SLI_PSEC_OSAL_NON_BLOCKING (0)
 
 #if DT_IRQ_HAS_NAME(DT_NODELABEL(se), sembrx)
-#define SE_MANAGER_USER_SEMBRX_IRQ_PRIORITY DT_IRQ_BY_NAME(DT_NODELABEL(se), sembrx, priority)
+#define SE_MANAGER_USER_SEMBRX_IRQ_PRIORITY                                                        \
+	(DT_IRQ_BY_NAME(DT_NODELABEL(se), sembrx, priority) + CONFIG_ZERO_LATENCY_LEVELS + 1)
 #endif
 
 typedef enum {
