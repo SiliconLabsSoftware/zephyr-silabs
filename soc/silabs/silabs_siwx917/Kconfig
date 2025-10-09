@@ -21,5 +21,10 @@ config MBEDTLS_USER_CONFIG_FILE
 	default "sl_mbedtls_config_zephyr.h" \
 		if PSA_CRYPTO_DRIVER_SILABS_SIWX91X
 
+if SOC_SERIES_SIWG917
+config TEST_WRAPPED_KEYS
+	bool "Enable Wrapper keys - specific to SiWG917"
+endif
+
 endif
 endif
