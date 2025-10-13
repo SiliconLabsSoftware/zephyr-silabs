@@ -50,7 +50,6 @@ ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_multipart)
 			      PSA_SUCCESS, "Failed to import key");
 	#endif
 	psa_reset_key_attributes(&attributes);
-
 	zassert_equal(psa_cipher_encrypt_setup(&operation, key_id, alg), PSA_SUCCESS,
 		      "Failed to begin encrypt operation");
 	zassert_equal(psa_cipher_generate_iv(&operation, iv, sizeof(iv), &iv_len), PSA_SUCCESS,
