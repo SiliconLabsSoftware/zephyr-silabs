@@ -71,16 +71,15 @@ ZTEST(psa_crypto_test, test_aead_aes_ccm)
 		      PSA_SUCCESS, "Failed to encrypt");
 
 	zassert_equal(out_len, sizeof(expect_cipher_tag_buf));
-	zassert_mem_equal(cipher_tag_buf, expect_cipher_tag_buf, sizeof(expect_cipher_tag_buf));
-
+	zassert_mem_equal(cipher_tag_buf, expect_cipher_tag_buf,
+					sizeof(expect_cipher_tag_buf));
 	zassert_equal(psa_aead_decrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
-				       aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, out_len,
-				       decrypted, sizeof(decrypted), &out_len),
-		      PSA_SUCCESS, "Failed to decrypt");
+				    aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, out_len,
+				    decrypted, sizeof(decrypted), &out_len),
+		    		PSA_SUCCESS, "Failed to decrypt");
 
 	zassert_equal(out_len, sizeof(aes_plaintext));
 	zassert_mem_equal(decrypted, aes_plaintext, sizeof(aes_plaintext));
-
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
@@ -103,21 +102,21 @@ ZTEST(psa_crypto_test, test_aead_aes_gcm)
 	psa_set_key_algorithm(&attributes, alg);
 
 	zassert_equal(psa_import_key(&attributes, aes_key_buf, sizeof(aes_key_buf), &key_id),
-		      PSA_SUCCESS, "Failed to import key");
+		    		PSA_SUCCESS, "Failed to import key");
 
 	zassert_equal(psa_aead_encrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
-				       aes_ad_buf, sizeof(aes_ad_buf), aes_plaintext,
-				       sizeof(aes_plaintext), cipher_tag_buf,
-				       sizeof(cipher_tag_buf), &out_len),
-		      PSA_SUCCESS, "Failed to encrypt");
+				    	aes_ad_buf, sizeof(aes_ad_buf), aes_plaintext,
+				    	sizeof(aes_plaintext), cipher_tag_buf,
+				    	sizeof(cipher_tag_buf), &out_len),
+		    			PSA_SUCCESS, "Failed to encrypt");
 
 	zassert_equal(out_len, sizeof(expect_cipher_tag_buf));
 	zassert_mem_equal(cipher_tag_buf, expect_cipher_tag_buf, sizeof(expect_cipher_tag_buf));
 
 	zassert_equal(psa_aead_decrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
-				       aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, out_len,
-				       decrypted, sizeof(decrypted), &out_len),
-		      PSA_SUCCESS, "Failed to decrypt");
+				    	aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, out_len,
+				    	decrypted, sizeof(decrypted), &out_len),
+		    			PSA_SUCCESS, "Failed to decrypt");
 
 	zassert_equal(out_len, sizeof(aes_plaintext));
 	zassert_mem_equal(decrypted, aes_plaintext, sizeof(aes_plaintext));
@@ -130,7 +129,6 @@ ZTEST(psa_crypto_test, test_aead_chacha20_poly1305)
 	uint8_t cipher_tag_buf[130]; /* Ciphertext + Tag */
 	uint8_t decrypted[sizeof(chachapoly_plaintext)] = {0};
 	size_t out_len;
-
 	psa_key_id_t key_id;
 	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
 	psa_algorithm_t alg = PSA_ALG_CHACHA20_POLY1305;
@@ -162,6 +160,5 @@ ZTEST(psa_crypto_test, test_aead_chacha20_poly1305)
 
 	zassert_equal(out_len, sizeof(chachapoly_plaintext));
 	zassert_mem_equal(decrypted, chachapoly_plaintext, sizeof(chachapoly_plaintext));
-
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }

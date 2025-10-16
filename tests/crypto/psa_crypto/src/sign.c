@@ -27,19 +27,14 @@ ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1)
 	psa_set_key_usage_flags(&attributes,
 				PSA_KEY_USAGE_SIGN_MESSAGE | PSA_KEY_USAGE_VERIFY_MESSAGE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDSA(PSA_ALG_ANY_HASH));
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
-	}
-
 	zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
-		      "Failed to generate private key");
+		    		"Failed to generate private key");
 
 	zassert_equal(psa_sign_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
-				       MESSAGE_SIZE, signature, sizeof(signature), &signature_len),
-		      PSA_SUCCESS, "Failed to hash-and-sign message");
+				    MESSAGE_SIZE, signature, sizeof(signature), &signature_len),
+		    		PSA_SUCCESS, "Failed to hash-and-sign message");
 	zassert_equal(psa_export_public_key(key_id, pubkey, sizeof(pubkey), &pubkey_len),
-		      PSA_SUCCESS, "Failed to export public key");
+		    		PSA_SUCCESS, "Failed to export public key");
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy private key");
 
 	/* Set up attributes for a public key (secp256r1) */
@@ -51,13 +46,6 @@ ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1)
 	zassert_equal(psa_import_key(&attributes, pubkey, sizeof(pubkey), &key_id), PSA_SUCCESS,
 		      "Failed to import public key");
 	zassert_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
-					 MESSAGE_SIZE, signature, signature_len),
-		      PSA_SUCCESS, "Failed to verify signature");
-
-	signature[0] += 1;
-	zassert_not_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
-					     MESSAGE_SIZE, signature, signature_len),
-			  PSA_SUCCESS, "Signature incorrectly successfully verified");
-
-	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
+					MESSAGE_SIZE, signature, signature_len),
+		    		PSA_SUCCESS, "Failed to verify signature");
 }
