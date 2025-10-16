@@ -219,22 +219,6 @@ static RAIL_Handle_t rail_init(void)
 	return rail_handle;
 }
 
-static void rail_isr_installer(void)
-{
-#ifdef CONFIG_SOC_SERIES_EFR32MG24
-	IRQ_CONNECT(SYNTH_IRQn, 0, SYNTH_IRQHandler, NULL, 0);
-#else
-	IRQ_CONNECT(RDMAILBOX_IRQn, 0, RDMAILBOX_IRQHandler, NULL, 0);
-#endif
-	IRQ_CONNECT(RAC_SEQ_IRQn, 0, RAC_SEQ_IRQHandler, NULL, 0);
-	IRQ_CONNECT(RAC_RSM_IRQn, 0, RAC_RSM_IRQHandler, NULL, 0);
-	IRQ_CONNECT(PROTIMER_IRQn, 0, PROTIMER_IRQHandler, NULL, 0);
-	IRQ_CONNECT(MODEM_IRQn, 0, MODEM_IRQHandler, NULL, 0);
-	IRQ_CONNECT(FRC_IRQn, 0, FRC_IRQHandler, NULL, 0);
-	IRQ_CONNECT(BUFC_IRQn, 0, BUFC_IRQHandler, NULL, 0);
-	IRQ_CONNECT(AGC_IRQn, 0, AGC_IRQHandler, NULL, 0);
-}
-
 int main(void)
 {
 	static const uint8_t default_payload[] = {
@@ -255,7 +239,6 @@ int main(void)
 	gpio_init_callback(&sw0_cb, btn_pressed, BIT(sw0.pin));
 	gpio_add_callback(sw0.port, &sw0_cb);
 
-	rail_isr_installer();
 	sl_rail_util_pa_init();
 	app_ctx.rail_handle = rail_init();
 	app_ctx.channel = 0;
