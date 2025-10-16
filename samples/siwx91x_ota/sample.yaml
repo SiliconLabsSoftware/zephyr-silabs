@@ -1,0 +1,19 @@
+# Copyright (c) 2025 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+sample:
+  name: HTTP/HTTPS OTAF
+  description: HTTP/HTTPS OTA firmware update application for SiWx917
+tests:
+  sample.net.http_otaf:
+    harness: net
+    platform_allow:
+      - siwx917_rb4338a
+    tags:
+      - net
+      - wifi
+      - http
+      - tls
+      - ota
+    integration_platforms:
+      - siwx917_rb4338a
