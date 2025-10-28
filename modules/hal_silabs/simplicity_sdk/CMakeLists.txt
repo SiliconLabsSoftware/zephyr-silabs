@@ -14,13 +14,13 @@ zephyr_include_directories(
   inc
 )
 
-zephyr_compile_definitions_ifdef(CONFIG_SOC_GECKO_SE
+zephyr_compile_definitions_ifdef(CONFIG_SILABS_SISDK_SE
   SL_SE_MANAGER_THREADING
 )
 
 set(vse_device_families 22 27)
 if(CONFIG_SOC_FAMILY_SILABS_S2 AND NOT (SILABS_DEVICE_FAMILY_NUMBER IN_LIST vse_device_families))
-  zephyr_compile_definitions_ifdef(CONFIG_SOC_GECKO_SE
+  zephyr_compile_definitions_ifdef(CONFIG_SILABS_SISDK_SE
     SL_SE_MANAGER_YIELD_WHILE_WAITING_FOR_COMMAND_COMPLETION
   )
 endif()
