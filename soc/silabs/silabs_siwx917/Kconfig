@@ -6,13 +6,13 @@ if MBEDTLS
 
 config PSA_CRYPTO_SW_ONLY
 	bool "PSA Crypto software implementation only"
-	select WISECONNECT_NETWORK_STACK
+	select SILABS_SIWX91X_NWP
 
 config PSA_CRYPTO_DRIVER_SILABS_SIWX91X
 	bool "PSA Crypto Driver for SiWx91x"
 	default y if !PSA_CRYPTO_SW_ONLY
 	# Crypto is handled by the network coprocessor
-	select WISECONNECT_NETWORK_STACK
+	select SILABS_SIWX91X_NWP
 
 config MBEDTLS_USER_CONFIG_ENABLE
 	default y if PSA_CRYPTO_DRIVER_SILABS_SIWX91X
