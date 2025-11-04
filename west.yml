@@ -15,7 +15,7 @@ manifest:
       path: modules/crypto/mbedtls
     - name: zephyr
       remote: silabs
-      revision: 433893e54b9ca7e70d6f158690839b56913d5dce
+      revision: e438b57a8caded26e90bc227edcf3329ece5241d
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
