@@ -4,10 +4,15 @@
 set(SECURITY_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/security)
 set(MBEDTLS_DIR ${ZEPHYR_MBEDTLS_MODULE_DIR})
 
-# Get SoC series number, i.e. translate e.g. efr32bg22 -> 22
-string(SUBSTRING ${CONFIG_SOC_SERIES} 4 3 SILABS_DEVICE_FAMILY_NUMBER)
-if(SILABS_DEVICE_FAMILY_NUMBER MATCHES "2.*")
+# Get SoC series number, i.e. translate efr32bg22 -> 22, mgm240p -> 24, simg301 -> 301
+if(CONFIG_SOC_SERIES MATCHES "^ef[rm]32")
   string(SUBSTRING ${CONFIG_SOC_SERIES} 7 2 SILABS_DEVICE_FAMILY_NUMBER)
+elseif(CONFIG_SOC_SERIES MATCHES "^si")
+  string(SUBSTRING ${CONFIG_SOC_SERIES} 4 3 SILABS_DEVICE_FAMILY_NUMBER)
+elseif(CONFIG_SOC_SERIES MATCHES "^.gm")
+  string(SUBSTRING ${CONFIG_SOC_SERIES} 3 2 SILABS_DEVICE_FAMILY_NUMBER)
+else()
+  message(FATAL_ERROR "unknown part")
 endif()
 
 zephyr_include_directories(
