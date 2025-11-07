@@ -1,6 +1,8 @@
 # Copyright (c) 2025 Silicon Laboratories Inc.
 # SPDX-License-Identifier: Apache-2.0
 
+list(PREPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/modules)
+
 function(zephyr_runner_file type path)
   # Property magic which makes west flash choose the signed build
   # output of a given type.
@@ -16,6 +18,8 @@ function(zephyr_commander_sign_tasks keyfile)
   # List of additional build byproducts.
   set(byproducts)
 
+  find_package(SimplicityCommander REQUIRED)
+
   if(CONFIG_BUILD_OUTPUT_HEX)
     list(APPEND byproducts ${output}.signed.hex)
     zephyr_runner_file(hex ${output}.signed.hex)
@@ -23,7 +27,7 @@ function(zephyr_commander_sign_tasks keyfile)
       CACHE FILEPATH "Signed kernel hex file" FORCE
     )
     set_property(GLOBAL APPEND PROPERTY extra_post_build_commands COMMAND
-                  commander convert ${output}.hex
+                  ${COMMANDER} convert ${output}.hex
                   --secureboot --keyfile ${keyfile} -o ${output}.signed.hex)
   endif()
 
