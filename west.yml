@@ -13,6 +13,10 @@ manifest:
       remote: silabs
       revision: 43bb1e577e2accfaa135464bac181ed2a0cc0489
       path: modules/crypto/mbedtls
+    - name: zephyr-mcuboot
+      remote: silabs
+      revision: 30a3475547e6c557d019943ef652af2e249d7883
+      path: bootloader/mcuboot
     - name: zephyr
       remote: silabs
       revision: e438b57a8caded26e90bc227edcf3329ece5241d
