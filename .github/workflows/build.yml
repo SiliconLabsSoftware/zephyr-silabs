@@ -74,6 +74,15 @@ jobs:
             -p xg24_rb4187c \
             -p bg29_rb4420a
 
+      - name: Build bootloader samples
+        shell: bash
+        run: |
+          west twister -v --inline-logs -K \
+            -s sample.sysbuild.with_mcuboot \
+            -p xg24_rb4187c \
+            -p xg27_rb4194a \
+            -p bg29_rb4420a
+
       - name: Build Bluetooth samples
         shell: bash
         run: |
