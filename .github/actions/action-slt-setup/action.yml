@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: Apache-2.0
+# Copyright (c) 2025 Silicon Laboratories Inc.
+
+name: Install tools with SLT
+description: Install required tools using SLT
+
+inputs:
+  package-file:
+    description: Path to package file to install from
+    required: true
+    default: pkg.slt
+  slt-url:
+    description: URL to download SLT from
+    required: true
+    default: https://www.silabs.com/documents/public/software/slt-cli-1.0.0-linux-x64.zip
+
+runs:
+  using: composite
+  steps:
+    - name: Download and extract SLT
+      shell: bash
+      run: |
+        wget -q ${{ inputs.slt-url }} -O slt.zip
+        unzip -q slt.zip -d $GITHUB_WORKSPACE/slt
+        chmod +x $GITHUB_WORKSPACE/slt/slt
+        rm slt.zip
+        echo "$GITHUB_WORKSPACE/slt" >> $GITHUB_PATH
+    - name: Install packages
+      shell: bash
+      run: |
+        slt install -f ${{ inputs.package-file }} --no-lock

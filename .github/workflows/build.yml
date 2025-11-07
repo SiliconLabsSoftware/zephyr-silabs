@@ -25,6 +25,11 @@ jobs:
         with:
           python-version: 3.12
 
+      - name: Set up Silicon Labs tools
+        uses: ./zephyr-silabs/.github/actions/action-slt-setup
+        with:
+          package-file: zephyr-silabs/pkg.slt
+
       - name: Setup Zephyr project
         uses: zephyrproject-rtos/action-zephyr-setup@v1
         with:
