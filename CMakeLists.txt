@@ -5,3 +5,16 @@
 # as the module CMake entry point (see zephyr/module.yml).
 
 add_subdirectory(modules)
+
+if(DEFINED CONFIG_SOC_FAMILY_SILABS_S2)
+
+# If MCUboot is being built, use the Commander signing script to sign the bootloader
+# with Simplicity Commander. This enables the MCUboot image to be secure boot
+# verified by the SE.
+if(DEFINED CONFIG_MCUBOOT)
+  set_target_properties(zephyr_property_target PROPERTIES
+    SIGNING_SCRIPT ${CMAKE_CURRENT_LIST_DIR}/zephyr/cmake/commander_sign.cmake
+  )
+endif()
+
+endif()
