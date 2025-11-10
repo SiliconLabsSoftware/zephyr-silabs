@@ -19,7 +19,7 @@ manifest:
       path: bootloader/mcuboot
     - name: zephyr
       remote: silabs
-      revision: e438b57a8caded26e90bc227edcf3329ece5241d
+      revision: 91b1b84eee8159ce9706e8e0a3826cea04a09170
       import:
         # By using name-allowlist we can clone only the modules that are
         # strictly needed by the application.
