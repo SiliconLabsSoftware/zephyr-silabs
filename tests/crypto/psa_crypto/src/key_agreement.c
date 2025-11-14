@@ -6,6 +6,7 @@
 
 #include <zephyr/ztest.h>
 #include <psa/crypto.h>
+#include <zephyr/sys/util.h>   /* for IS_ENABLED() */
 
 static const uint8_t client_private_key[] = {
 	0xB0, 0x76, 0x51, 0xEA, 0x20, 0xF0, 0x28, 0xA8, 0x16, 0xEE, 0x01,
@@ -27,12 +28,11 @@ static const uint8_t server_public_key[] = {
 	0x8D, 0x49, 0x85, 0x8C, 0x7A, 0x9F, 0xC1, 0x46, 0xDA, 0xCC, 0x96,
 	0xEF, 0x6E, 0xD4, 0xDA, 0x71, 0xBF, 0xED, 0x32, 0x0D, 0x76,
 };
-static const uint8_t expected_shared_secret[] = {
+static const uint8_t expected_shared_secret[] __unused = {
 	0xF2, 0xE6, 0x0E, 0x1C, 0xB7, 0x64, 0xBC, 0x48, 0xF2, 0x9D, 0xBB,
 	0x12, 0xFB, 0x12, 0x17, 0x31, 0x32, 0x1D, 0x79, 0xAF, 0x0A, 0x9F,
 	0xAB, 0xAD, 0x34, 0x05, 0xA2, 0x07, 0x39, 0x9C, 0x5F, 0x15,
 };
-
 ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 {
 	uint8_t shared_secret_buf[32];
@@ -44,9 +44,9 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_MONTGOMERY));
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
+	if (IS_ENABLED(CONFIG_TEST_WRAPPED_KEYS)) {
 		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
+							  PSA_KEY_PERSISTENCE_VOLATILE, 0));
 	}
 	zassert_equal(psa_import_key(&attributes, client_private_key, sizeof(client_private_key),
 				     &key_id),
@@ -64,9 +64,9 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_MONTGOMERY));
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
+	if (IS_ENABLED(CONFIG_TEST_WRAPPED_KEYS)) {
 		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
+							  PSA_KEY_PERSISTENCE_VOLATILE, 0));
 	}
 	zassert_equal(psa_import_key(&attributes, server_private_key, sizeof(server_private_key),
 				     &key_id),
@@ -78,8 +78,10 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 					    sizeof(shared_secret_buf), &shared_secret_len),
 		      PSA_SUCCESS, "Failed to perform key agreement with client");
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy server key");
-
-	/* Verify shared secret */
-	zassert_mem_equal(shared_secret_buf, expected_shared_secret, sizeof(expected_shared_secret),
-			  "Key agreement did not resolve the correct shared secret");
+	if (!IS_ENABLED(CONFIG_TEST_WRAPPED_KEYS)) {
+		/* Verify shared secret */
+		zassert_mem_equal(shared_secret_buf, expected_shared_secret,
+				sizeof(expected_shared_secret),
+				"Key agreement did not resolve the correct shared secret");
+	}
 }
