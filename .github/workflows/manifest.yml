@@ -1,0 +1,33 @@
+name: Manifest
+on:
+  pull_request_target:
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  contribs:
+    runs-on: ubuntu-22.04
+    name: Manifest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v4
+        with:
+          path: silabs/zephyr-silabs
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Manifest
+        uses: zephyrproject-rtos/action-manifest@v1.3.1
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          manifest-path: 'west.yml'
+          checkout-path: 'silabs/zephyr-silabs'
+          use-tree-checkout: 'true'
+          check-impostor-commits: 'true'
+          label-prefix: 'manifest-'
+          verbosity-level: '1'
+          labels: 'manifest'
+          dnm-labels: 'DNM'
