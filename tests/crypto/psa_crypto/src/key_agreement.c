@@ -33,7 +33,7 @@ static const uint8_t expected_shared_secret[] = {
 	0xAB, 0xAD, 0x34, 0x05, 0xA2, 0x07, 0x39, 0x9C, 0x5F, 0x15,
 };
 
-ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
+void test_key_agreement_ecdh_25519(psa_key_location_t location)
 {
 	uint8_t shared_secret_buf[32];
 	size_t shared_secret_len;
@@ -44,10 +44,8 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_MONTGOMERY));
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
-	}
+	psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+						  PSA_KEY_PERSISTENCE_VOLATILE, location));
 	zassert_equal(psa_import_key(&attributes, client_private_key, sizeof(client_private_key),
 				     &key_id),
 		      PSA_SUCCESS, "Failed to import client key");
@@ -64,10 +62,8 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 	psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_MONTGOMERY));
 	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
 	psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
-	if (IS_ENABLED(TEST_WRAPPED_KEYS)) {
-		psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
-							  PSA_KEY_PERSISTENCE_VOLATILE, 1));
-	}
+	psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+						  PSA_KEY_PERSISTENCE_VOLATILE, location));
 	zassert_equal(psa_import_key(&attributes, server_private_key, sizeof(server_private_key),
 				     &key_id),
 		      PSA_SUCCESS, "Failed to import server key");
@@ -82,4 +78,18 @@ ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519)
 	/* Verify shared secret */
 	zassert_mem_equal(shared_secret_buf, expected_shared_secret, sizeof(expected_shared_secret),
 			  "Key agreement did not resolve the correct shared secret");
+}
+
+ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519_transparent)
+{
+	test_key_agreement_ecdh_25519(0);
+}
+
+ZTEST(psa_crypto_test, test_key_agreement_ecdh_25519_opaque)
+{
+	if (!IS_ENABLED(TEST_OPAQUE_KEY_AGREEMENT)) {
+		ztest_test_skip();
+	}
+
+	test_key_agreement_ecdh_25519(1);
 }
