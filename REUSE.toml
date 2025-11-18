@@ -1,0 +1,22 @@
+version = 1
+
+# Declare default license and copyright text for files that typically do not include them.
+[[annotations]]
+path = [
+    # zephyr-keep-sorted-start
+    "**/*.cfg",
+    "**/*.cmake",
+    "**/*.conf",
+    "**/*.ecl",
+    "**/*.html",
+    "**/*.md",
+    "**/*.rst",
+    "**/*.yaml",
+    "**/*.yml",
+    "**/*_defconfig",
+    "**/CMakeLists.txt",
+    "**/Kconfig*",
+    # zephyr-keep-sorted-stop
+]
+SPDX-License-Identifier = "Apache-2.0"
+SPDX-FileCopyrightText = "Copyright (c) 2025 Silicon Laboratories Inc."
