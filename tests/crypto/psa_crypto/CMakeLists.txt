@@ -28,4 +28,15 @@ target_compile_definitions(app PUBLIC
   TEST_OPAQUE_SIGN=1
 )
 endif()
+
+# SiWx917 only supports one-shot operations on internally generated opaque keys
+# for sign_message/verify_message and AEAD encrypt/decrypt
+if(CONFIG_PSA_CRYPTO_DRIVER_SILABS_SIWX91X)
+target_compile_definitions(app PUBLIC
+  TEST_OPAQUE_AEAD=1
+  TEST_OPAQUE_SIGN=1
+  TEST_OPAQUE_NO_IMPORT_KEY=1
+  TEST_OPAQUE_NO_MULTIPART=1
+  TEST_OPAQUE_NO_VERIFY=1
+)
 endif()
