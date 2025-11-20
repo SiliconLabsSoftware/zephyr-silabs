@@ -174,6 +174,7 @@ void do_wifi_connect(void)
 		printk("\r\nmalloc failed\r\n");
 		return;
 	}
+  memset(cnx_params, 0, sizeof(struct wifi_connect_req_params));
 	context.connecting = true;
 	cnx_params->channel = WIFI_CHANNEL_ANY;
 	cnx_params->band = 0;
