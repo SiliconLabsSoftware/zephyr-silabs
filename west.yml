@@ -1,6 +1,20 @@
 # Copyright 2024 Silicon Laboratories Inc.
 # SPDX-License-Identifier: Apache-2.0
 
+# West manifest file for Silicon Labs SDK for Zephyr.
+#
+# The west workspace configuration file, .west/config, sets the
+# path to the project containing this file in the [manifest] section's
+# "path" variable.
+#
+# You are free to create your own manifest files and put them in any
+# repository you want, to create your own custom workspaces.
+# For example, you could create a manifest file in your own application
+# directory, which would pull this repository in as an ordinary project.
+#
+# You can pass your manifest repository to west init when creating a
+# new workspace. See the west documentation for more information.
+
 manifest:
   remotes:
     - name: zephyrproject-rtos
@@ -9,6 +23,25 @@ manifest:
       url-base: https://github.com/siliconlabssoftware
 
   projects:
+    - name: zephyr
+      remote: silabs
+      revision: 3568e1b6d5cdd51a6b964a2a1d6d29200fea2056
+      import:
+        # Silicon Labs SDK for Zephyr imports the Zephyr main tree at the
+        # revision given above. Only the modules named below are imported.
+        # If a module is overridden it is not listed here, and instead
+        # added separately at the top level.
+        name-allowlist:
+          - cmsis-dsp
+          - cmsis-nn
+          - cmsis_6
+          - fatfs
+          - hal_silabs
+          - littlefs
+          - lvgl
+          - picolibc
+          - segger
+          - zcbor
     - name: zephyr-mbedtls
       remote: silabs
       revision: 43bb1e577e2accfaa135464bac181ed2a0cc0489
@@ -17,12 +50,3 @@ manifest:
       remote: silabs
       revision: 30a3475547e6c557d019943ef652af2e249d7883
       path: bootloader/mcuboot
-    - name: zephyr
-      remote: silabs
-      revision: 3568e1b6d5cdd51a6b964a2a1d6d29200fea2056
-      import:
-        # By using name-allowlist we can clone only the modules that are
-        # strictly needed by the application.
-        name-allowlist:
-          - cmsis_6    # required by the ARM port
-          - hal_silabs # required by Silabs boards
