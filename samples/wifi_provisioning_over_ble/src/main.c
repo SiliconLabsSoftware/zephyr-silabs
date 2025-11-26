@@ -18,6 +18,8 @@
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/wifi_mgmt.h>
 #include "app_config.h"
+#include "sl_wifi.h"
+#include "wifi_app_util.h"
 
 /*BLE Related*/
 #include <zephyr/kernel.h>
@@ -226,9 +228,14 @@ static void handle_in_commands(uint8_t *value, uint16_t len)
 	} break;
 	/*Sending Security type*/
 	case '5': {
+		/* Convert incoming security code to Zephyr enum */
+		uint8_t app_code;
+
 		memset(current_char2_data, 0, sizeof(current_char2_data));
-		sec_type = ((value[3]) - '0');
 		printk("In Security Request\n");
+
+		app_code = (uint8_t)((value[3]) - '0');
+		sec_type = wifi_app_map_security_from_siconnect(app_code);
 		current_char2_data[0] = 0x07;
 		current_char2_data[1] = 0x00;
 		if (sec_type != 0) {
@@ -269,10 +276,17 @@ static void handle_in_commands(uint8_t *value, uint16_t len)
 		printk("FW version request\n");
 		memset(current_char2_data, 0, sizeof(current_char2_data));
 
+		sl_wifi_firmware_version_t firmware_version = (sl_wifi_firmware_version_t){0};
+		int status = sl_wifi_get_firmware_version(&firmware_version);
 		current_char2_data[0] = 0x08;
-		current_char2_data[1] = strlen(KERNEL_VERSION_STRING);
-		memcpy(&current_char2_data[2], (uint8_t *)KERNEL_VERSION_STRING,
-		       strlen(KERNEL_VERSION_STRING));
+		if (status == SL_STATUS_OK) {
+			current_char2_data[1] = sizeof(sl_wifi_firmware_version_t);
+			memcpy(&current_char2_data[2], &firmware_version,
+			       sizeof(sl_wifi_firmware_version_t));
+		} else {
+			printk("sl_wifi_get_firmware_version failed: 0x%x\n", status);
+			current_char2_data[1] = 0;
+		}
 	} break;
 	default:
 		printk("Default command case\n\n");
@@ -602,7 +616,7 @@ static void handle_wifi_scan_result(struct net_mgmt_event_callback *cb)
 		printk("Failed to get connection reference\n");
 		return;
 	}
-	bt_data_notify[0] = entry->security; /*Security mode*/
+	bt_data_notify[0] = wifi_app_map_security_to_siconnect(entry->security); /*Security mode*/
 	bt_data_notify[1] = ',';
 	strncpy((char *)bt_data_notify + 2, (const char *)entry->ssid, entry->ssid_length);
 	bt_data_notify[entry->ssid_length + 2] = '\0';
