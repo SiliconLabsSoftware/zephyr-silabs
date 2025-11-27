@@ -48,7 +48,7 @@ manifest:
       path: modules/hal/silabs_extra
     - name: zephyr-mbedtls
       remote: silabs
-      revision: 43bb1e577e2accfaa135464bac181ed2a0cc0489
+      revision: bb997b915d08a8a1ae45966df44a5ae32f308793
       path: modules/crypto/mbedtls
     - name: zephyr-mcuboot
       remote: silabs
