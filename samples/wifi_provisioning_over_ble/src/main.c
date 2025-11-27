@@ -167,28 +167,31 @@ void do_wifi_disconnect(void)
  **/
 void do_wifi_connect(void)
 {
-	struct wifi_connect_req_params *cnx_params = NULL;
-
-	cnx_params = malloc(sizeof(struct wifi_connect_req_params));
-	if (cnx_params == NULL) {
-		printk("\r\nmalloc failed\r\n");
-		return;
+	struct wifi_connect_req_params cnx_params = {
+		.channel = WIFI_CHANNEL_ANY,
+		.band = 0,
+		.security = sec_type,
+		.mfp = WIFI_MFP_DISABLE,
+		.ssid = ssid,
+		.ssid_length = strlen(ssid),
+		.psk = pwd,
+		.psk_length = strlen(pwd),
+	};
+	/* Configure MFP/credentials for WPA3 and mixed modes */
+	if (sec_type == WIFI_SECURITY_TYPE_SAE_AUTO) {
+		cnx_params.mfp = WIFI_MFP_REQUIRED;
+		cnx_params.sae_password = pwd;
+		cnx_params.sae_password_length = strlen(pwd);
+		cnx_params.psk = NULL;
+		cnx_params.psk_length = 0;
+	} else if (sec_type == WIFI_SECURITY_TYPE_WPA_AUTO_PERSONAL) {
+		cnx_params.mfp = WIFI_MFP_OPTIONAL;
 	}
 	context.connecting = true;
-	cnx_params->channel = WIFI_CHANNEL_ANY;
-	cnx_params->band = 0;
-	cnx_params->security = sec_type;
-	cnx_params->psk_length = strlen(pwd);
-	cnx_params->psk = pwd;
-	cnx_params->ssid_length = strlen(ssid);
-	cnx_params->ssid = ssid;
 
-	int status = net_mgmt(NET_REQUEST_WIFI_CONNECT, iface, cnx_params,
-			      sizeof(struct wifi_connect_req_params));
+	int status = net_mgmt(NET_REQUEST_WIFI_CONNECT, iface, &cnx_params, sizeof(cnx_params));
 	if (status != SUCCESS) {
 		printk("Connection request failed with error: %d\n", status);
-		free(cnx_params);
-		cnx_params = NULL;
 		context.connecting = false;
 		current_char2_data[0] = 0x02;
 		current_char2_data[1] = 0x00;
