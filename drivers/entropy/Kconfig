@@ -1,0 +1,17 @@
+# Copyright (c) 2025 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+if ENTROPY_GENERATOR
+
+config ENTROPY_SILABS_CRYPTOACC_TRNG
+	bool "Silicon Labs CRYPTOACC TRNG driver"
+	default y
+	depends on DT_HAS_SILABS_GECKO_TRNG_ENABLED
+	depends on PSA_CRYPTO_CLIENT
+	depends on PSA_CRYPTO_DRIVER_SILABS_VSE
+	select ENTROPY_HAS_DRIVER
+	help
+	  This option enables the TRNG based entropy driver for Series 2 devices
+	  with VSE (Virtual Secure Engine), i.e. xG22 and xG27.
+
+endif

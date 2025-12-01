@@ -1,6 +1,8 @@
 # SPDX-License-Identifier: Apache-2.0
 # Copyright (c) 2025 Silicon Laboratories Inc.
 
+if SOC_FAMILY_SILABS_S2
+
 if SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_PROVIDER_SILABS
 
 choice SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_PROVIDER
@@ -9,5 +11,12 @@ endchoice
 
 configdefault SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_SIZE
 	default 16
+
+endif
+
+# Disable the upstream TRNG driver and use the downstream TRNG driver
+# that integrates with the rest of the PSA Crypto drivers instead
+configdefault ENTROPY_GECKO_TRNG
+	default n if PSA_CRYPTO_DRIVER_SILABS_VSE
 
 endif
