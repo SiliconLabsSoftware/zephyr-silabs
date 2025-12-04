@@ -25,7 +25,7 @@ manifest:
   projects:
     - name: zephyr
       remote: silabs
-      revision: 0c14b37b14b4e9bbd13aaa97cd23c0d617bfd368
+      revision: 7bd2513bc8ce03082bee6e90ba5a373123cb5066
       import:
         # Silicon Labs SDK for Zephyr imports the Zephyr main tree at the
         # revision given above. Only the modules named below are imported.
