@@ -42,15 +42,17 @@ manifest:
           - picolibc
           - segger
           - zcbor
+    - name: mbedtls
+      remote: silabs
+      repo-path: zephyr-mbedtls
+      revision: bb997b915d08a8a1ae45966df44a5ae32f308793
+      path: modules/crypto/mbedtls
+    - name: mcuboot
+      remote: silabs
+      repo-path: zephyr-mcuboot
+      revision: 30a3475547e6c557d019943ef652af2e249d7883
+      path: bootloader/mcuboot
     - name: zephyr-hal-silabs-extra
       remote: silabs
       revision: 04ea2a26baf2d0a768ce5c8970a754bbdd71e9b1
       path: modules/hal/silabs_extra
-    - name: zephyr-mbedtls
-      remote: silabs
-      revision: bb997b915d08a8a1ae45966df44a5ae32f308793
-      path: modules/crypto/mbedtls
-    - name: zephyr-mcuboot
-      remote: silabs
-      revision: 30a3475547e6c557d019943ef652af2e249d7883
-      path: bootloader/mcuboot
