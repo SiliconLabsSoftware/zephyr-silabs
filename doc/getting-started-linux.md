@@ -1,4 +1,4 @@
-# Getting Started with Silicon Labs SDK for Zephyr on Linux
+# Getting Started with Simplicity SDK for Zephyr on Linux
 
 The steps below applies on common Linux hosts. Please refer to the [full
 documentation][main-doc] for detailed steps.

@@ -1,7 +1,7 @@
 # Copyright 2024 Silicon Laboratories Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-# West manifest file for Silicon Labs SDK for Zephyr.
+# West manifest file for Simplicity SDK for Zephyr.
 #
 # The west workspace configuration file, .west/config, sets the
 # path to the project containing this file in the [manifest] section's
@@ -27,7 +27,7 @@ manifest:
       remote: silabs
       revision: f700b5c57ca27a95634947809194aaab5b7511e8
       import:
-        # Silicon Labs SDK for Zephyr imports the Zephyr main tree at the
+        # Simplicity SDK for Zephyr imports the Zephyr main tree at the
         # revision given above. Only the modules named below are imported.
         # If a module is overridden it is not listed here, and instead
         # added separately at the top level.

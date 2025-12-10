@@ -3,9 +3,9 @@
 [badge]:  https://github.com/SiliconLabsSoftware/zephyr-silabs/actions/workflows/upstream-build.yml/badge.svg
 [recipe]: https://github.com/SiliconLabsSoftware/zephyr-silabs/actions/workflows/upstream-build.yml
 
-# Silicon Labs SDK for Zephyr
+# Simplicity SDK for Zephyr
 
-This repository contains the Silicon Labs SDK for Zephyr, which is Silicon Labs'
+This repository contains the Simplicity SDK for Zephyr, which is Silicon Labs'
 primary downstream enablement for Zephyr.
 
 Silicon Labs is a [Platinum Member][project-members] of the Zephyr Project, and
@@ -18,7 +18,7 @@ compatible with the upstream. The downstream repository also enables additional
 quality assurance of releases for Silicon Labs platforms.
 
 Silicon Labs is committed to an upstream-first development methodology. We
-strive to keep the number of patches applied in Silicon Labs SDK for Zephyr
+strive to keep the number of patches applied in Simplicity SDK for Zephyr
 down by basing the downstream release on upstream stable releases.
 
 [project-members]: https://zephyrproject.org/project-members/
@@ -29,7 +29,7 @@ down by basing the downstream release on upstream stable releases.
 ## Structure
 
 This repository is the top-level [manifest repository][west-manifest] for the
-Silicon Labs SDK for Zephyr. The SDK uses the [West][west] tool to check out
+Simplicity SDK for Zephyr. The SDK uses the [West][west] tool to check out
 and organize the different repositories that are part of it. The
 [manifest file](./west.yml) tells West which repositories to check out at
 which revision. Important repos include:
@@ -61,12 +61,12 @@ workspace/
 │       ├── cmsis_6/    # Upstream CMSIS 6 repository
 │       └── silabs/     # Silicon Labs HAL
 ├── zephyr/             # Silicon Labs downstream fork of Zephyr
-└── zephyr-silabs/      # Silicon Labs SDK for Zephyr manifest repository
+└── zephyr-silabs/      # Simplicity SDK for Zephyr manifest repository
 ```
 
 ## Getting Started
 
-To get started with Silicon Labs SDK for Zephyr, follow the
+To get started with Simplicity SDK for Zephyr, follow the
 [Getting Started Guide from the Zephyr Project][zephyr-getting-started].
 Instead of doing `west init` to initialize a workspace based on the upstream
 manifest, use the following commands, where `silabs_zephyr` is an example name
