@@ -25,7 +25,7 @@ manifest:
   projects:
     - name: zephyr
       remote: silabs
-      revision: 01f56ea25292e5c1b0ca4c5895653c806dd4b1f3
+      revision: e71be929a2973ab4be23e43b4792ff2a89ac74f8
       import:
         # Simplicity SDK for Zephyr imports the Zephyr main tree at the
         # revision given above. Only the modules named below are imported.
@@ -36,12 +36,15 @@ manifest:
           - cmsis-nn
           - cmsis_6
           - fatfs
-          - hal_silabs
           - littlefs
           - lvgl
           - picolibc
           - segger
           - zcbor
+    - name: hal_silabs
+      remote: silabs
+      revision: 6bde23d62ffd16347d1696ba15db92b070907828
+      path: modules/hal/silabs
     - name: mbedtls
       remote: silabs
       repo-path: zephyr-mbedtls
