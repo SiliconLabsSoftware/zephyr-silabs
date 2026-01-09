@@ -20,14 +20,12 @@
 #include <zephyr/bluetooth/uuid.h>
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/bluetooth/services/bas.h>
-//#include <zephyr/bluetooth/services/hrs.h>
 
 static struct bt_conn *current_conn;
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
-		      //BT_UUID_16_ENCODE(BT_UUID_HRS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
 		      BT_UUID_16_ENCODE(BT_UUID_DIS_VAL)),
 #if defined(CONFIG_BT_EXT_ADV)
@@ -212,7 +210,6 @@ static ssize_t write_led(struct bt_conn *conn,
 
 	}
 
-	//led_value = ((uint8_t *)buf)[0];
 	set_led_state(((uint8_t *)buf)[0]);
 
 	gatt_attr_changed(attr, NULL, 0);
@@ -228,10 +225,10 @@ static ssize_t read_led(struct bt_conn *conn,
 			uint16_t len,
 			uint16_t offset)
 {
-	//Read user data> LED state
+	/* Read user data> LED state */
 	const uint8_t *val = attr->user_data;
 
-	//Read led state
+	/* Read led state */
 	return bt_gatt_attr_read(conn, attr, buf, len, offset, val, sizeof(*val));
 }
 
@@ -262,7 +259,7 @@ static void set_led_state(uint8_t state)
 	else {
 		led_value = 0;
 		led_report_value = 0;
-		gpio_pin_set(led.port, led.pin, (int)0);
+		gpio_pin_set(led.port, led.pin, 0);
 	}
 }
 
@@ -314,8 +311,8 @@ static void button_pressed_isr(const struct device *dev,
                                struct gpio_callback *cb,
                                uint32_t pins)
 {
-    /* Simple: toggle LED using current state */
-    set_led_state(!led_value);
+	/* Simple: toggle LED using current state */
+	set_led_state(!led_value);
 	gatt_attr_changed(&led_svc.attrs[LED_SVC_ATTR_CTRL_VALUE], &led_report_value, sizeof(led_report_value));
 }
 
@@ -336,7 +333,7 @@ int main(void)
 
 	bt_conn_auth_cb_register(&auth_cb_display);
 
-//BT_LE_ADV_CONN_FAST_1
+/* BT_LE_ADV_CONN_FAST_1 */
 
 #if !defined(CONFIG_BT_EXT_ADV)
 	printk("Starting Legacy Advertising (connectable and scannable)\n");
@@ -402,17 +399,17 @@ int main(void)
 	 /* Interrupt on edge (falling for active-low button with pull-up) */
     err = gpio_pin_interrupt_configure_dt(&btn, GPIO_INT_EDGE_TO_ACTIVE);
     if (err) {
-        printk("Failed to configure button interrupt: %d\n", err);
-        return 0;
+		printk("Failed to configure button interrupt: %d\n", err);
+		return 0;
     }
 
-    gpio_init_callback(&button_cb_data,
-                       button_pressed_isr,
-                       BIT(btn.pin));
+	gpio_init_callback(&button_cb_data,
+						button_pressed_isr,
+        				BIT(btn.pin));
 
-    gpio_add_callback(btn.port, &button_cb_data);
+	gpio_add_callback(btn.port, &button_cb_data);
 
-    printk("Button initialized\n");
+	printk("Button initialized\n");
 
 	/* Implement notification. */
 	while (1) {
