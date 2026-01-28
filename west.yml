@@ -38,6 +38,7 @@ manifest:
           - fatfs
           - littlefs
           - lvgl
+          - openthread
           - picolibc
           - segger
           - zcbor
@@ -55,6 +56,10 @@ manifest:
       repo-path: zephyr-mcuboot
       revision: 30a3475547e6c557d019943ef652af2e249d7883
       path: bootloader/mcuboot
+    - name: openthread
+      remote: zephyrproject-rtos
+      revision: 2bc7712f57af22058770d1ef131ad3da79a0c764
+      path: modules/lib/openthread
     - name: zephyr-hal-silabs-extra
       remote: silabs
       revision: c56788de2962baee4c6682d9f1494ea077019c9e
