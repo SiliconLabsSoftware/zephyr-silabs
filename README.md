@@ -66,6 +66,8 @@ workspace/
 
 ## Getting Started
 
+**NOTE:** Make sure to use Python 3.10≤x≤3.13 for the following steps.
+
 To get started with Simplicity SDK for Zephyr, follow the
 [Getting Started Guide from the Zephyr Project][zephyr-getting-started].
 Instead of doing `west init` to initialize a workspace based on the upstream
@@ -95,3 +97,37 @@ libraries.
 
 For Linux users, see also the more detailed
 [Getting Started on Linux](./doc/getting-started-linux.md) guide.
+
+## Building Openthread Shell Sample for 4187c
+
+Use the following command to build `samples/net/openthread/shell` for xG24 4187c:
+
+```
+cd silabs_zephyr/zephyr
+west build -b xg24_rb4187c samples/net/openthread/shell -- -DCONF_FILE="overlay-ot-silabs.conf"
+```
+
+Once the command succeeds, `commander` can be used to flash `zephyr/build/zephyr/zephyr.elf`:
+
+```
+commander flash zephyr/build/zephyr/zephyr.elf -s 012345678
+```
+
+When the app has finished flashing, you will be able to use the uart console on port 4901
+
+```
+*** Booting Zephyr OS build e7eb26399c22 ***
+
+uart:~$
+```
+
+This applicaiton should perform the same as an ot-cli application, only every Thread command shall be prefixed with `ot `, i.e. `ot ipaddr`.
+
+```
+uart:~$ ot scan
+ot scan
+| PAN  | MAC Address      | Ch | dBm | LQI |
++------+------------------+----+-----+-----+
+| b97a | d2cf4bc363c2acff | 26 | -76 | 255 |
+Done
+```
