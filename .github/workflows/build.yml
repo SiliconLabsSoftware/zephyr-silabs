@@ -128,3 +128,10 @@ jobs:
         run: |
           west twister -v --inline-logs \
             -s sample.rail.simple_txrx -T zephyr-silabs/samples
+
+      - name: Build OpenThread shell sample
+        shell: bash
+        run: |
+          west twister -v --inline-logs -K \
+            -s sample.net.openthread.shell.silabs \
+            -p xg24_rb4187c
