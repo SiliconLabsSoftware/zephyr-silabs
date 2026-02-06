@@ -88,6 +88,7 @@ zephyr_library_sources_ifdef(CONFIG_PSA_CRYPTO_DRIVER_SILABS_HSE
 zephyr_include_directories_ifdef(CONFIG_PSA_CRYPTO_DRIVER_SILABS_VSE
   ${LIBCRYPTOSOC_DIR}/include
   ${LIBCRYPTOSOC_DIR}/src
+  ${LIBCRYPTOSOC_DIR}/src/platform/silicon_labs
 )
 zephyr_library_sources_ifdef(CONFIG_PSA_CRYPTO_DRIVER_SILABS_VSE
   ${SECURITY_DIR}/sl_component/sl_psa_driver/src/cryptoacc_management.c
@@ -121,6 +122,7 @@ zephyr_library_sources_ifdef(CONFIG_PSA_CRYPTO_DRIVER_SILABS_VSE
   ${LIBCRYPTOSOC_DIR}/src/sx_primitives.c
   ${LIBCRYPTOSOC_DIR}/src/sx_rng.c
   ${LIBCRYPTOSOC_DIR}/src/sx_trng.c
+  ${LIBCRYPTOSOC_DIR}/src/platform/silicon_labs/sli_libcryptosoc.c
 )
 
 endif() # PSA Crypto
