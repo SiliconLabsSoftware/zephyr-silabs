@@ -20,7 +20,9 @@
 #include <zephyr/net/net_core.h>
 #include <zephyr/net/net_context.h>
 #include "app_config.h"
-#include <zephyr/net/socket.h>
+#include <zephyr/posix/sys/socket.h>
+#include <zephyr/posix/arpa/inet.h>
+#include <zephyr/posix/unistd.h>
 
 /*BLE Related*/
 #include <zephyr/bluetooth/bluetooth.h>
