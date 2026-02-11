@@ -75,7 +75,7 @@ manifest, use the following commands, where `silabs_zephyr` is an example name
 for your workspace directory:
 
 ```
-west init -m https://github.com/SiliconLabsSoftware/zephyr-silabs silabs_zephyr
+west init -m https://github.com/SiliconLabsSoftware/zephyr-silabs silabs_zephyr --mr silabs/feature/thread-poc
 cd silabs_zephyr
 west update
 west blobs fetch
