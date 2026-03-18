@@ -11,13 +11,11 @@ config PSA_CRYPTO_DRIVER_SILABS_HSE
 	bool "PSA Crypto Driver for Secure Engine"
 	depends on $(dt_has_compat,$(DT_COMPAT_SILABS_GECKO_SEMAILBOX))
 	select SILABS_SISDK_SE
-	default y if !PSA_CRYPTO_SW_ONLY
 
 config PSA_CRYPTO_DRIVER_SILABS_VSE
 	bool "PSA Crypto Driver for Virtual Secure Engine"
 	depends on $(dt_has_compat,$(DT_COMPAT_SILABS_GECKO_TRNG))
 	select SILABS_SISDK_SE
-	default y if !PSA_CRYPTO_SW_ONLY
 
 config MBEDTLS_USER_CONFIG_ENABLE
 	default y if (PSA_CRYPTO_DRIVER_SILABS_HSE || PSA_CRYPTO_DRIVER_SILABS_VSE)
@@ -41,7 +39,6 @@ if SECURE_STORAGE
 
 config SECURE_STORAGE_ITS_TRANSFORM_AEAD_KEY_PROVIDER_SILABS
 	bool "Secure Storage ITS transform AEAD key provider using Silicon Labs SE builtin key"
-	default y
 	depends on $(dt_has_compat,$(DT_COMPAT_SILABS_GECKO_SEMAILBOX))
 	select MBEDTLS_PSA_CRYPTO_BUILTIN_KEYS
 	select PSA_WANT_KEY_TYPE_AES

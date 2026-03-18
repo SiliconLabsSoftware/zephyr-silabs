@@ -25,7 +25,7 @@ manifest:
   projects:
     - name: zephyr
       remote: silabs
-      revision: 37eb5ad0318a55bbb83c712151278de9b6145c73
+      revision: 60f8fac0ddb72059b45e04cf6dd60078e8ce0281
       import:
         # Simplicity SDK for Zephyr imports the Zephyr main tree at the
         # revision given above. Only the modules named below are imported.
@@ -38,23 +38,17 @@ manifest:
           - fatfs
           - littlefs
           - lvgl
+          - mcuboot
+          - mbedtls
+          - mldsa-native
           - picolibc
           - segger
+          - tf-psa-crypto
           - zcbor
     - name: hal_silabs
       remote: silabs
-      revision: 4db87e248dba7ebcb113c4d9e3d096dd4df22de6
+      revision: f5201210afa1319ed8dd8dbe21682bcb63b25771
       path: modules/hal/silabs
-    - name: mbedtls
-      remote: silabs
-      repo-path: zephyr-mbedtls
-      revision: bb997b915d08a8a1ae45966df44a5ae32f308793
-      path: modules/crypto/mbedtls
-    - name: mcuboot
-      remote: silabs
-      repo-path: zephyr-mcuboot
-      revision: 30a3475547e6c557d019943ef652af2e249d7883
-      path: bootloader/mcuboot
     - name: zephyr-hal-silabs-extra
       remote: silabs
       revision: 5f7327c94bd73116bc92cb220d3c85356a57fe11

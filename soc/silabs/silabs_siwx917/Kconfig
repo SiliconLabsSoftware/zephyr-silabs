@@ -10,7 +10,6 @@ config PSA_CRYPTO_SW_ONLY
 
 config PSA_CRYPTO_DRIVER_SILABS_SIWX91X
 	bool "PSA Crypto Driver for SiWx91x"
-	default y if !PSA_CRYPTO_SW_ONLY
 	# Crypto is handled by the network coprocessor
 	select SILABS_SIWX91X_NWP
 
