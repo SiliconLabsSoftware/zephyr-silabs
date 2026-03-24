@@ -7,7 +7,10 @@ set(WISECONNECT_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect)
 if(CONFIG_PSA_CRYPTO_DRIVER_SILABS_SIWX91X)
 
 zephyr_library_named(hal_silabs_siwx91x_crypto)
-zephyr_library_link_libraries(mbedTLSBase)
+zephyr_library_link_libraries(mbedTLS)
+zephyr_library_link_libraries(tfpsacrypto)
+# Crypto drivers need access to internal TF-PSA-Crypto headers
+zephyr_library_include_directories($<TARGET_PROPERTY:tfpsacrypto,INCLUDE_DIRECTORIES>)
 
 zephyr_include_directories(
   config
@@ -35,8 +38,6 @@ zephyr_compile_definitions(
   SLI_SHA_DEVICE_SI91X
   SLI_MULTITHREAD_DEVICE_SI91X
   SLI_SECURE_KEY_STORAGE_DEVICE_SI91X
-  PSA_HAVE_SOFT_KEY_TYPE_AES # Causes MBEDTLS_PSA_BUILTIN_CIPHER to be set
-  MBEDTLS_PSA_ECC_ACCEL_INCOMPLETE_KEY_TYPES # Accelerated ECC support can't import keys
 )
 
 zephyr_library_sources(
