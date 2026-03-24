@@ -3,7 +3,6 @@
 
 set(SECURITY_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/security)
 set(LIBCRYPTOSOC_DIR ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/util/third_party/crypto_ip/libcryptosoc)
-set(MBEDTLS_DIR ${ZEPHYR_MBEDTLS_MODULE_DIR})
 
 # Get SoC series number, i.e. translate efr32bg22 -> 22, mgm240p -> 24, simg301 -> 301
 if(CONFIG_SOC_SERIES MATCHES "^ef[rm]32")
@@ -36,17 +35,13 @@ if(CONFIG_PSA_CRYPTO_DRIVER_SILABS_HSE OR CONFIG_PSA_CRYPTO_DRIVER_SILABS_VSE OR
 
 zephyr_library_named(hal_silabs_crypto)
 
-target_include_directories(hal_silabs_crypto PRIVATE
-  ${MBEDTLS_DIR}/library
-)
-
 zephyr_include_directories(
   ${SECURITY_DIR}/sl_component/sl_psa_driver/inc
   ${SECURITY_DIR}/sl_component/sl_mbedtls_support/config
   ${SECURITY_DIR}/sl_component/sl_mbedtls_support/inc
 )
 zephyr_compile_definitions(
-  MBEDTLS_PSA_CRYPTO_USER_CONFIG_FILE="sl_psa_crypto_config_zephyr.h"
+  TF_PSA_CRYPTO_USER_CONFIG_FILE="sl_psa_crypto_config_zephyr.h"
 )
 zephyr_library_sources(
   ${SECURITY_DIR}/sl_component/sl_psa_driver/src/sli_psa_driver_common.c
@@ -54,7 +49,10 @@ zephyr_library_sources(
   ${SECURITY_DIR}/sl_component/sl_psa_driver/src/sli_psa_driver_init.c
 #  ${SECURITY_DIR}/sl_component/sl_psa_driver/src/sli_psa_trng.c
 )
-zephyr_library_link_libraries(mbedTLSBase)
+zephyr_library_link_libraries(mbedTLS)
+zephyr_library_link_libraries(tfpsacrypto)
+# Crypto drivers need access to internal TF-PSA-Crypto headers
+zephyr_library_include_directories($<TARGET_PROPERTY:tfpsacrypto,INCLUDE_DIRECTORIES>)
 
 # HSE
 zephyr_library_sources_ifdef(CONFIG_PSA_CRYPTO_DRIVER_SILABS_HSE
