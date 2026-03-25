@@ -7,24 +7,11 @@
 #include <zephyr/logging/log.h>
 #include <zephyr/kernel.h>
 
-#include "rail.h"
+#include "sl_rail.h"
 #include "rail_config.h"
-#include "pa_conversions_efr32.h"
+#include "sl_rail_util_pa_conversions.h"
 
 LOG_MODULE_REGISTER(app);
-
-#ifdef RAIL0_CHANNEL_GROUP_1_PROFILE_WISUN_OFDM
-#  if !defined(HARDWARE_BOARD_HAS_EFF)
-	BUILD_ASSERT(SL_RAIL_UTIL_PA_SELECTION_SUBGHZ == RAIL_TX_POWER_MODE_OFDM_PA,
-		     "Please use the OFDM PA settings in the sl_rail_util_pa_config.h "
-		     "for OFDM phys");
-#  endif
-#  if defined(HARDWARE_BOARD_HAS_EFF) && RAIL_SUPPORTS_EFF
-	BUILD_ASSERT(SL_RAIL_UTIL_PA_SELECTION_SUBGHZ >= RAIL_TX_POWER_MODE_OFDM_PA_EFF_30DBM,
-		     "Please use the OFDM PA for EFF settings in the sl_rail_util_pa_config.h "
-		     "for OFDM phys");
-#  endif
-#endif
 
 static const struct gpio_dt_spec sw0 = GPIO_DT_SPEC_GET(DT_ALIAS(sw0), gpios);
 static const struct gpio_dt_spec led_rx = GPIO_DT_SPEC_GET(DT_ALIAS(led0), gpios);
@@ -40,7 +27,7 @@ enum {
 };
 
 struct {
-	RAIL_Handle_t rail_handle;
+	sl_rail_handle_t rail_handle;
 	struct k_event events;
 	struct k_mutex tx_lock;
 	int channel;
@@ -48,28 +35,29 @@ struct {
 	int payload_len;
 } app_ctx;
 
-void rx_packets(RAIL_Handle_t rail_handle)
+void rx_packets(sl_rail_handle_t rail_handle)
 {
 	uint8_t rx_frame[32];
-	RAIL_RxPacketHandle_t handle;
-	RAIL_RxPacketInfo_t info;
-	RAIL_Status_t status;
+	sl_rail_rx_packet_handle_t handle;
+	sl_rail_rx_packet_info_t info;
+	sl_rail_status_t status;
 
 	for (;;) {
-		handle = RAIL_GetRxPacketInfo(rail_handle, RAIL_RX_PACKET_HANDLE_OLDEST_COMPLETE,
-					      &info);
-		if (handle == RAIL_RX_PACKET_HANDLE_INVALID) {
+		handle = sl_rail_get_rx_packet_info(rail_handle,
+						    SL_RAIL_RX_PACKET_HANDLE_OLDEST_COMPLETE,
+						    &info);
+		if (handle == SL_RAIL_RX_PACKET_HANDLE_INVALID) {
 			return;
 		}
-		if (info.packetBytes < sizeof(rx_frame)) {
-			RAIL_CopyRxPacket(rx_frame, &info);
+		if (info.packet_bytes < sizeof(rx_frame)) {
+			sl_rail_copy_rx_packet(rail_handle, rx_frame, &info);
 		}
-		status = RAIL_ReleaseRxPacket(rail_handle, handle);
+		status = sl_rail_release_rx_packet(rail_handle, handle);
 		if (status) {
-			LOG_ERR("RAIL_ReleaseRxPacket(): %d", status);
+			LOG_ERR("sl_rail_release_rx_packet(): 0x%x", status);
 		}
-		if (info.packetBytes < sizeof(rx_frame)) {
-			LOG_HEXDUMP_INF(rx_frame, info.packetBytes, "rx data:");
+		if (info.packet_bytes < sizeof(rx_frame)) {
+			LOG_HEXDUMP_INF(rx_frame, info.packet_bytes, "rx data:");
 		} else {
 			LOG_INF("rx: skip large packet");
 		}
@@ -77,20 +65,20 @@ void rx_packets(RAIL_Handle_t rail_handle)
 	}
 }
 
-void tx_packet(RAIL_Handle_t rail_handle, int channel, const uint8_t *payload, int len)
+void tx_packet(sl_rail_handle_t rail_handle, int channel, const uint8_t *payload, int len)
 {
-	RAIL_Status_t status;
+	sl_rail_status_t status;
 	int ret;
 
-	ret = RAIL_WriteTxFifo(rail_handle, payload, len, true);
+	ret = sl_rail_write_tx_fifo(rail_handle, payload, len, true);
 	if (ret != len) {
-		LOG_ERR("RAIL_WriteTxFifo(): %d", ret);
+		LOG_ERR("sl_rail_write_tx_fifo(): 0x%x", ret);
 		return;
 	}
 	gpio_pin_set_dt(&led_tx, 1);
-	status = RAIL_StartTx(rail_handle, channel, RAIL_TX_OPTIONS_DEFAULT, NULL);
+	status = sl_rail_start_tx(rail_handle, channel, SL_RAIL_TX_OPTIONS_DEFAULT, NULL);
 	if (status) {
-		LOG_ERR("RAIL_StartTx(): %d ", status);
+		LOG_ERR("sl_rail_start_tx(): 0x%x", status);
 	}
 	LOG_HEXDUMP_INF(payload, len, "tx data:");
 }
@@ -110,110 +98,145 @@ void cli_send(const struct shell *sh, size_t argc, char **argv)
 	k_mutex_unlock(&app_ctx.tx_lock);
 }
 
-void rail_on_event(RAIL_Handle_t rail_handle, RAIL_Events_t events)
+void rail_on_event(sl_rail_handle_t rail_handle, sl_rail_events_t events)
 {
-	RAIL_Status_t status;
+	sl_rail_status_t status;
 
-	if (events & RAIL_EVENTS_RX_COMPLETION) {
-		if (events & RAIL_EVENT_RX_PACKET_RECEIVED) {
+	if (events & SL_RAIL_EVENTS_RX_COMPLETION) {
+		if (events & SL_RAIL_EVENT_RX_PACKET_RECEIVED) {
 			gpio_pin_set_dt(&led_rx, 1);
-			RAIL_HoldRxPacket(rail_handle);
+			sl_rail_hold_rx_packet(rail_handle);
 			k_event_post(&app_ctx.events, EV_RAIL_RX);
 		} else {
 			LOG_ERR("radio rx error: %08llx", events);
 		}
 	}
 
-	if (events & RAIL_EVENTS_TX_COMPLETION) {
-		if (!(events & RAIL_EVENT_TX_PACKET_SENT)) {
+	if (events & SL_RAIL_EVENTS_TX_COMPLETION) {
+		if (!(events & SL_RAIL_EVENT_TX_PACKET_SENT)) {
 			LOG_ERR("radio tx error: %08llx", events);
 		}
 		gpio_pin_set_dt(&led_tx, 0);
 	}
 
-	if (events & RAIL_EVENTS_TXACK_COMPLETION) {
+	if (events & SL_RAIL_EVENTS_TXACK_COMPLETION) {
 		/* We do not configure Tx ack. Catch the event anyway */
 		LOG_INF("received ack completion");
 	}
 
-	if (events & RAIL_EVENT_CAL_NEEDED) {
-		status = RAIL_Calibrate(rail_handle, NULL, RAIL_CAL_ALL_PENDING);
+	if (events & SL_RAIL_EVENT_CAL_NEEDED) {
+		status = sl_rail_calibrate(rail_handle, NULL, SL_RAIL_CAL_ALL_PENDING);
 		if (status) {
-			LOG_ERR("RAIL_Calibrate(): %d", status);
+			LOG_ERR("sl_rail_calibrate(): 0x%x", status);
 		}
 	}
 }
 
-static void rail_on_rf_ready(RAIL_Handle_t rail_handle)
+static void rail_on_rf_ready(sl_rail_handle_t rail_handle)
 {
 	LOG_INF("radio is ready");
 }
 
-static void rail_on_channel_config(RAIL_Handle_t rail_handle,
-				   const RAIL_ChannelConfigEntry_t *entry)
+static void rail_on_channel_config(sl_rail_handle_t rail_handle,
+				   const sl_rail_channel_config_entry_t *entry)
 {
 	sl_rail_util_pa_on_channel_config_change(rail_handle, entry);
 }
 
-static RAIL_Handle_t rail_init(void)
+static sl_rail_handle_t rail_init(void)
 {
-	static uint8_t tx_fifo[256] __aligned(4);
-	RAIL_Config_t rail_config = {
-		.eventsCallback = &rail_on_event,
+	static SL_RAIL_DECLARE_FIFO_BUFFER(tx_fifo, 256);
+	static SL_RAIL_DECLARE_FIFO_BUFFER(rx_fifo, 256);
+	sl_rail_config_t rail_config = {
+		.events_callback = &rail_on_event,
+		.rx_packet_queue_entries = sl_rail_builtin_rx_packet_queue_entries,
+		.p_rx_packet_queue = sl_rail_builtin_rx_packet_queue_ptr,
+		.rx_fifo_bytes = sizeof(rx_fifo),
+		.p_rx_fifo_buffer = rx_fifo,
+		.tx_fifo_bytes = sizeof(tx_fifo),
+		.tx_fifo_init_bytes = 0,
+		.p_tx_fifo_buffer = tx_fifo,
 	};
-	RAIL_DataConfig_t data_config = {
-		.txSource = TX_PACKET_DATA,
-		.rxSource = RX_PACKET_DATA,
-		.txMethod = PACKET_MODE,
-		.rxMethod = PACKET_MODE,
+	sl_rail_tx_data_config_t tx_data_config = {
+		.tx_source = SL_RAIL_TX_DATA_SOURCE_PACKET_DATA,
+		.tx_method = SL_RAIL_DATA_METHOD_PACKET_MODE,
 	};
-	RAIL_StateTransitions_t transitions = {
-		.success = RAIL_RF_STATE_RX,
-		.error   = RAIL_RF_STATE_RX,
+	sl_rail_rx_data_config_t rx_data_config = {
+		.rx_source = SL_RAIL_RX_DATA_SOURCE_PACKET_DATA,
+		.rx_method = SL_RAIL_DATA_METHOD_PACKET_MODE,
 	};
-	RAIL_Handle_t rail_handle;
-	RAIL_Status_t status;
-	int ret;
+	sl_rail_state_transitions_t transitions = {
+		.success = SL_RAIL_RF_STATE_RX,
+		.error   = SL_RAIL_RF_STATE_RX,
+	};
+	sl_rail_handle_t rail_handle = SL_RAIL_EFR32_HANDLE;
+	const sl_rail_channel_config_t *channel_config =
+		(const sl_rail_channel_config_t *)channelConfigs[0];
+	sl_rail_status_t status;
 
-	rail_handle = RAIL_Init(&rail_config, &rail_on_rf_ready);
-	if (!rail_handle) {
-		LOG_ERR("RAIL_Init() failed");
-	}
-	status = RAIL_ConfigData(rail_handle, &data_config);
+	status = sl_rail_init(&rail_handle, &rail_config, &rail_on_rf_ready);
 	if (status) {
-		LOG_ERR("RAIL_ConfigData(): %d", status);
+		LOG_ERR("sl_rail_init(): 0x%x", status);
+		return NULL;
 	}
-	status = RAIL_ConfigChannels(rail_handle, channelConfigs[0], &rail_on_channel_config);
+	status = sl_rail_config_tx_data(rail_handle, &tx_data_config);
 	if (status) {
-		LOG_ERR("RAIL_ConfigChannels(): %d", status);
+		LOG_ERR("sl_rail_config_tx_data(): 0x%x", status);
+		return NULL;
 	}
-	status = RAIL_SetPtiProtocol(rail_handle, RAIL_PTI_PROTOCOL_CUSTOM);
+	status = sl_rail_config_rx_data(rail_handle, &rx_data_config);
 	if (status) {
-		LOG_ERR("RAIL_SetPtiProtocol(): %d", status);
+		LOG_ERR("sl_rail_config_rx_data(): 0x%x", status);
+		return NULL;
 	}
-	status = RAIL_ConfigCal(rail_handle, RAIL_CAL_TEMP | RAIL_CAL_ONETIME);
+	status = sl_rail_config_channels(rail_handle, channel_config, &rail_on_channel_config);
 	if (status) {
-		LOG_ERR("RAIL_ConfigCal(): %d", status);
+		LOG_ERR("sl_rail_config_channels(): 0x%x", status);
+		return NULL;
 	}
-	status = RAIL_ConfigEvents(rail_handle, RAIL_EVENTS_ALL,
-				   RAIL_EVENTS_RX_COMPLETION |
-				   RAIL_EVENTS_TX_COMPLETION |
-				   RAIL_EVENTS_TXACK_COMPLETION |
-				   RAIL_EVENT_CAL_NEEDED);
+	app_ctx.channel = sl_rail_get_first_channel(rail_handle, channel_config);
+	if (app_ctx.channel == SL_RAIL_CHANNEL_INVALID) {
+		LOG_ERR("invalid sl_rail_get_first_channel()");
+		return NULL;
+	}
+	status = sl_rail_prepare_channel(rail_handle, app_ctx.channel);
 	if (status) {
-		LOG_ERR("RAIL_ConfigEvents(): %d", status);
+		LOG_ERR("sl_rail_prepare_channel(): 0x%x", status);
+		return NULL;
 	}
-	status = RAIL_SetTxTransitions(rail_handle, &transitions);
+	status = sl_rail_set_pti_protocol(rail_handle, SL_RAIL_PTI_PROTOCOL_CUSTOM);
 	if (status) {
-		LOG_ERR("RAIL_SetTxTransitions(): %d", status);
+		LOG_ERR("sl_rail_set_pti_protocol(): 0x%x", status);
+		return NULL;
 	}
-	status = RAIL_SetRxTransitions(rail_handle, &transitions);
+	status = sl_rail_config_cal(rail_handle, SL_RAIL_CAL_TEMP | SL_RAIL_CAL_ONETIME);
 	if (status) {
-		LOG_ERR("RAIL_SetRxTransitions(): %d", status);
+		LOG_ERR("sl_rail_config_cal(): 0x%x", status);
+		return NULL;
 	}
-	ret = RAIL_SetTxFifo(rail_handle, tx_fifo, 0, sizeof(tx_fifo));
-	if (ret != sizeof(tx_fifo)) {
-		LOG_ERR("RAIL_SetTxFifo(): %d != %d", ret, sizeof(tx_fifo));
+	status = sl_rail_config_events(rail_handle, SL_RAIL_EVENTS_ALL,
+				       SL_RAIL_EVENTS_RX_COMPLETION |
+				       SL_RAIL_EVENTS_TX_COMPLETION |
+				       SL_RAIL_EVENTS_TXACK_COMPLETION |
+				       SL_RAIL_EVENT_CAL_NEEDED);
+	if (status) {
+		LOG_ERR("sl_rail_config_events(): 0x%x", status);
+		return NULL;
+	}
+	status = sl_rail_set_tx_transitions(rail_handle, &transitions);
+	if (status) {
+		LOG_ERR("sl_rail_set_tx_transitions(): 0x%x", status);
+		return NULL;
+	}
+	status = sl_rail_set_rx_transitions(rail_handle, &transitions);
+	if (status) {
+		LOG_ERR("sl_rail_set_rx_transitions(): 0x%x", status);
+		return NULL;
+	}
+	status = sl_rail_util_pa_post_init(rail_handle, SL_RAIL_TX_PA_MODE_2P4_GHZ);
+	if (status) {
+		LOG_ERR("sl_rail_util_pa_post_init(): 0x%x", status);
+		return NULL;
 	}
 
 	return rail_handle;
@@ -226,7 +249,7 @@ int main(void)
 		0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD, 0xEE, 0xFF
 	};
 	struct gpio_callback sw0_cb;
-	RAIL_Status_t status;
+	sl_rail_status_t status;
 	uint32_t events;
 	int ret;
 
@@ -241,23 +264,37 @@ int main(void)
 
 	sl_rail_util_pa_init();
 	app_ctx.rail_handle = rail_init();
-	app_ctx.channel = 0;
 	app_ctx.payload = default_payload;
 	app_ctx.payload_len = sizeof(default_payload);
 
-	ret = RAIL_SetFixedLength(app_ctx.rail_handle, app_ctx.payload_len);
-	if (ret != app_ctx.payload_len) {
-		LOG_ERR("RAIL_SetFixedLength(): %d ", ret);
+	if (app_ctx.rail_handle == NULL) {
+		return 1;
 	}
-	status = RAIL_StartRx(app_ctx.rail_handle, app_ctx.channel, NULL);
+
+	ret = sl_rail_set_fixed_length(app_ctx.rail_handle, app_ctx.payload_len);
+	if (ret != app_ctx.payload_len) {
+		LOG_ERR("sl_rail_set_fixed_length(): 0x%x", ret);
+		return 1;
+	}
+	status = sl_rail_start_rx(app_ctx.rail_handle, app_ctx.channel, NULL);
 	if (status) {
-		LOG_ERR("RAIL_StartRx(): %d ", status);
+		LOG_ERR("sl_rail_start_rx(): 0x%x", status);
+		return 1;
 	}
 
 #ifdef CONFIG_PM
-	status = RAIL_InitPowerManager();
+	sl_rail_timer_sync_config_t timer_sync_config = SL_RAIL_TIMER_SYNC_DEFAULT;
+
+	status = sl_rail_config_sleep(app_ctx.rail_handle, &timer_sync_config);
 	if (status) {
-		LOG_ERR("RAIL_InitPowerManager(): %d", status);
+		LOG_ERR("sl_rail_config_sleep(): 0x%x", status);
+		return 1;
+	}
+
+	status = sl_rail_init_power_manager();
+	if (status) {
+		LOG_ERR("sl_rail_init_power_manager(): 0x%x", status);
+		return 1;
 	}
 #endif
 
