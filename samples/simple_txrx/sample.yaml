@@ -5,4 +5,6 @@ tests:
   sample.rail.simple_txrx:
     platform_allow:
       - sltb010a@2
+      - xg23_rb4210a
       - xg24_dk2601b
+      - xg28_ek2705a
