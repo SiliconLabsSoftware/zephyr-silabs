@@ -20,3 +20,12 @@ path = [
 ]
 SPDX-License-Identifier = "Apache-2.0"
 SPDX-FileCopyrightText = "Copyright (c) 2025 Silicon Laboratories Inc."
+
+[[annotations]]
+path = [
+    # zephyr-keep-sorted-start
+    "**/*.radioconf",
+    # zephyr-keep-sorted-stop
+]
+SPDX-License-Identifier = "Zlib"
+SPDX-FileCopyrightText = "Copyright (c) 2026 Silicon Laboratories Inc."
