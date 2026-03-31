@@ -13,6 +13,7 @@
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/net/socket.h>
 #include <zephyr/net/http/client.h>
+#include <zephyr/sys/reboot.h>
 #include "firmware_upgradation.h"
 #include "sl_wifi.h"
 
@@ -452,7 +453,7 @@ static int ota_load_firmware(struct app_ctx *ctx)
 	/* Check if firmware update is completed */
 	if (status == SL_STATUS_SI91X_FW_UPDATE_DONE) {
 		printf("Firmware update completed. Rebooting...\n");
-		sys_reboot();
+		sys_reboot(SYS_REBOOT_WARM);
 	}
 	if (status != SL_STATUS_OK) {
 		return -EIO;
