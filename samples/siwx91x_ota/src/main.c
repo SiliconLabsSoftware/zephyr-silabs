@@ -422,7 +422,7 @@ static int ota_load_firmware(struct app_ctx *ctx)
 	__ASSERT(ctx->flash_buffer_len > 0, "No firmware data to process");
 
 	if (ctx->range_start == 0) {
-		buf_offset = sizeof(sl_si91x_firmware_header_t);
+		buf_offset = sizeof(sl_wifi_firmware_header_t);
 		status = sl_wifi_get_firmware_size(ctx->flash_buffer, &ota_calc_image_size);
 		if (status != SL_STATUS_OK) {
 			printf("Unable to fetch firmware size. Status: 0x%08x\n", status);
