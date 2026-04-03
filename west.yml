@@ -25,7 +25,7 @@ manifest:
   projects:
     - name: zephyr
       remote: silabs
-      revision: 77eb31e8604216cad176b11d34f2a2643b23dcfa
+      revision: 5c1b82e4d3deab347727c13d4f7dad6995b18167
       import:
         # Simplicity SDK for Zephyr imports the Zephyr main tree at the
         # revision given above. Only the modules named below are imported.
@@ -55,7 +55,7 @@ manifest:
     - name: tf-psa-crypto
       remote: silabs
       repo-path: zephyr-tf-psa-crypto
-      revision: d71bd7c8a97b9bfbe3b504359276138754113521
+      revision: 071d2d1700a7efaf09aac706e82b67cc936c93b9
       path: modules/crypto/tf-psa-crypto
     - name: zephyr-hal-silabs-extra
       remote: silabs
