@@ -25,7 +25,7 @@ manifest:
   projects:
     - name: zephyr
       remote: silabs
-      revision: 6182bc08c9d72e9e9aed8f5cf05a406fbfd25dd8
+      revision: 684c9e8f32e4373a21098559f748f06915f950c9
       import:
         # Simplicity SDK for Zephyr imports the Zephyr main tree at the
         # revision given above. Only the modules named below are imported.
@@ -50,7 +50,7 @@ manifest:
     - name: mcuboot
       remote: silabs
       repo-path: zephyr-mcuboot
-      revision: b8ae4003ea5eadd1b29a42d52e383e724deba023
+      revision: 023ea05e7c4f77fc05fdd928b1fb46c9c56683c7
       path: bootloader/mcuboot
     - name: tf-psa-crypto
       remote: silabs
