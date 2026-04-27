@@ -1,0 +1,20 @@
+sample:
+  name: Comparator
+  description: The sample code prints the comparator output to a terminal
+              on a regular basis. The input is ported to a board specific pin.
+              If 3.3 V is delivered to this pin the comparator triggers and the
+              change is printed.
+tests:
+  sample.comparator:
+    harness: none
+    integration_platforms:
+      - pg23_pk2504a
+      - pg28_pk2506a
+      - xg24_dk2601b
+      - xg24_rb4187c
+      - xg27_dk2602a
+      - xg28_rb4401c
+      - xg29_rb4412a
+    tags:
+      - comparator
+    build_only: true
