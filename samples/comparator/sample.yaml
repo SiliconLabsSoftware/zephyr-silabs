@@ -1,0 +1,14 @@
+sample:
+  name: Comparator
+  description: Similar to the Silabs' SOC Blinky sample, implements a simple custom
+              GATT service controlling the state of the LED (ON/OFF)
+              and sending notifications to subscribed clients when the button state changes.
+tests:
+  sample.comparator:
+    harness: comparator
+    integration_platforms:
+      - xg24_dk2601b
+    tags:
+      - led
+      - gpio
+    build_only: true
