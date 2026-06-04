@@ -40,9 +40,6 @@ zephyr_include_directories(
   ${SECURITY_DIR}/sl_component/sl_mbedtls_support/config
   ${SECURITY_DIR}/sl_component/sl_mbedtls_support/inc
 )
-zephyr_compile_definitions(
-  TF_PSA_CRYPTO_USER_CONFIG_FILE="sl_psa_crypto_config_zephyr.h"
-)
 zephyr_library_sources(
   ${SECURITY_DIR}/sl_component/sl_psa_driver/src/sli_psa_driver_common.c
   ${SECURITY_DIR}/sl_component/sl_psa_driver/src/sli_psa_driver_ghash.c

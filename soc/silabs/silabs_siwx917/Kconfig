@@ -14,11 +14,8 @@ config PSA_CRYPTO_DRIVER_SILABS_SIWX91X
 	# Crypto is handled by the network coprocessor
 	select SILABS_SIWX91X_NWP
 
-config MBEDTLS_USER_CONFIG_ENABLE
-	default y if PSA_CRYPTO_DRIVER_SILABS_SIWX91X
-
-config MBEDTLS_USER_CONFIG_FILE
-	default "sl_mbedtls_config_zephyr.h" \
+config TF_PSA_CRYPTO_USER_CONFIG_FILE
+	default "sl_psa_crypto_config_zephyr.h" \
 		if PSA_CRYPTO_DRIVER_SILABS_SIWX91X
 
 endif
