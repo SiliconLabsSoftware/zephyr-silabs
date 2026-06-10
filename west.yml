@@ -40,6 +40,7 @@ manifest:
           - lvgl
           - mbedtls
           - mldsa-native
+          - openthread
           - picolibc
           - segger
           - zcbor
