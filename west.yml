@@ -51,7 +51,7 @@ manifest:
     - name: mcuboot
       remote: silabs
       repo-path: zephyr-mcuboot
-      revision: 023ea05e7c4f77fc05fdd928b1fb46c9c56683c7
+      revision: 40fbecd086a72f479fcfdce1172cbab9db87f4cd
       path: bootloader/mcuboot
     - name: tf-psa-crypto
       remote: silabs
