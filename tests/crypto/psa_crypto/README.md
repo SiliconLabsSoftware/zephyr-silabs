@@ -22,6 +22,7 @@ for details.
 
 ```
 commander manufacturing init --mbr default -d SiWG917M111MGTBA
+# Fully power cycle the device before proceeding (pin reset may not be sufficient)
 commander util genkeyconfig -o keys.json -d SiWG917M111MGTBA
 commander manufacturing provision --keys keys.json -d SiWG917M111MGTBA
 echo '{"efuse_data": {"ta_secure_boot_enable": 1, "m4_secure_boot_enable": 1}}' > mbr.json

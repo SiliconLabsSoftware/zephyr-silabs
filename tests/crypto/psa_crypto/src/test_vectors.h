@@ -9,5 +9,6 @@
 #include <stdint.h>
 
 extern const uint8_t plaintext[1024];
+extern const uint8_t long_plaintext[4096];
 
 #endif

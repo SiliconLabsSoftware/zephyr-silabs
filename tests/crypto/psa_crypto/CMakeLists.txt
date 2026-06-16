@@ -12,6 +12,7 @@ target_sources(app PRIVATE
   src/aead.c
   src/cipher.c
   src/hash.c
+  src/mac.c
   src/sign.c
   src/key_agreement.c
 )

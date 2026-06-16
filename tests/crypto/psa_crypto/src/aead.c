@@ -7,22 +7,24 @@
 #include <zephyr/ztest.h>
 #include <psa/crypto.h>
 
-const uint8_t aes_key_buf[] = {0xea, 0x4f, 0x6f, 0x3c, 0x2f, 0xed, 0x2b, 0x9d,
-			       0xd9, 0x70, 0x8c, 0x2e, 0x72, 0x1a, 0xe0, 0x0f};
-const uint8_t aes_nonce_buf[] = {0xf9, 0x75, 0x80, 0x9d, 0xdb, 0x51,
-				 0x72, 0x38, 0x27, 0x45, 0x63, 0x4f};
-const uint8_t aes_ad_buf[] = {0x5c, 0x65, 0xd4, 0xf2, 0x61, 0xd2, 0xc5, 0x4f, 0xfe, 0x6a};
-const uint8_t aes_plaintext[] = {0x8d, 0x6c, 0x08, 0x44, 0x6c, 0xb1, 0x0d, 0x9a, 0x20, 0x75};
+#include "test_vectors.h"
 
-const uint8_t chachapoly_key_buf[] = {0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
-				      0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
-				      0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
-				      0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f};
-const uint8_t chachapoly_nonce_buf[] = {0x07, 0x00, 0x00, 0x00, 0x40, 0x41,
-					0x42, 0x43, 0x44, 0x45, 0x46, 0x47};
-const uint8_t chachapoly_ad_buf[] = {0x50, 0x51, 0x52, 0x53, 0xc0, 0xc1,
-				     0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7};
-const uint8_t chachapoly_plaintext[] = {
+static const uint8_t aes_key_buf[] = {0xea, 0x4f, 0x6f, 0x3c, 0x2f, 0xed, 0x2b, 0x9d,
+				      0xd9, 0x70, 0x8c, 0x2e, 0x72, 0x1a, 0xe0, 0x0f};
+static const uint8_t aes_nonce_buf[] = {0xf9, 0x75, 0x80, 0x9d, 0xdb, 0x51,
+					0x72, 0x38, 0x27, 0x45, 0x63, 0x4f};
+static const uint8_t aes_ad_buf[] = {0x5c, 0x65, 0xd4, 0xf2, 0x61, 0xd2, 0xc5, 0x4f, 0xfe, 0x6a};
+static const uint8_t aes_plaintext[] = {0x8d, 0x6c, 0x08, 0x44, 0x6c, 0xb1, 0x0d, 0x9a, 0x20, 0x75};
+
+static const uint8_t chachapoly_key_buf[] = {0x80, 0x81, 0x82, 0x83, 0x84, 0x85, 0x86, 0x87,
+					     0x88, 0x89, 0x8a, 0x8b, 0x8c, 0x8d, 0x8e, 0x8f,
+					     0x90, 0x91, 0x92, 0x93, 0x94, 0x95, 0x96, 0x97,
+					     0x98, 0x99, 0x9a, 0x9b, 0x9c, 0x9d, 0x9e, 0x9f};
+static const uint8_t chachapoly_nonce_buf[] = {0x07, 0x00, 0x00, 0x00, 0x40, 0x41,
+					       0x42, 0x43, 0x44, 0x45, 0x46, 0x47};
+static const uint8_t chachapoly_ad_buf[] = {0x50, 0x51, 0x52, 0x53, 0xc0, 0xc1,
+					    0xc2, 0xc3, 0xc4, 0xc5, 0xc6, 0xc7};
+static const uint8_t chachapoly_plaintext[] = {
 	0x4c, 0x61, 0x64, 0x69, 0x65, 0x73, 0x20, 0x61, 0x6e, 0x64, 0x20, 0x47, 0x65, 0x6e, 0x74,
 	0x6c, 0x65, 0x6d, 0x65, 0x6e, 0x20, 0x6f, 0x66, 0x20, 0x74, 0x68, 0x65, 0x20, 0x63, 0x6c,
 	0x61, 0x73, 0x73, 0x20, 0x6f, 0x66, 0x20, 0x27, 0x39, 0x39, 0x3a, 0x20, 0x49, 0x66, 0x20,
@@ -31,7 +33,7 @@ const uint8_t chachapoly_plaintext[] = {
 	0x20, 0x66, 0x6f, 0x72, 0x20, 0x74, 0x68, 0x65, 0x20, 0x66, 0x75, 0x74, 0x75, 0x72, 0x65,
 	0x2c, 0x20, 0x73, 0x75, 0x6e, 0x73, 0x63, 0x72, 0x65, 0x65, 0x6e, 0x20, 0x77, 0x6f, 0x75,
 	0x6c, 0x64, 0x20, 0x62, 0x65, 0x20, 0x69, 0x74, 0x2e};
-const uint8_t chachapoly_expect_cipher_tag_buf[] = {
+static const uint8_t chachapoly_expect_cipher_tag_buf[] = {
 	0xd3, 0x1a, 0x8d, 0x34, 0x64, 0x8e, 0x60, 0xdb, 0x7b, 0x86, 0xaf, 0xbc, 0x53, 0xef, 0x7e,
 	0xc2, 0xa4, 0xad, 0xed, 0x51, 0x29, 0x6e, 0x08, 0xfe, 0xa9, 0xe2, 0xb5, 0xa7, 0x36, 0xee,
 	0x62, 0xd6, 0x3d, 0xbe, 0xa4, 0x5e, 0x8c, 0xa9, 0x67, 0x12, 0x82, 0xfa, 0xfb, 0x69, 0xda,
@@ -42,6 +44,8 @@ const uint8_t chachapoly_expect_cipher_tag_buf[] = {
 	0x76, 0xd2, 0x65, 0x86, 0xce, 0xc6, 0x4b, 0x61, 0x16, 0x1a, 0xe1, 0x0b, 0x59, 0x4f, 0x09,
 	0xe2, 0x6a, 0x7e, 0x90, 0x2e, 0xcb, 0xd0, 0x60, 0x06, 0x91,
 };
+static uint8_t long_cipher_tag_buf[sizeof(long_plaintext) + 16];
+static uint8_t long_decrypted[sizeof(long_plaintext)];
 
 void test_aead_aes_ccm(bool generate_key, psa_key_location_t location)
 {
@@ -92,6 +96,49 @@ void test_aead_aes_ccm(bool generate_key, psa_key_location_t location)
 
 	zassert_equal(out_len, sizeof(aes_plaintext));
 	zassert_mem_equal(decrypted, aes_plaintext, sizeof(aes_plaintext));
+
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
+}
+
+void test_aead_aes_ccm_long(bool generate_key, psa_key_location_t location)
+{
+	size_t out_len;
+
+	psa_key_id_t key_id;
+	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+	psa_algorithm_t alg = PSA_ALG_CCM;
+
+	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
+	psa_set_key_algorithm(&attributes, alg);
+	psa_set_key_bits(&attributes, 128);
+	psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+						  PSA_KEY_PERSISTENCE_VOLATILE, location));
+
+	if (generate_key) {
+		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
+			      "Failed to generate key");
+	} else {
+		zassert_equal(
+			psa_import_key(&attributes, aes_key_buf, sizeof(aes_key_buf), &key_id),
+			PSA_SUCCESS, "Failed to import key");
+	}
+
+	zassert_equal(psa_aead_encrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
+				       aes_ad_buf, sizeof(aes_ad_buf), long_plaintext,
+				       sizeof(long_plaintext), long_cipher_tag_buf,
+				       sizeof(long_cipher_tag_buf), &out_len),
+		      PSA_SUCCESS, "Failed to encrypt");
+
+	zassert_equal(out_len, sizeof(long_cipher_tag_buf));
+
+	zassert_equal(psa_aead_decrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
+				       aes_ad_buf, sizeof(aes_ad_buf), long_cipher_tag_buf, out_len,
+				       long_decrypted, sizeof(long_decrypted), &out_len),
+		      PSA_SUCCESS, "Failed to decrypt");
+
+	zassert_equal(out_len, sizeof(long_plaintext));
+	zassert_mem_equal(long_decrypted, long_plaintext, sizeof(long_plaintext));
 
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
@@ -149,6 +196,49 @@ void test_aead_aes_gcm(bool generate_key, psa_key_location_t location)
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
+void test_aead_aes_gcm_long(bool generate_key, psa_key_location_t location)
+{
+	size_t out_len;
+
+	psa_key_id_t key_id;
+	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+	psa_algorithm_t alg = PSA_ALG_GCM;
+
+	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
+	psa_set_key_algorithm(&attributes, alg);
+	psa_set_key_bits(&attributes, 128);
+	psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+						  PSA_KEY_PERSISTENCE_VOLATILE, location));
+
+	if (generate_key) {
+		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
+			      "Failed to generate key");
+	} else {
+		zassert_equal(
+			psa_import_key(&attributes, aes_key_buf, sizeof(aes_key_buf), &key_id),
+			PSA_SUCCESS, "Failed to import key");
+	}
+
+	zassert_equal(psa_aead_encrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
+				       aes_ad_buf, sizeof(aes_ad_buf), long_plaintext,
+				       sizeof(long_plaintext), long_cipher_tag_buf,
+				       sizeof(long_cipher_tag_buf), &out_len),
+		      PSA_SUCCESS, "Failed to encrypt");
+
+	zassert_equal(out_len, sizeof(long_cipher_tag_buf));
+
+	zassert_equal(psa_aead_decrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
+				       aes_ad_buf, sizeof(aes_ad_buf), long_cipher_tag_buf, out_len,
+				       long_decrypted, sizeof(long_decrypted), &out_len),
+		      PSA_SUCCESS, "Failed to decrypt");
+
+	zassert_equal(out_len, sizeof(long_plaintext));
+	zassert_mem_equal(long_decrypted, long_plaintext, sizeof(long_plaintext));
+
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
+}
+
 void test_aead_chacha20_poly1305(bool generate_key, psa_key_location_t location)
 {
 	uint8_t cipher_tag_buf[130]; /* Ciphertext + Tag */
@@ -200,10 +290,61 @@ void test_aead_chacha20_poly1305(bool generate_key, psa_key_location_t location)
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
+void test_aead_chacha20_poly1305_long(bool generate_key, psa_key_location_t location)
+{
+	size_t out_len;
+
+	psa_key_id_t key_id;
+	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+	psa_algorithm_t alg = PSA_ALG_CHACHA20_POLY1305;
+
+	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
+	psa_set_key_algorithm(&attributes, alg);
+	psa_set_key_type(&attributes, PSA_KEY_TYPE_CHACHA20);
+	psa_set_key_bits(&attributes, 256);
+	psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+						  PSA_KEY_PERSISTENCE_VOLATILE, location));
+
+	if (generate_key) {
+		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
+			      "Failed to generate key");
+	} else {
+		zassert_equal(psa_import_key(&attributes, chachapoly_key_buf,
+					     sizeof(chachapoly_key_buf), &key_id),
+			      PSA_SUCCESS, "Failed to import key");
+	}
+
+	zassert_equal(psa_aead_encrypt(key_id, alg, chachapoly_nonce_buf,
+				       sizeof(chachapoly_nonce_buf), chachapoly_ad_buf,
+				       sizeof(chachapoly_ad_buf), long_plaintext,
+				       sizeof(long_plaintext), long_cipher_tag_buf,
+				       sizeof(long_cipher_tag_buf), &out_len),
+		      PSA_SUCCESS, "Failed to encrypt");
+
+	zassert_equal(out_len, sizeof(long_cipher_tag_buf));
+
+	zassert_equal(psa_aead_decrypt(key_id, alg, chachapoly_nonce_buf,
+				       sizeof(chachapoly_nonce_buf), chachapoly_ad_buf,
+				       sizeof(chachapoly_ad_buf), long_cipher_tag_buf, out_len,
+				       long_decrypted, sizeof(long_decrypted), &out_len),
+		      PSA_SUCCESS, "Failed to decrypt");
+
+	zassert_equal(out_len, sizeof(long_plaintext));
+	zassert_mem_equal(long_decrypted, long_plaintext, sizeof(long_plaintext));
+
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
+}
+
 ZTEST(psa_crypto_test, test_aead_aes_ccm_transparent)
 {
 	test_aead_aes_ccm(false, 0);
 	test_aead_aes_ccm(true, 0);
+}
+
+ZTEST(psa_crypto_test, test_aead_aes_ccm_long_transparent)
+{
+	test_aead_aes_ccm_long(false, 0);
+	test_aead_aes_ccm_long(true, 0);
 }
 
 ZTEST(psa_crypto_test, test_aead_aes_ccm_opaque)
@@ -225,6 +366,12 @@ ZTEST(psa_crypto_test, test_aead_aes_gcm_transparent)
 	test_aead_aes_gcm(true, 0);
 }
 
+ZTEST(psa_crypto_test, test_aead_aes_gcm_long_transparent)
+{
+	test_aead_aes_gcm_long(false, 0);
+	test_aead_aes_gcm_long(true, 0);
+}
+
 ZTEST(psa_crypto_test, test_aead_aes_gcm_opaque)
 {
 	if (!IS_ENABLED(TEST_OPAQUE_AEAD)) {
@@ -242,6 +389,12 @@ ZTEST(psa_crypto_test, test_aead_chacha20_poly1305_transparent)
 {
 	test_aead_chacha20_poly1305(false, 0);
 	test_aead_chacha20_poly1305(true, 0);
+}
+
+ZTEST(psa_crypto_test, test_aead_chacha20_poly1305_long_transparent)
+{
+	test_aead_chacha20_poly1305_long(false, 0);
+	test_aead_chacha20_poly1305_long(true, 0);
 }
 
 ZTEST(psa_crypto_test, test_aead_chacha20_poly1305_opaque)
