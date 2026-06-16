@@ -46,7 +46,7 @@ manifest:
           - zcbor
     - name: hal_silabs
       remote: silabs
-      revision: d91d60465ca99b0a8e44a429769ee759843267f7
+      revision: 80751f9d28b9f96b154fd70f36d562ff3f10dd40
       path: modules/hal/silabs
     - name: mcuboot
       remote: silabs
@@ -56,7 +56,7 @@ manifest:
     - name: tf-psa-crypto
       remote: silabs
       repo-path: zephyr-tf-psa-crypto
-      revision: 071d2d1700a7efaf09aac706e82b67cc936c93b9
+      revision: 495a207fb17938041cad5d419fba1275b076c39f
       path: modules/crypto/tf-psa-crypto
     - name: zephyr-hal-silabs-extra
       remote: silabs
