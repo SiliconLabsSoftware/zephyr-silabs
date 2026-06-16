@@ -29,3 +29,10 @@ tests:
       - CONFIG_MBEDTLS_PSA_P256M_DRIVER_ENABLED=y
       # a bigger stack is needed for mpi math
       - CONFIG_TEST_EXTRA_STACK_SIZE=512
+  crypto.psa_crypto.siwx91x:
+    platform_allow:
+      - siwx917_rb4338a
+    extra_configs:
+      - CONFIG_PSA_CRYPTO_DRIVER_SILABS_SIWX91X=y
+      # a bigger stack is needed for mpi math
+      - CONFIG_TEST_EXTRA_STACK_SIZE=512
