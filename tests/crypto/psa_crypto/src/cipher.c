@@ -9,22 +9,24 @@
 
 #include "test_vectors.h"
 
-uint8_t key_256[32] = {
+static uint8_t key_256[32] = {
 	0x31, 0x4b, 0x66, 0x77, 0x19, 0x39, 0x73, 0x17, 0x7d, 0xaf, 0x98,
 	0x3d, 0x5d, 0x31, 0x26, 0x02, 0x31, 0x4b, 0x66, 0x77, 0x19, 0x39,
 	0x73, 0x17, 0x7d, 0xaf, 0x98, 0x3d, 0x5d, 0x31, 0x26, 0x02,
 };
 
-uint8_t key_128[16] = {
+static uint8_t key_128[16] = {
 	0x73, 0x17, 0x7d, 0xaf, 0x98, 0x3d, 0x5d, 0x31,
 	0x26, 0x02, 0x73, 0x17, 0x7d, 0xaf, 0x98, 0x02,
 };
 
-uint8_t ciphertext[sizeof(plaintext)];
-uint8_t ciphertext_buffer_256[sizeof(plaintext) + sizeof(key_256)];
-uint8_t decrypted[sizeof(ciphertext)];
-size_t ciphertext_len;
-size_t decrypted_len;
+static uint8_t ciphertext[sizeof(plaintext)];
+static uint8_t ciphertext_buffer_256[sizeof(plaintext) + sizeof(key_256)];
+static uint8_t decrypted[sizeof(ciphertext)];
+static uint8_t long_ciphertext_buffer_256[sizeof(long_plaintext) + sizeof(key_256)];
+static uint8_t long_decrypted[sizeof(long_plaintext)];
+static size_t ciphertext_len;
+static size_t decrypted_len;
 
 void test_cipher_aes_cbc_256_multipart(bool generate_key, psa_key_location_t location)
 {
@@ -130,6 +132,55 @@ void test_cipher_aes_cbc_256_single(bool generate_key, psa_key_location_t locati
 
 	zassert_equal(decrypted_len, sizeof(decrypted), "Decrypted length mismatch");
 	zassert(memcmp(decrypted, plaintext, sizeof(plaintext)) != 0,
+		"Decrypted modified data identical to original plaintext");
+
+	psa_destroy_key(key_id);
+}
+
+void test_cipher_aes_cbc_256_long_single(bool generate_key, psa_key_location_t location)
+{
+	psa_key_id_t key_id;
+	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+	psa_algorithm_t alg = PSA_ALG_CBC_NO_PADDING;
+
+	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT | PSA_KEY_USAGE_DECRYPT);
+	psa_set_key_algorithm(&attributes, alg);
+	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+	psa_set_key_bits(&attributes, 256);
+	psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+						  PSA_KEY_PERSISTENCE_VOLATILE, location));
+	if (generate_key) {
+		zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
+			      "Failed to generate key");
+	} else {
+		zassert_equal(psa_import_key(&attributes, key_256, sizeof(key_256), &key_id),
+			      PSA_SUCCESS, "Failed to import key");
+	}
+	psa_reset_key_attributes(&attributes);
+
+	zassert_equal(psa_cipher_encrypt(key_id, alg, long_plaintext, sizeof(long_plaintext),
+					 long_ciphertext_buffer_256,
+					 sizeof(long_ciphertext_buffer_256), &ciphertext_len),
+		      PSA_SUCCESS, "Failed to perform one-shot encrypt operation");
+
+	zassert(memcmp(long_ciphertext_buffer_256, long_plaintext, sizeof(long_plaintext)) != 0,
+		"Ciphertext identical to plaintext");
+
+	zassert_equal(psa_cipher_decrypt(key_id, alg, long_ciphertext_buffer_256, ciphertext_len,
+					 long_decrypted, sizeof(long_decrypted), &decrypted_len),
+		      PSA_SUCCESS, "Failed to perform one-shot decrypt operation");
+
+	zassert_equal(decrypted_len, sizeof(long_decrypted), "Decrypted length mismatch");
+	zassert_mem_equal(long_decrypted, long_plaintext, sizeof(long_plaintext));
+
+	long_ciphertext_buffer_256[0] += 1;
+	zassert_equal(psa_cipher_decrypt(key_id, alg, long_ciphertext_buffer_256, ciphertext_len,
+					 long_decrypted, sizeof(long_decrypted), &decrypted_len),
+		      PSA_SUCCESS,
+		      "Failed to perform one-shot decrypt operation with modified ciphertext");
+
+	zassert_equal(decrypted_len, sizeof(long_decrypted), "Decrypted length mismatch");
+	zassert(memcmp(long_decrypted, long_plaintext, sizeof(long_plaintext)) != 0,
 		"Decrypted modified data identical to original plaintext");
 
 	psa_destroy_key(key_id);
@@ -256,6 +307,24 @@ ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_single_opaque)
 		test_cipher_aes_cbc_256_single(false, 1);
 	}
 	test_cipher_aes_cbc_256_single(true, 1);
+}
+
+ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_long_single_transparent)
+{
+	test_cipher_aes_cbc_256_long_single(false, 0);
+	test_cipher_aes_cbc_256_long_single(true, 0);
+}
+
+ZTEST(psa_crypto_test, test_cipher_aes_cbc_256_long_single_opaque)
+{
+	if (!IS_ENABLED(TEST_OPAQUE_CIPHER)) {
+		ztest_test_skip();
+	}
+
+	if (!IS_ENABLED(TEST_OPAQUE_NO_IMPORT_KEY)) {
+		test_cipher_aes_cbc_256_long_single(false, 1);
+	}
+	test_cipher_aes_cbc_256_long_single(true, 1);
 }
 
 /* AES-ECB-128 Single */

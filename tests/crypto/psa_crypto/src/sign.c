@@ -14,9 +14,8 @@ uint8_t signature[64];
 size_t pubkey_len;
 size_t signature_len;
 
-#define MESSAGE_SIZE (sizeof(plaintext) / 2)
-
-void test_sign_ecdsa_secp256r1(bool verify, psa_key_location_t location)
+void test_sign_ecdsa_secp256r1(bool verify, psa_key_location_t location, const uint8_t *message,
+			       size_t message_size)
 {
 	psa_key_id_t key_id;
 	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
@@ -33,8 +32,8 @@ void test_sign_ecdsa_secp256r1(bool verify, psa_key_location_t location)
 	zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
 		      "Failed to generate private key");
 
-	zassert_equal(psa_sign_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
-				       MESSAGE_SIZE, signature, sizeof(signature), &signature_len),
+	zassert_equal(psa_sign_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), message,
+				       message_size, signature, sizeof(signature), &signature_len),
 		      PSA_SUCCESS, "Failed to hash-and-sign message");
 	if (verify) {
 		zassert_equal(psa_export_public_key(key_id, pubkey, sizeof(pubkey), &pubkey_len),
@@ -54,13 +53,13 @@ void test_sign_ecdsa_secp256r1(bool verify, psa_key_location_t location)
 
 	zassert_equal(psa_import_key(&attributes, pubkey, sizeof(pubkey), &key_id), PSA_SUCCESS,
 		      "Failed to import public key");
-	zassert_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
-					 MESSAGE_SIZE, signature, signature_len),
+	zassert_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), message,
+					 message_size, signature, signature_len),
 		      PSA_SUCCESS, "Failed to verify signature");
 
 	signature[0] += 1;
-	zassert_not_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), plaintext,
-					     MESSAGE_SIZE, signature, signature_len),
+	zassert_not_equal(psa_verify_message(key_id, PSA_ALG_ECDSA(PSA_ALG_SHA_256), message,
+					     message_size, signature, signature_len),
 			  PSA_SUCCESS, "Signature incorrectly successfully verified");
 
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
@@ -68,7 +67,7 @@ void test_sign_ecdsa_secp256r1(bool verify, psa_key_location_t location)
 
 ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1_transparent)
 {
-	test_sign_ecdsa_secp256r1(true, 0);
+	test_sign_ecdsa_secp256r1(true, 0, plaintext, sizeof(plaintext) / 2);
 }
 
 ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1_opaque)
@@ -78,8 +77,13 @@ ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1_opaque)
 	}
 
 	if (IS_ENABLED(TEST_OPAQUE_NO_VERIFY)) {
-		test_sign_ecdsa_secp256r1(false, 1);
+		test_sign_ecdsa_secp256r1(false, 1, plaintext, sizeof(plaintext) / 2);
 	} else {
-		test_sign_ecdsa_secp256r1(true, 1);
+		test_sign_ecdsa_secp256r1(true, 1, plaintext, sizeof(plaintext) / 2);
 	}
+}
+
+ZTEST(psa_crypto_test, test_sign_ecdsa_secp256r1_long_transparent)
+{
+	test_sign_ecdsa_secp256r1(true, 0, long_plaintext, sizeof(long_plaintext));
 }
