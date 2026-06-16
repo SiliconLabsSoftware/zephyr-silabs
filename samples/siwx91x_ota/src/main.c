@@ -164,7 +164,7 @@ static void ota_dns_event_handler(struct net_mgmt_event_callback *cb, uint64_t m
 	} else if (entry->sa_family == AF_INET6) {
 		net_addr_ntop(AF_INET6, &net_sin6(entry)->sin6_addr, addr, sizeof(addr));
 	} else {
-		strcpy(addr, "<unknown format>");
+		snprintf(addr, sizeof(addr), "<unknown format>");
 	}
 	printf("%s DNS Address: %s\n", op, addr);
 }
@@ -348,7 +348,7 @@ static int ota_http_response_cb(struct http_response *rsp, enum http_final_call 
 	ctx->http_status_code = rsp->http_status_code;
 	ctx->image_size = rsp->content_range.total;
 
-	if (ctx->flash_buffer_len + rsp->body_frag_len > sizeof(ctx->flash_buffer)) {
+	if (rsp->body_frag_len > sizeof(ctx->flash_buffer) - ctx->flash_buffer_len) {
 		return -ENODATA;
 	}
 	memcpy(ctx->flash_buffer + ctx->flash_buffer_len, rsp->body_frag_start, rsp->body_frag_len);
