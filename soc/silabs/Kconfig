@@ -2,3 +2,41 @@
 # SPDX-License-Identifier: Apache-2.0
 
 rsource "*/Kconfig"
+
+if SOC_FAMILY_SILABS_S2 || SOC_FAMILY_SILABS_SIWX91X
+if MBEDTLS
+
+choice PSA_CRYPTO_DRIVER_IMPLEMENTATION
+	prompt "PSA Crypto driver implementation"
+	default PSA_CRYPTO_DRIVER_SILABS_HSE if $(dt_compat_enabled,$(DT_COMPAT_SILABS_GECKO_SEMAILBOX))
+	default PSA_CRYPTO_DRIVER_SILABS_VSE if $(dt_compat_enabled,$(DT_COMPAT_SILABS_GECKO_TRNG))
+	default PSA_CRYPTO_DRIVER_SILABS_SIWX91X if SOC_FAMILY_SILABS_SIWX91X
+	default PSA_CRYPTO_SW_ONLY
+
+config PSA_CRYPTO_SW_ONLY
+	bool "PSA Crypto software implementation only"
+
+config PSA_CRYPTO_DRIVER_SILABS_HSE
+	bool "PSA Crypto Driver for Secure Engine"
+	depends on $(dt_has_compat,$(DT_COMPAT_SILABS_GECKO_SEMAILBOX))
+	select SILABS_SISDK_SE
+
+config PSA_CRYPTO_DRIVER_SILABS_VSE
+	bool "PSA Crypto Driver for Virtual Secure Engine"
+	depends on $(dt_has_compat,$(DT_COMPAT_SILABS_GECKO_TRNG))
+	select SILABS_SISDK_SE
+
+config PSA_CRYPTO_DRIVER_SILABS_SIWX91X
+	bool "PSA Crypto Driver for SiWx91x"
+	depends on SOC_FAMILY_SILABS_SIWX91X
+	select SILABS_SIWX91X_NWP
+endchoice
+
+config TF_PSA_CRYPTO_USER_CONFIG_FILE
+	default "sl_psa_crypto_config_zephyr.h" \
+		if (PSA_CRYPTO_DRIVER_SILABS_HSE || \
+		    PSA_CRYPTO_DRIVER_SILABS_VSE || \
+		    PSA_CRYPTO_DRIVER_SILABS_SIWX91X)
+
+endif
+endif
