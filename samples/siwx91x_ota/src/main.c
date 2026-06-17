@@ -164,6 +164,13 @@ static void ota_dns_event_handler(struct net_mgmt_event_callback *cb, uint64_t m
 	} else if (entry->sa_family == AF_INET6) {
 		net_addr_ntop(AF_INET6, &net_sin6(entry)->sin6_addr, addr, sizeof(addr));
 	} else {
+		/* Use snprintf instead of strcpy: a defensive best-practice change.
+		 * Although the literal "<unknown format>" (16 chars + NUL) fits safely
+		 * within addr[INET6_ADDRSTRLEN] (46 bytes), snprintf with an explicit
+		 * size bound prevents overflow if the string or buffer size changes in
+		 * the future, and silences static-analysis tools that flag strcpy
+		 * unconditionally.
+		 */
 		snprintf(addr, sizeof(addr), "<unknown format>");
 	}
 	printf("%s DNS Address: %s\n", op, addr);
@@ -348,7 +355,7 @@ static int ota_http_response_cb(struct http_response *rsp, enum http_final_call 
 	ctx->http_status_code = rsp->http_status_code;
 	ctx->image_size = rsp->content_range.total;
 
-/* Bounds check using subtraction to avoid unsigned integer overflow:
+	/* Bounds check using subtraction to avoid unsigned integer overflow:
 	 * The original form (flash_buffer_len + body_frag_len > sizeof(flash_buffer))
 	 * is unsafe because both operands are unsigned 32-bit values — if their sum
 	 * exceeds UINT32_MAX it wraps to a small value, making the guard pass even
@@ -357,7 +364,7 @@ static int ota_http_response_cb(struct http_response *rsp, enum http_final_call 
 	 * computes remaining space first; this subtraction is always safe because
 	 * flash_buffer_len is kept <= sizeof(flash_buffer) by invariant.
 	 */
-		if (rsp->body_frag_len > sizeof(ctx->flash_buffer) - ctx->flash_buffer_len) {
+	if (rsp->body_frag_len > sizeof(ctx->flash_buffer) - ctx->flash_buffer_len) {
 		return -ENODATA;
 	}
 	memcpy(ctx->flash_buffer + ctx->flash_buffer_len, rsp->body_frag_start, rsp->body_frag_len);
