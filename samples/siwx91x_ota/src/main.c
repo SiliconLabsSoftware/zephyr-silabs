@@ -348,7 +348,16 @@ static int ota_http_response_cb(struct http_response *rsp, enum http_final_call 
 	ctx->http_status_code = rsp->http_status_code;
 	ctx->image_size = rsp->content_range.total;
 
-	if (rsp->body_frag_len > sizeof(ctx->flash_buffer) - ctx->flash_buffer_len) {
+/* Bounds check using subtraction to avoid unsigned integer overflow:
+	 * The original form (flash_buffer_len + body_frag_len > sizeof(flash_buffer))
+	 * is unsafe because both operands are unsigned 32-bit values — if their sum
+	 * exceeds UINT32_MAX it wraps to a small value, making the guard pass even
+	 * when the combined write would overflow the buffer.
+	 * Rewriting as (body_frag_len > sizeof(flash_buffer) - flash_buffer_len)
+	 * computes remaining space first; this subtraction is always safe because
+	 * flash_buffer_len is kept <= sizeof(flash_buffer) by invariant.
+	 */
+		if (rsp->body_frag_len > sizeof(ctx->flash_buffer) - ctx->flash_buffer_len) {
 		return -ENODATA;
 	}
 	memcpy(ctx->flash_buffer + ctx->flash_buffer_len, rsp->body_frag_start, rsp->body_frag_len);
