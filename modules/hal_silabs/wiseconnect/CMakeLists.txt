@@ -7,7 +7,10 @@ set(WISECONNECT_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/wiseconnect)
 if(CONFIG_PSA_CRYPTO_DRIVER_SILABS_SIWX91X)
 
 zephyr_library_named(hal_silabs_siwx91x_crypto)
-zephyr_library_link_libraries(mbedTLSBase)
+zephyr_library_link_libraries(mbedTLS)
+zephyr_library_link_libraries(tfpsacrypto)
+# Crypto drivers need access to internal TF-PSA-Crypto headers
+zephyr_library_include_directories($<TARGET_PROPERTY:tfpsacrypto,INCLUDE_DIRECTORIES>)
 
 zephyr_include_directories(
   config
@@ -22,7 +25,6 @@ zephyr_include_directories(
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/hmac/inc
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/mac/inc
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/multithread/inc
-  ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/puf/inc
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/sha/inc
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/trng/inc
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/wrap/inc
@@ -35,10 +37,7 @@ zephyr_compile_definitions(
   SLI_MAC_DEVICE_SI91X
   SLI_SHA_DEVICE_SI91X
   SLI_MULTITHREAD_DEVICE_SI91X
-  SLI_PUF_ENABLE
   SLI_SECURE_KEY_STORAGE_DEVICE_SI91X
-  PSA_HAVE_SOFT_KEY_TYPE_AES # Causes MBEDTLS_PSA_BUILTIN_CIPHER to be set
-  MBEDTLS_PSA_ECC_ACCEL_INCOMPLETE_KEY_TYPES # Accelerated ECC support can't import keys
 )
 
 zephyr_library_sources(
@@ -55,7 +54,6 @@ zephyr_library_sources(
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/hmac/src/sl_si91x_hmac.c
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/mac/src/sl_si91x_psa_mac.c
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/multithread/src/sl_si91x_crypto_thread.c
-  ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/puf/src/sl_si91x_puf.c
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/sha/src/sl_si91x_psa_sha.c
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/sha/src/sl_si91x_sha.c
   ${WISECONNECT_DIR}/components/device/silabs/si91x/wireless/crypto/trng/src/sl_si91x_psa_trng.c

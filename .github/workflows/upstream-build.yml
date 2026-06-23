@@ -1,5 +1,5 @@
 # SPDX-License-Identifier: Apache-2.0
-# Copyright (c) 2025 Silicon Laboratories Inc.
+# Copyright (c) 2026 Silicon Laboratories Inc.
 
 name: Silabs upstream daily build
 
@@ -12,26 +12,23 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          path: zephyr-silabs
+          repository: zephyrproject-rtos/zephyr
+          path: zephyr
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: 3.12
 
-      - name: Update manifest to point at upstream main branch
-        working-directory: zephyr-silabs
-        shell: bash
-        run: |
-          yq -i '(.manifest.projects[] | select(.name == "zephyr")) |= (.remote = "zephyrproject-rtos" | .revision = "main")' west.yml
-
       - name: Setup Zephyr project
-        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        uses: zephyrproject-rtos/action-zephyr-setup@360ff9b36e58499d9eb28015cdcde7ca03a5b04d # v1.0.12
         with:
-          app-path: zephyr-silabs
+          app-path: zephyr
           toolchains: arm-zephyr-eabi
+          west-group-filter: -hal,-tools
+          west-project-filter: +hal_silabs,+cmsis.*,-nrf.*,-tf-m-.*,-trusted-firmware-.*,-acpica
 
       - name: Fetch blobs
         shell: bash
@@ -85,9 +82,3 @@ jobs:
           west twister -v --inline-logs -K \
             -s sample.net.wifi.siwx91x_offloaded \
             -p siwx917_rb4338a
-
-      - name: Build Rail samples
-        shell: bash
-        run: |
-          west twister -v --inline-logs \
-            -s sample.rail.simple_txrx -T zephyr-silabs/samples

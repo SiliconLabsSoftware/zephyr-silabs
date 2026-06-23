@@ -15,6 +15,12 @@ const uint8_t expect_sha256_hash[32] = {
 	0x0b, 0x45, 0x1a, 0x4b, 0xf2, 0xcb, 0x81, 0xfd, 0x46, 0x76,
 };
 
+const uint8_t expect_sha256_hash_long[32] = {
+	0x4b, 0x8b, 0x0b, 0xab, 0x7c, 0x6f, 0xea, 0xe7, 0xa3, 0x80, 0x87,
+	0xec, 0x05, 0x6a, 0xd5, 0x16, 0x9b, 0x6f, 0xd9, 0x6c, 0xd1, 0xbb,
+	0x13, 0xd1, 0xa8, 0x2a, 0x65, 0x10, 0x37, 0x5c, 0x7a, 0xc9,
+};
+
 ZTEST(psa_crypto_test, test_hash_sha256)
 {
 	uint8_t hash_buf[32];
@@ -29,6 +35,23 @@ ZTEST(psa_crypto_test, test_hash_sha256)
 
 	zassert_equal(psa_hash_compare(PSA_ALG_SHA_256, plaintext, sizeof(plaintext),
 				       expect_sha256_hash, sizeof(expect_sha256_hash)),
+		      PSA_SUCCESS, "Failed to compare hash");
+}
+
+ZTEST(psa_crypto_test, test_hash_sha256_long)
+{
+	uint8_t hash_buf[32];
+	size_t hash_len;
+
+	zassert_equal(psa_hash_compute(PSA_ALG_SHA_256, long_plaintext, sizeof(long_plaintext),
+				       hash_buf, sizeof(hash_buf), &hash_len),
+		      PSA_SUCCESS, "Failed to compute hash");
+	zassert_equal(hash_len, sizeof(expect_sha256_hash_long), "Hash length mismatch");
+	zassert_mem_equal(hash_buf, expect_sha256_hash_long, sizeof(expect_sha256_hash_long),
+			  "Hash mismatch");
+
+	zassert_equal(psa_hash_compare(PSA_ALG_SHA_256, long_plaintext, sizeof(long_plaintext),
+				       expect_sha256_hash_long, sizeof(expect_sha256_hash_long)),
 		      PSA_SUCCESS, "Failed to compare hash");
 }
 

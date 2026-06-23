@@ -11,12 +11,15 @@ on:
     - reopened
     - synchronize
 
+permissions:
+  contents: read
+
 jobs:
   compliance:
     runs-on: ubuntu-24.04
     steps:
     - name: Checkout
-      uses: actions/checkout@v4
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         ref: ${{ github.event.pull_request.head.sha }}
         fetch-depth: 0
@@ -41,12 +44,12 @@ jobs:
         git log  --pretty=oneline | head -n 10
 
     - name: Set up Python
-      uses: actions/setup-python@v5
+      uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
       with:
         python-version: 3.12
 
     - name: Setup Zephyr project
-      uses: zephyrproject-rtos/action-zephyr-setup@v1
+      uses: zephyrproject-rtos/action-zephyr-setup@360ff9b36e58499d9eb28015cdcde7ca03a5b04d # v1.0.12
       with:
         app-path: zephyr-silabs
         toolchains: arm-zephyr-eabi
@@ -55,7 +58,18 @@ jobs:
       working-directory: zephyr-silabs
       run: |
         ZEPHYR_BASE="$(west topdir)/zephyr"
-        pip3 install -r $ZEPHYR_BASE/scripts/requirements-compliance.txt
+        pip3 install -r $ZEPHYR_BASE/scripts/requirements-compliance.txt --require-hashes
+
+    - name: Setup Node.js
+      uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238 # v6.2.0
+      with:
+        node-version: "lts/*"
+        cache: npm
+        check-latest: true
+        cache-dependency-path: zephyr/scripts/ci/package-lock.json
+
+    - name: Install Node dependencies
+      run: npm --prefix zephyr/scripts/ci ci
 
     - name: Run Compliance Tests
       continue-on-error: true
@@ -69,11 +83,19 @@ jobs:
         -c origin/${GITHUB_BASE_REF}..
 
     - name: upload-results
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
       continue-on-error: true
       with:
         name: compliance.xml
         path: zephyr-silabs/compliance.xml
+
+    - name: Upload dts linter patch
+      uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6.0.0
+      continue-on-error: true
+      if: hashFiles('dts_linter.patch') != ''
+      with:
+        name: dts_linter.patch
+        path: dts_linter.patch
 
     - name: check-warns
       working-directory: zephyr-silabs
@@ -83,7 +105,7 @@ jobs:
           exit 1;
         fi
 
-        warns=("ClangFormat")
+        warns=("ClangFormat" "LicenseAndCopyrightCheck")
         files=($($ZEPHYR_BASE/scripts/ci/check_compliance.py -l))
 
         for file in "${files[@]}"; do

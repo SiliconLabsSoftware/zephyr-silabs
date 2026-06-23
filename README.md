@@ -76,7 +76,6 @@ for your workspace directory:
 west init -m https://github.com/SiliconLabsSoftware/zephyr-silabs silabs_zephyr
 cd silabs_zephyr
 west update
-west blobs fetch
 ```
 
 It is also possible to clone the repository manually, and use `west init -l` to
@@ -86,8 +85,8 @@ The Getting Started Guide covers setting up the build environment, as well as
 building and flashing an example.
 
 To use Zephyr with Silicon Labs devices, certain pre-built libraries are
-required for the radio. The `west blobs fetch` command downloads these
-libraries.
+required for the radio. Use the `west blobs fetch` command to download these
+libraries once the build environment is set up.
 
 [zephyr-getting-started]: https://docs.zephyrproject.org/latest/develop/getting_started/index.html
 

@@ -16,12 +16,32 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
           path: zephyr-silabs
 
+      - name: Rebase onto the target branch
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        working-directory: zephyr-silabs
+        run: |
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
+          git remote -v
+          # Ensure there's no merge commits in the PR
+          [[ "$(git rev-list --merges --count origin/${BASE_REF}..)" == "0" ]] || \
+          (echo "::error ::Merge commits not allowed, rebase instead";false)
+          rm -fr ".git/rebase-apply"
+          rm -fr ".git/rebase-merge"
+          git rebase origin/${BASE_REF}
+          git clean -f -d
+          # debug
+          git log  --pretty=oneline | head -n 10
+
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405 # v6.2.0
         with:
           python-version: 3.12
 
@@ -31,7 +51,7 @@ jobs:
           package-file: zephyr-silabs/pkg.slt
 
       - name: Setup Zephyr project
-        uses: zephyrproject-rtos/action-zephyr-setup@v1
+        uses: zephyrproject-rtos/action-zephyr-setup@360ff9b36e58499d9eb28015cdcde7ca03a5b04d # v1.0.12
         with:
           app-path: zephyr-silabs
           toolchains: arm-zephyr-eabi
