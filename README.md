@@ -34,8 +34,8 @@ and organize the different repositories that are part of it. The
 [manifest file](./west.yml) tells West which repositories to check out at
 which revision. Important repos include:
 
-* [zephyr-silabs][repo-zephyr-silabs] - The manifest repository for Silicon
-  Labs SDK for Zephyr. Functions as the entry point for the SDK, and points to
+* [zephyr-silabs][repo-zephyr-silabs] - The manifest repository for Simplicity
+  SDK for Zephyr. Functions as the entry point for the SDK, and points to
   a mix of upstream repositories, downstream forks and additional downstream
   repositories. Filters out HAL repositories not related to Silicon Labs targets
   to optimize the download size and disk usage of the SDK.
@@ -69,13 +69,15 @@ workspace/
 To get started with Simplicity SDK for Zephyr, follow the
 [Getting Started Guide from the Zephyr Project][zephyr-getting-started].
 Instead of doing `west init` to initialize a workspace based on the upstream
-manifest, use the following commands, where `silabs_zephyr` is an example name
-for your workspace directory:
+manifest, use the following commands, where `workspace` is an example name
+for your workspace directory and `<tag_or_branch>` is the revision to check
+out, e.g. `main` or `v2026.6.0`:
 
 ```
-west init -m https://github.com/SiliconLabsSoftware/zephyr-silabs silabs_zephyr
-cd silabs_zephyr
+west init -m https://github.com/SiliconLabsSoftware/zephyr-silabs workspace --mr <tag_or_branch>
+cd workspace
 west update
+west blobs fetch
 ```
 
 It is also possible to clone the repository manually, and use `west init -l` to
