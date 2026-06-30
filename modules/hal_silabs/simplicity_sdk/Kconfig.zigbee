@@ -1,0 +1,89 @@
+# Copyright (c) 2026 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig ZIGBEE_SILABS
+	bool "Silicon Labs Zigbee stack (prebuilt libraries)"
+	depends on SOC_GECKO_HAS_RADIO
+	depends on ZEPHYR_HAL_SILABS_MODULE_BLOBS || BUILD_ONLY_NO_BLOBS
+	select SOC_GECKO_USE_RAIL
+	select SILABS_SISDK_PROTOCOL_CRYPTO
+	select SILABS_SISDK_SLEEPTIMER
+	select SILABS_SISDK_CORE
+	help
+	  Link the Silicon Labs Zigbee PRO stack prebuilt libraries from the
+	  hal_silabs blob bundle. Open-source Zigbee SDK sources and Zephyr
+	  runtime glue are still required to produce a working firmware image.
+
+if ZIGBEE_SILABS
+
+choice ZIGBEE_SILABS_STACK
+	prompt "Zigbee stack variant"
+	default ZIGBEE_SILABS_STACK_LEAF
+
+config ZIGBEE_SILABS_STACK_LEAF
+	bool "Zigbee PRO leaf stack (end device)"
+
+config ZIGBEE_SILABS_STACK_ROUTER
+	bool "Zigbee PRO router stack"
+
+config ZIGBEE_SILABS_STACK_COORDINATOR
+	bool "Zigbee PRO stack (router / coordinator)"
+
+endchoice
+
+config ZIGBEE_SILABS_RAIL_MUX
+	bool "Use RAIL-multiplexed stack library"
+	depends on SILABS_SISDK_RAIL_MULTIPROTOCOL
+	depends on !ZIGBEE_SILABS_STACK_LEAF
+	help
+	  Select the rail-mux prebuilt stack variant for router or coordinator
+	  roles when RAIL multiprotocol is enabled (for example Zigbee with
+	  Bluetooth LE). The leaf stack has no rail-mux blob variant.
+
+config ZIGBEE_SILABS_R23_SUPPORT
+	bool "Zigbee R23 support library"
+	default y
+	help
+	  Link libzigbee-r23-support.a for Zigbee 3.0 / R23 features.
+
+config ZIGBEE_SILABS_CBKE
+	bool "Zigbee CBKE security libraries"
+	default y
+	help
+	  Link the Certificate-Based Key Establishment (CBKE) prebuilt
+	  libraries required for Zigbee 3.0 security.
+
+config ZIGBEE_SILABS_DEBUG_BASIC
+	bool "Zigbee basic debug library"
+	default y
+	help
+	  Link libzigbee-debug-basic.a.
+
+config ZIGBEE_SILABS_DEBUG_EXTENDED
+	bool "Zigbee extended debug library"
+	help
+	  Link libzigbee-debug-extended.a.
+
+config ZIGBEE_SILABS_SOURCE_ROUTE
+	bool "Zigbee source routing library"
+	default y if ZIGBEE_SILABS_STACK_ROUTER || ZIGBEE_SILABS_STACK_COORDINATOR
+	help
+	  Link libzigbee-source-route.a. Typically used on routers and
+	  coordinators, not leaf end devices.
+
+config ZIGBEE_SILABS_GP
+	bool "Zigbee Green Power library"
+	help
+	  Link libzigbee-gp.a.
+
+config ZIGBEE_SILABS_ZLL
+	bool "Zigbee Light Link library"
+	help
+	  Link libzigbee-zll.a.
+
+config ZIGBEE_SILABS_DYNAMIC_COMMISSIONING
+	bool "Zigbee dynamic commissioning library"
+	help
+	  Link libzigbee-dynamic-commissioning.a.
+
+endif # ZIGBEE_SILABS
