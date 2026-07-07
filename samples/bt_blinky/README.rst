@@ -1,5 +1,5 @@
 .. zephyr:code-sample:: bt_blinky
-   :name: Blueooth blinky (Peripheral)
+   :name: Bluetooth blinky (Peripheral)
    :relevant-api: bluetooth
 
 Overview
@@ -24,5 +24,5 @@ Building a minimal variant
 
 .. zephyr-app-commands::
    :zephyr-app: samples/bt_blinky
-   :board: qemu_cortex_m3
+   :board: xg24_dk2601b
    :goals: build

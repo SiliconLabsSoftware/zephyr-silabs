@@ -10,6 +10,7 @@
 
 #include <stdio.h>
 #include <zephyr/kernel.h>
+#include <zephyr/spinlock.h>
 #include <zephyr/drivers/gpio.h>
 
 #include <zephyr/bluetooth/bluetooth.h>
@@ -19,19 +20,23 @@
 #include <zephyr/bluetooth/gatt.h>
 #include <zephyr/bluetooth/services/bas.h>
 
-#if defined(CONFIG_GPIO)
 /* The devicetree node identifier for the "led0" alias. */
 #define LED0_NODE DT_ALIAS(led0)
 #define BTN0_NODE DT_ALIAS(sw0)
-#endif /* CONFIG_GPIO */
 
+/* Time interval for battery level notification */
+#define BAT_NOT K_MSEC(1000)
+
+static struct k_spinlock lock;
+struct k_poll_signal signal;
+static struct k_work_delayable bat_work;
 static struct bt_conn *current_conn;
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
 	BT_DATA_BYTES(BT_DATA_UUID16_ALL,
-		      BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
-		      BT_UUID_16_ENCODE(BT_UUID_DIS_VAL)),
+				  BT_UUID_16_ENCODE(BT_UUID_BAS_VAL),
+				  BT_UUID_16_ENCODE(BT_UUID_DIS_VAL)),
 #if defined(CONFIG_BT_EXT_ADV)
 	BT_DATA(BT_DATA_NAME_COMPLETE, CONFIG_BT_DEVICE_NAME, sizeof(CONFIG_BT_DEVICE_NAME) - 1),
 #endif /* CONFIG_BT_EXT_ADV */
@@ -71,45 +76,44 @@ enum{
 };
 
 static uint8_t led_value = 1;
-static uint8_t led_report_value = 1;
 
 static void btapp_gatt_attr_changed(const struct bt_gatt_attr *attr,
 									const void *value,
 									uint16_t len);
 
 static ssize_t btapp_write_led(struct bt_conn *conn,
-			const struct bt_gatt_attr *attr,
-			const void *buf,
-			uint16_t len,
-			uint16_t offset,
-			uint8_t flags);
+							   const struct bt_gatt_attr *attr,
+							   const void *buf,
+							   uint16_t len,
+							   uint16_t offset,
+							   uint8_t flags);
 
 static ssize_t btapp_read_led(struct bt_conn *conn,
-			const struct bt_gatt_attr *attr,
-			void *buf,
-			uint16_t len,
-			uint16_t offset);
+							  const struct bt_gatt_attr *attr,
+							  void *buf,
+							  uint16_t len,
+							  uint16_t offset);
 
 static void btapp_led_report_ccc_cfg_changed(const struct bt_gatt_attr *attr, uint16_t value);
 
 static void btapp_set_led_state(uint8_t state);
 
 BT_GATT_SERVICE_DEFINE(led_svc,
-					BT_GATT_PRIMARY_SERVICE(&led_service_uuid),
-					BT_GATT_CHARACTERISTIC(&led_char_uuid.uuid,
-					BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
-					BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-					btapp_read_led,
-					btapp_write_led,
-					&led_value),
-	BT_GATT_CHARACTERISTIC(&led_report_char_uuid.uuid,
-					BT_GATT_CHRC_NOTIFY,
-					BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
-					NULL,
-					NULL,
-					&led_report_value),
-	BT_GATT_CCC(btapp_led_report_ccc_cfg_changed,
-			BT_GATT_PERM_READ | BT_GATT_PERM_WRITE)
+		BT_GATT_PRIMARY_SERVICE(&led_service_uuid),
+		BT_GATT_CHARACTERISTIC(&led_char_uuid.uuid,
+							   BT_GATT_CHRC_READ | BT_GATT_CHRC_WRITE,
+							   BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+							   btapp_read_led,
+							   btapp_write_led,
+							   &led_value),
+		BT_GATT_CHARACTERISTIC(&led_report_char_uuid.uuid,
+							   BT_GATT_CHRC_NOTIFY,
+							   BT_GATT_PERM_READ | BT_GATT_PERM_WRITE,
+							   NULL,
+							   NULL,
+							   &led_value),
+		BT_GATT_CCC(btapp_led_report_ccc_cfg_changed,
+					BT_GATT_PERM_READ | BT_GATT_PERM_WRITE)
 );
 
 enum {
@@ -119,8 +123,6 @@ enum {
 	STATE_BITS,
 };
 
-static ATOMIC_DEFINE(state, STATE_BITS);
-
 static void btapp_connected(struct bt_conn *conn, uint8_t err)
 {
 	if (err) {
@@ -129,7 +131,6 @@ static void btapp_connected(struct bt_conn *conn, uint8_t err)
 		printk("Connected\n");
 
 		current_conn = conn;
-		(void)atomic_set_bit(state, STATE_CONNECTED);
 	}
 }
 
@@ -137,8 +138,9 @@ static void btapp_disconnected(struct bt_conn *conn, uint8_t reason)
 {
 	printk("Disconnected, reason 0x%02x %s\n", reason, bt_hci_err_to_str(reason));
 
-	(void)atomic_set_bit(state, STATE_DISCONNECTED);
 	current_conn = NULL;
+
+	k_poll_signal_raise(&signal, STATE_DISCONNECTED);
 }
 
 BT_CONN_CB_DEFINE(conn_callbacks) = {
@@ -172,9 +174,17 @@ static void btapp_bas_notify(void)
 	bt_bas_set_battery_level(battery_level);
 }
 
+static void bat_timeout(struct k_work *work)
+{
+	ARG_UNUSED(work);
+
+	btapp_bas_notify();
+	k_work_schedule(&bat_work, BAT_NOT);
+}
+
 static void btapp_gatt_attr_changed(const struct bt_gatt_attr *attr,
-							const void *value,
-							uint16_t len)
+									const void *value,
+									uint16_t len)
 {
 	(void)value;
 	(void)len;
@@ -182,50 +192,54 @@ static void btapp_gatt_attr_changed(const struct bt_gatt_attr *attr,
 	if (attr == &led_svc.attrs[LED_SVC_ATTR_CTRL_VALUE]) {
 		printk("LED control changed\n");
 		bt_gatt_notify(current_conn, &led_svc.attrs[LED_SVC_ATTR_REP_VALUE],
-									&led_report_value,
-									sizeof(led_report_value));
+					   &led_value,
+					   sizeof(led_value));
 	} else if (attr == &led_svc.attrs[LED_SVC_ATTR_REP_VALUE]) {
-		printk("LED erpotr changed\n");
+		printk("LED report changed\n");
 	}
-	printk("LED value %d\n", led_report_value);
+	printk("LED value %d\n", led_value);
 
 }
-
-#if defined(CONFIG_GPIO)
-
-#if DT_NODE_HAS_STATUS_OKAY(LED0_NODE)
 
 static const struct gpio_dt_spec led = GPIO_DT_SPEC_GET(LED0_NODE, gpios);
 static const struct gpio_dt_spec btn = GPIO_DT_SPEC_GET(BTN0_NODE, gpios);
 static struct gpio_callback button_cb_data;
 
 static ssize_t btapp_write_led(struct bt_conn *conn,
-			const struct bt_gatt_attr *attr,
-			const void *buf,
-			uint16_t len,
-			uint16_t offset,
-			uint8_t flags)
+							   const struct bt_gatt_attr *attr,
+							   const void *buf,
+							   uint16_t len,
+							   uint16_t offset,
+							   uint8_t flags)
 {
-	if (len != 1 || offset != 0) {
+	k_spinlock_key_t key;
+
+	if (len != 1) {
 		printk("Write error\n");
 		return BT_GATT_ERR(BT_ATT_ERR_INVALID_ATTRIBUTE_LEN);
 
+	} else if (offset != 0) {
+		printk("Write error\n");
+		return BT_GATT_ERR(BT_ATT_ERR_INVALID_OFFSET);
 	}
 
-	btapp_set_led_state(((uint8_t *)buf)[0]);
+	key = k_spin_lock(&lock);
 
+	btapp_set_led_state(((uint8_t *)buf)[0]);
 	btapp_gatt_attr_changed(attr, NULL, 0);
+
+	k_spin_unlock(&lock, key);
 
 	return len;
 }
 
 static ssize_t btapp_read_led(struct bt_conn *conn,
-			const struct bt_gatt_attr *attr,
-			void *buf,
-			uint16_t len,
-			uint16_t offset)
+							  const struct bt_gatt_attr *attr,
+							  void *buf,
+							  uint16_t len,
+							  uint16_t offset)
 {
-	/* Read user data> LED state */
+	/* Read user data that is LED state */
 	const uint8_t *val = attr->user_data;
 
 	/* Read led state */
@@ -243,9 +257,9 @@ static void btapp_led_report_ccc_cfg_changed(const struct bt_gatt_attr *attr, ui
 	led_value = gpio_pin_get(led.port, led.pin);
 
 	if (led_report_notify_enabled) {
-		bt_gatt_notify(current_conn, &led_svc.attrs[LED_SVC_ATTR_CTRL_VALUE],
-						&led_report_value,
-						sizeof(led_report_value));
+		bt_gatt_notify(current_conn, &led_svc.attrs[LED_SVC_ATTR_REP_VALUE],
+						&led_value,
+						sizeof(led_value));
 	}
 }
 
@@ -253,11 +267,9 @@ static void btapp_set_led_state(uint8_t state)
 {
 	if (state > 0) {
 		led_value = 1;
-		led_report_value = 1;
 		gpio_pin_set(led.port, led.pin, 1);
 	} else {
 		led_value = 0;
-		led_report_value = 0;
 		gpio_pin_set(led.port, led.pin, 0);
 	}
 }
@@ -297,7 +309,7 @@ static int btapp_button_setup(void)
 	printk("Configuring GPIO pin...");
 	err = gpio_pin_configure_dt(&btn, GPIO_INPUT | GPIO_PULL_UP);
 	if (err) {
-		printk("Failed to confugure button pin.\n");
+		printk("Failed to configure button pin.\n");
 		return -EIO;
 	}
 	printk("done.\n");
@@ -306,22 +318,58 @@ static int btapp_button_setup(void)
 }
 
 static void button_pressed_isr(const struct device *dev,
-								struct gpio_callback *cb,
-								uint32_t pins)
+							   struct gpio_callback *cb,
+							   uint32_t pins)
 {
+	k_spinlock_key_t key = k_spin_lock(&lock);
+
 	/* Simple: toggle LED using current state */
 	btapp_set_led_state(!led_value);
 	btapp_gatt_attr_changed(&led_svc.attrs[LED_SVC_ATTR_CTRL_VALUE],
-					&led_report_value,
-					sizeof(led_report_value));
-}
+					&led_value,
+					sizeof(led_value));
 
-#endif /* LED0_NODE */
-#endif /* CONFIG_GPIO */
+	k_spin_unlock(&lock, key);
+}
 
 int main(void)
 {
+	struct k_poll_event events[1];
+	int signaled, result;
 	int err;
+
+	k_poll_signal_init(&signal);
+	k_poll_event_init(&events[0], K_POLL_TYPE_SIGNAL,
+					K_POLL_MODE_NOTIFY_ONLY, &signal);
+
+	err = btapp_led_setup();
+	if (err) {
+		return 0;
+	}
+
+	err = btapp_button_setup();
+	if (err) {
+		return 0;
+	}
+
+	/* Interrupt on edge (falling for active-low button with pull-up) */
+	err = gpio_pin_interrupt_configure_dt(&btn, GPIO_INT_EDGE_TO_ACTIVE);
+	if (err) {
+		printk("Failed to configure button interrupt: %d\n", err);
+		return 0;
+	}
+
+	gpio_init_callback(&button_cb_data,
+						button_pressed_isr,
+						BIT(btn.pin));
+
+	err = gpio_add_callback(btn.port, &button_cb_data);
+	if (err) {
+		printk("Failed to register callback: %d\n", err);
+		return 0;
+	}
+
+	printk("Button initialized\n");
 
 	err = bt_enable(NULL);
 	if (err) {
@@ -386,43 +434,18 @@ int main(void)
 
 	printk("Advertising successfully started\n");
 
-	err = btapp_led_setup();
-	if (err) {
-		return 0;
-	}
+	/* Initialize battery level notification function */
+	k_work_init_delayable(&bat_work, bat_timeout);
 
-	err = btapp_button_setup();
-	if (err) {
-		return 0;
-	}
+	/* Start battery level notification */
+	k_work_schedule(&bat_work, BAT_NOT);
 
-	/* Interrupt on edge (falling for active-low button with pull-up) */
-	err = gpio_pin_interrupt_configure_dt(&btn, GPIO_INT_EDGE_TO_ACTIVE);
-	if (err) {
-		printk("Failed to configure button interrupt: %d\n", err);
-		return 0;
-	}
-
-	gpio_init_callback(&button_cb_data,
-						button_pressed_isr,
-						BIT(btn.pin));
-
-	gpio_add_callback(btn.port, &button_cb_data);
-
-	printk("Button initialized\n");
-
-	/* Implement notification. */
 	while (1) {
-		k_sleep(K_SECONDS(1));
 
-		/* Battery level simulation */
-		btapp_bas_notify();
+		k_poll(events, 1, K_FOREVER);
+		k_poll_signal_check(&signal, &signaled, &result);
+		if (signaled && (result == STATE_DISCONNECTED)) {
 
-		if (atomic_test_and_clear_bit(state, STATE_CONNECTED)) {
-			/* Connected callback executed */
-			printk("Successfully Connected\n");
-
-		} else if (atomic_test_and_clear_bit(state, STATE_DISCONNECTED)) {
 #if !defined(CONFIG_BT_EXT_ADV)
 			printk("Starting Legacy Advertising (connectable and scannable)\n");
 			err = bt_le_adv_start(BT_LE_ADV_CONN_FAST_1, ad, ARRAY_SIZE(ad), sd,
@@ -440,7 +463,8 @@ int main(void)
 				return 0;
 			}
 #endif /* CONFIG_BT_EXT_ADV */
-
+			k_poll_signal_reset(&signal);
+			events[0].state = K_POLL_STATE_NOT_READY;
 		}
 	}
 
