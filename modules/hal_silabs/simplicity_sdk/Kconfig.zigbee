@@ -16,6 +16,77 @@ menuconfig ZIGBEE_SILABS
 
 if ZIGBEE_SILABS
 
+config SILABS_SISDK_ZIGBEE
+	bool
+	default y
+	help
+	  Internal symbol gating generated Zigbee component Kconfig and sources.
+
+# Aliases for blob/prebuilt options referenced by generated component Kconfig.
+config SILABS_SISDK_ZIGBEE_DEBUG_BASIC
+	bool
+	default y
+	depends on ZIGBEE_SILABS_DEBUG_BASIC
+
+config SILABS_SISDK_ZIGBEE_GREEN_POWER
+	bool
+	default y
+	depends on ZIGBEE_SILABS_GP
+
+config SILABS_SISDK_ZIGBEE_LIGHT_LINK
+	bool
+	default y
+	depends on ZIGBEE_SILABS_ZLL
+
+config SILABS_SISDK_ZIGBEE_SOURCE_ROUTE
+	bool
+	default y
+	depends on ZIGBEE_SILABS_SOURCE_ROUTE
+
+config SILABS_SISDK_ZIGBEE_STACK_LEAF
+	bool
+	default y
+	depends on ZIGBEE_SILABS_STACK_LEAF
+
+config SILABS_SISDK_ZIGBEE_STACK_ROUTER
+	bool
+	default y
+	depends on ZIGBEE_SILABS_STACK_ROUTER
+
+config SILABS_SISDK_ZIGBEE_STACK_PRO
+	bool
+	default y
+	depends on ZIGBEE_SILABS_STACK_COORDINATOR
+
+orsource "zigbee/generated/Kconfig.components"
+
+# PSA algorithms required by the OSS security_manager plugin and Zigbee secure
+# key storage. Pulled in here so applications do not duplicate mbedtls Kconfig.
+config ZIGBEE_SILABS_PSA_CRYPTO
+	bool
+	default y
+	depends on SILABS_SISDK_ZIGBEE_SECURITY_MANAGER
+	select PSA_CRYPTO
+	select ENTROPY_GENERATOR
+	select PSA_WANT_ALG_SHA_256
+	select PSA_WANT_ALG_HMAC
+	select PSA_WANT_ALG_CMAC
+	select PSA_WANT_ALG_CCM
+	select PSA_WANT_ALG_ECB_NO_PADDING
+	select PSA_WANT_ALG_HKDF
+	select PSA_WANT_ALG_ECDSA
+	select PSA_WANT_ALG_ECDH
+	select PSA_WANT_KEY_TYPE_AES
+	select PSA_WANT_KEY_TYPE_RAW_DATA
+	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_GENERATE
+	select PSA_WANT_KEY_TYPE_ECC_KEY_PAIR_IMPORT
+	select PSA_WANT_ECC_SECP_R1_256
+	select PSA_WANT_ECC_MONTGOMERY_255
+	# Persistent Zigbee vault keys (PSA_KEY_PERSISTENCE_DEFAULT) need ITS.
+	select SETTINGS
+	select SECURE_STORAGE
+	select HWINFO
+
 choice ZIGBEE_SILABS_STACK
 	prompt "Zigbee stack variant"
 	default ZIGBEE_SILABS_STACK_LEAF
@@ -85,5 +156,73 @@ config ZIGBEE_SILABS_DYNAMIC_COMMISSIONING
 	bool "Zigbee dynamic commissioning library"
 	help
 	  Link libzigbee-dynamic-commissioning.a.
+
+config SILABS_ZIGBEE_TOKEN_NVS
+	bool "Zephyr NVS backend for Zigbee stack tokens"
+	default y
+	select FLASH
+	select FLASH_MAP
+	select NVS
+	help
+	  Store Silicon Labs Zigbee stack tokens in a Zephyr NVS partition
+	  instead of the Simplicity SDK token manager and NVM3. Prefers a
+	  zb_token_partition node when present; otherwise uses storage_partition.
+	  When PSA secure storage also uses storage_partition, provide a
+	  dedicated zb_token_partition so the two NVS mounts do not collide.
+
+if SILABS_ZIGBEE_TOKEN_NVS
+
+config SILABS_ZIGBEE_TOKEN_NVS_SECTOR_COUNT
+	int "NVS sector count for Zigbee token storage"
+	default 2
+	help
+	  Number of flash sectors used by the Zigbee token NVS filesystem.
+	  Must fit within zb_token_partition (or storage_partition) size.
+
+config SILABS_ZIGBEE_TOKEN_NVS_MAX_SIZE
+	int "Maximum Zigbee token payload size in bytes"
+	default 256
+	help
+	  Maximum token data length supported by the NVS shim.
+
+endif # SILABS_ZIGBEE_TOKEN_NVS
+
+config SILABS_ZIGBEE_RUNTIME
+	bool "Zigbee stack runtime init and tick glue"
+	default y
+	depends on SILABS_SISDK_ZIGBEE_SYSTEM_COMMON
+	help
+	  Call sli_zigbee_stack_init_callback() and
+	  sli_zigbee_app_framework_init_callback(), and drive periodic stack
+	  and application framework ticks on Zephyr.
+
+if SILABS_ZIGBEE_RUNTIME
+
+config SILABS_ZIGBEE_RUNTIME_THREAD
+	bool "Run Zigbee ticks in a dedicated thread"
+	default y
+	help
+	  When enabled, sl_zigbee_runtime_start() creates a background thread
+	  that calls sl_zigbee_runtime_process_once() periodically.
+
+config SILABS_ZIGBEE_RUNTIME_THREAD_STACK_SIZE
+	int "Zigbee runtime thread stack size"
+	default 4096
+	depends on SILABS_ZIGBEE_RUNTIME_THREAD
+
+config SILABS_ZIGBEE_RUNTIME_THREAD_PRIORITY
+	int "Zigbee runtime thread priority"
+	default 5
+	depends on SILABS_ZIGBEE_RUNTIME_THREAD
+
+config SILABS_ZIGBEE_RUNTIME_DEFAULT_TICK_MS
+	int "Default Zigbee tick period when no AF events are scheduled"
+	default 10
+
+config SILABS_ZIGBEE_RUNTIME_MAX_SLEEP_MS
+	int "Maximum sleep between Zigbee ticks"
+	default 100
+
+endif # SILABS_ZIGBEE_RUNTIME
 
 endif # ZIGBEE_SILABS
