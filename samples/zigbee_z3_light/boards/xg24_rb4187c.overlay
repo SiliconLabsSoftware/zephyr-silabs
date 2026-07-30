@@ -1,0 +1,34 @@
+/*
+ * Copyright (c) 2026 Silicon Laboratories Inc.
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * - Enable Zephyr silabs,pti (debug_silabs_pti.c) instead of SiSDK PTI util.
+ * - Split the 32 KiB storage region so Zigbee token NVS and PSA ITS/settings
+ *   do not share one NVS mount.
+ */
+
+&pti {
+	pinctrl-0 = <&pti_default>;
+	pinctrl-names = "default";
+	status = "okay";
+};
+
+&flash0 {
+	partitions {
+		/*
+		 * Replace the board's single 32 KiB storage_partition with two
+		 * 16 KiB regions (2 x 8 KiB pages each on Series-2).
+		 */
+		/delete-node/ partition@178000;
+
+		zb_token_partition: partition@178000 {
+			reg = <0x00178000 DT_SIZE_K(16)>;
+			label = "zb-tokens";
+		};
+
+		storage_partition: partition@17c000 {
+			reg = <0x0017c000 DT_SIZE_K(16)>;
+			label = "storage";
+		};
+	};
+};
