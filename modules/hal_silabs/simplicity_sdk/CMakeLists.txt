@@ -69,15 +69,25 @@ endif() # PSA Crypto
 # Zigbee stack (downstream-only prebuilt library integration)
 set(BLOBS_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/zephyr/blobs/simplicity_sdk)
 set(ZIGBEE_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/protocol/zigbee)
+set(SERVICE_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/service)
+set(LEGACY_HAL_DIR ${SERVICE_DIR}/legacy_hal)
+set(TOKEN_MANAGER_DIR ${SERVICE_DIR}/token_manager)
+set(SECURITY_MANAGER_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/plugin/security_manager)
 
-function(add_zigbee_prebuilt_library lib_name component)
+function(add_prebuilt_library lib_name prebuilt_path)
   if(NOT CONFIG_BUILD_ONLY_NO_BLOBS)
     add_library(${lib_name} STATIC IMPORTED GLOBAL)
     set_target_properties(${lib_name} PROPERTIES
-      IMPORTED_LOCATION ${BLOBS_DIR}/zigbee/libs/build/gcc/cortex-m33/${component}/release/lib${component}.a
+      IMPORTED_LOCATION ${BLOBS_DIR}/${prebuilt_path}
     )
     zephyr_link_libraries(${lib_name})
   endif()
+endfunction()
+
+function(add_zigbee_prebuilt_library lib_name component)
+  add_prebuilt_library(${lib_name}
+    zigbee/libs/build/gcc/cortex-m33/${component}/release/lib${component}.a
+  )
 endfunction()
 
 if(CONFIG_ZIGBEE_SILABS)
@@ -138,10 +148,132 @@ if(CONFIG_ZIGBEE_SILABS)
 
   zephyr_compile_definitions(
     SL_ZIGBEE_CONFIG_HEADER="sl_zigbee_config.h"
+    SL_COMPONENT_CATALOG_PRESENT
+    PLATFORM_HEADER="platform-header.h"
+    STACK_TYPES_HEADER=\"stack/include/sl_zigbee_types.h\"
+    STACK_HEADER=\"stack/include/sl_zigbee.h\"
   )
-  zephyr_include_directories(config/zigbee)
+  zephyr_include_directories(zigbee/config)
+
+  zephyr_library_sources(
+    zigbee/src/sl_zigbee_platform_shim.c
+  )
+  zephyr_library_sources_ifdef(CONFIG_SILABS_ZIGBEE_TOKEN_NVS
+    zigbee/src/sl_zigbee_token_zephyr_shim.c
+  )
+  zephyr_library_sources_ifdef(CONFIG_SILABS_ZIGBEE_RUNTIME
+    zigbee/src/sl_zigbee_hal_zephyr_shim.c
+    zigbee/src/sl_zigbee_runtime_glue.c
+    zigbee/src/sl_zigbee_stack_platform_glue.c
+    zigbee/src/sl_zigbee_token_public_api_shim.c
+    ${ZIGBEE_DIR}/platform/radio/rail_lib/plugin/sl_rail_util_ant_div/sl_rail_util_ant_div.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/aes-mmo-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/binding-table-baremetal-callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/binding-table-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/bootload_baremetal_callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/child_baremetal_callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/gp-types-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/gp-proxy-table-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/message_baremetal_callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/message_baremetal_wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/network-formation-baremetal-callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/network-formation-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/raw-message-baremetal-callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/raw-message-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/security_baremetal_callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/security_baremetal_wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/sl_zigbee_address_info_baremetal_wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/sl_zigbee_random_api_baremetal_wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/source-route-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/stack-info-baremetal-callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/stack-info-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/trust-center-baremetal-callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/trust-center-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/zigbee-device-stack-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/zigbee-security-manager-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/zll-api-baremetal-callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/zll-api-baremetal-wrapper.c
+  )
+  zephyr_include_directories_ifdef(CONFIG_SILABS_ZIGBEE_RUNTIME
+    ${ZIGBEE_DIR}/platform/radio/rail_lib/plugin/sl_rail_util_ant_div
+  )
+  # Force-include ant-div config only for the SDK plugin source (disabled defaults).
+  if(CONFIG_SILABS_ZIGBEE_RUNTIME)
+    set_source_files_properties(
+      ${ZIGBEE_DIR}/platform/radio/rail_lib/plugin/sl_rail_util_ant_div/sl_rail_util_ant_div.c
+      PROPERTIES COMPILE_OPTIONS
+        "-include${CMAKE_CURRENT_LIST_DIR}/zigbee/config/sl_rail_util_ant_div_config.h"
+    )
+  endif()
+
+  if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/zigbee/generated/components.cmake)
+    include(zigbee/generated/components.cmake)
+  endif()
 
   if(EXISTS ${ZIGBEE_DIR})
+    set(BYTE_UTILITIES_DIR ${ZIGBEE_DIR}/util/plugin/byte_utilities)
+    if(EXISTS ${BYTE_UTILITIES_DIR}/byte-utilities.h)
+      zephyr_include_directories(${BYTE_UTILITIES_DIR})
+      zephyr_library_sources(${BYTE_UTILITIES_DIR}/byte-utilities.c)
+      zephyr_compile_definitions(SL_CATALOG_BYTE_UTILITIES_PRESENT)
+    endif()
+
+    if(EXISTS ${LEGACY_HAL_DIR}/inc/hal/hal.h)
+      # zigbee/config provides led.h/button.h stubs so untouched SDK
+      # hal.h includes resolve without porting those legacy HAL headers.
+      # BEFORE keeps the stubs ahead of ${LEGACY_HAL_DIR}/inc.
+      target_include_directories(zephyr_interface INTERFACE BEFORE
+        ${CMAKE_CURRENT_LIST_DIR}/zigbee/config
+      )
+      zephyr_include_directories(
+        ${LEGACY_HAL_DIR}/inc
+        ${ZIGBEE_DIR}/util/silicon_labs/silabs_core/event_queue
+      )
+      zephyr_compile_definitions(
+        CORTEXM3
+        CORTEXM3_EFM32_MICRO
+        CORTEXM3_EFR32
+        PHY_RAIL
+        SL_CODE_COMPONENT_LEGACY_HAL=legacy_hal
+        SL_CATALOG_EMLIB_RMU_PRESENT
+        SL_CATALOG_LEGACY_HAL_PRESENT
+        SL_CATALOG_LEGACY_HAL_SOC_PRESENT
+      )
+    endif()
+
+    if(EXISTS ${TOKEN_MANAGER_DIR}/inc/sl_token_manager_api.h)
+      zephyr_include_directories(
+        ${TOKEN_MANAGER_DIR}/config
+        ${TOKEN_MANAGER_DIR}/inc
+        ${TOKEN_MANAGER_DIR}/legacy/inc
+      )
+
+      zephyr_compile_definitions(
+        SL_COMMON_TOKEN_MANAGER_ENABLE_DYNAMIC_TOKENS=1
+        SL_COMMON_TOKEN_MANAGER_ENABLE_STATIC_TOKENS=1
+        CUSTOM_TOKEN_HEADER=\"sl_token_manager_af_token_header.h\"
+        SL_CATALOG_COMMON_TOKEN_MANAGER_PRESENT
+        SL_CODE_COMPONENT_COMMON_TOKEN_MANAGER=common_token_manager
+      )
+    endif()
+
+    if(EXISTS ${SECURITY_MANAGER_DIR}/security_manager.h)
+      zephyr_include_directories(${SECURITY_MANAGER_DIR})
+      zephyr_library_include_directories(
+        ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/security/sl_component/sl_psa_driver/inc
+        ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/security/sl_component/sl_mbedtls_support/inc
+        ${ZEPHYR_BASE}/../modules/crypto/tf-psa-crypto/core
+      )
+  zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_SECURITY_MANAGER
+    ${SECURITY_MANAGER_DIR}/security_manager.c
+    ${SECURITY_DIR}/sl_component/sl_mbedtls_support/src/sl_psa_crypto.c
+    zigbee/src/sl_psa_its_zephyr_shim.c
+  )
+      zephyr_compile_definitions_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_SECURITY_MANAGER
+        SL_CATALOG_SECURITY_MANAGER_PRESENT
+      )
+    endif()
+
     zephyr_include_directories(
       ${ZIGBEE_DIR}/app/framework/common
       ${ZIGBEE_DIR}/app/framework/include
