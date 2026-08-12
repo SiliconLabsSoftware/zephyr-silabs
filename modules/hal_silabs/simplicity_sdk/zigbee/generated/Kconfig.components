@@ -6,6 +6,12 @@
 menu "Zigbee component sources"
 	depends on SILABS_SISDK_ZIGBEE
 
+config SILABS_SISDK_ZIGBEE_BYTE_UTILITIES
+	bool "Byte Utilities"
+	depends on SILABS_SISDK_ZIGBEE
+	help
+	  Generated from byte_utilities.slcc. Category: Platform|Utilities.
+
 config SILABS_SISDK_ZIGBEE_APPLICATION_BOOTLOADER
 	bool "Zigbee Application Bootloader"
 	depends on SILABS_SISDK_ZIGBEE
@@ -307,12 +313,14 @@ config SILABS_SISDK_ZIGBEE_STACK_COMMON
 	depends on SILABS_SISDK_ZIGBEE
 	depends on SILABS_SISDK_ZIGBEE_STRONG_RANDOM_API_PSA
 	depends on SILABS_SISDK_ZIGBEE_SECURITY_MANAGER
+	depends on SILABS_SISDK_ZIGBEE_BYTE_UTILITIES
 	imply SILABS_SISDK_ZIGBEE_SYSTEM_COMMON
 	help
 	  Generated from zigbee_stack_common.slcc. Category: Zigbee|Stack|Pro
 	  Core. Acyclic component requirements:
 	  SILABS_SISDK_ZIGBEE_STRONG_RANDOM_API_PSA,
-	  SILABS_SISDK_ZIGBEE_SECURITY_MANAGER. Cyclic component relationships
+	  SILABS_SISDK_ZIGBEE_SECURITY_MANAGER,
+	  SILABS_SISDK_ZIGBEE_BYTE_UTILITIES. Cyclic component relationships
 	  represented as soft implies: SILABS_SISDK_ZIGBEE_SYSTEM_COMMON.
 
 config SILABS_SISDK_ZIGBEE_STACK_DIAGNOSTICS

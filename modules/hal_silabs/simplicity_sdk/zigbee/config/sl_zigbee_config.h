@@ -10,6 +10,8 @@
 #ifndef SL_ZIGBEE_CONFIG_H
 #define SL_ZIGBEE_CONFIG_H
 
+#include "sl_component_catalog.h"
+
 /* SL_RAIL_IEEE802154_CCA_MODE_RSSI; avoid pulling RAIL headers at compile time. */
 #ifndef SL_ZIGBEE_RADIO_802154_CCA_MODE
 #define SL_ZIGBEE_RADIO_802154_CCA_MODE 0

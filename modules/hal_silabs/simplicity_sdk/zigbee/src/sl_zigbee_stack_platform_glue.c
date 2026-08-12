@@ -100,12 +100,36 @@ uint32_t halCommonCrc32(uint8_t newByte, uint32_t prevResult)
 /*
  * sl_stack_init() RAIL util helpers that Zephyr does not already own:
  * - PA: SiSDK pa_conversions (linked with CONFIG_SOC_GECKO_USE_RAIL)
- * - ant_div: SiSDK sl_rail_util_ant_div.c (disabled config = no-op init)
+ * - ant_div: stubs below for PoC
  * - PTI: owned by Zephyr's silabs,pti driver (debug_silabs_pti.c) when &pti
  *   is okay in DTS — do not call RAIL_ConfigPti here
  * - coex: not ported yet
  * - power manager: gated on CONFIG_PM
  */
+
+/* Antenna diversity disabled: satisfy Zigbee stack / runtime link refs. */
+#define SL_RAIL_UTIL_ANTENNA_MODE_DISABLED 0
+#define SL_RAIL_UTIL_ANTENNA_SELECT_ANTENNA1 1
+
+sl_status_t sl_rail_util_ant_div_init(void)
+{
+	return SL_STATUS_OK;
+}
+
+int8_t sl_rail_util_ant_div_get_tx_antenna_mode(void)
+{
+	return SL_RAIL_UTIL_ANTENNA_MODE_DISABLED;
+}
+
+int8_t sl_rail_util_ant_div_get_tx_antenna_selected(void)
+{
+	return SL_RAIL_UTIL_ANTENNA_SELECT_ANTENNA1;
+}
+
+sl_status_t sl_rail_util_ant_div_toggle_tx_antenna(void)
+{
+	return SL_STATUS_NOT_SUPPORTED;
+}
 
 void sl_rail_util_power_manager_init(void)
 {

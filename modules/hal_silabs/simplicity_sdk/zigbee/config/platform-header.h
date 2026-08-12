@@ -17,6 +17,7 @@
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #define TRUE  1u
 #define FALSE 0u

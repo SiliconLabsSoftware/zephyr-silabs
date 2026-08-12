@@ -16,6 +16,10 @@
 #include "sl_zigbee_runtime.h"
 #include "sl_zigbee_system_common.h"
 
+#if defined(CONFIG_SILABS_ZIGBEE_TOKEN_NVS)
+#include "sl_token_manager_api.h"
+#endif
+
 #if defined(CONFIG_SILABS_SISDK_ZIGBEE_SECURE_KEY_STORAGE_UPGRADE)
 #include "stack/security/zigbee-secure-key-storage-upgrade.h"
 #endif
@@ -25,7 +29,6 @@ LOG_MODULE_REGISTER(silabs_zigbee_runtime, CONFIG_LOG_DEFAULT_LEVEL);
 extern uint32_t sli_zigbee_af_ms_to_next_event(void);
 
 /* sl_stack_init() RAIL util / antenna helpers (see sl_zigbee_stack_platform_glue.c). */
-void sl_rail_util_coex_init(void);
 void sl_rail_util_pa_init(void);
 void sl_rail_util_power_manager_init(void);
 sl_status_t sl_rail_util_ant_div_init(void);
@@ -82,10 +85,26 @@ sl_status_t sl_zigbee_runtime_init(void)
 	 */
 	halInternalInitLed();
 
-	sl_rail_util_coex_init();
 	sl_rail_util_pa_init();
 	sl_rail_util_power_manager_init();
 	/* PTI itself is configured by Zephyr's silabs,pti driver when enabled. */
+
+#if defined(CONFIG_SILABS_ZIGBEE_TOKEN_NVS)
+	/*
+	 * Match SiSDK sl_service_init() → sl_token_manager_init() before
+	 * stack init. Token registration/defaults come from
+	 * sl_zigbee_token_defines.c::halStackInitTokens().
+	 */
+	{
+		sl_status_t token_status = sl_token_manager_init();
+
+		if (token_status != SL_STATUS_OK) {
+			LOG_ERR("sl_token_manager_init failed: 0x%04x", token_status);
+			return token_status;
+		}
+	}
+#endif
+
 	sli_zigbee_stack_init_callback();
 	sli_zigbee_app_framework_init_callback();
 
@@ -129,13 +148,18 @@ sl_status_t sl_zigbee_runtime_start(void)
 		return SL_STATUS_OK;
 	}
 
+	/*
+	 * FP_HARDABI + FPU_SHARING: Zigbee/RAIL/PSA paths use the FPU. Without
+	 * K_FP_REGS, lazy FP context + exception return can load a bad
+	 * EXC_RETURN and fault with PC/LR garbage.
+	 */
 	zigbee_thread_id = k_thread_create(&zigbee_thread,
 					   zigbee_thread_stack,
 					   K_THREAD_STACK_SIZEOF(zigbee_thread_stack),
 					   zigbee_thread_entry,
 					   NULL, NULL, NULL,
 					   CONFIG_SILABS_ZIGBEE_RUNTIME_THREAD_PRIORITY,
-					   0,
+					   K_FP_REGS,
 					   K_NO_WAIT);
 	if (zigbee_thread_id == NULL) {
 		LOG_ERR("failed to create Zigbee runtime thread");
