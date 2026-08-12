@@ -158,17 +158,18 @@ config ZIGBEE_SILABS_DYNAMIC_COMMISSIONING
 	  Link libzigbee-dynamic-commissioning.a.
 
 config SILABS_ZIGBEE_TOKEN_NVS
-	bool "Zephyr NVS backend for Zigbee stack tokens"
+	bool "Zephyr NVS backend for Common Token Manager dynamic tokens"
 	default y
 	select FLASH
 	select FLASH_MAP
 	select NVS
 	help
-	  Store Silicon Labs Zigbee stack tokens in a Zephyr NVS partition
-	  instead of the Simplicity SDK token manager and NVM3. Prefers a
-	  zb_token_partition node when present; otherwise uses storage_partition.
-	  When PSA secure storage also uses storage_partition, provide a
-	  dedicated zb_token_partition so the two NVS mounts do not collide.
+	  Back CTM dynamic tokens (sl_token_manager_*) with Zephyr NVS.
+	  Static/manufacturing tokens use stock CTM Series-2 INT_FLASH code
+	  (DEVINFO / USERDATA / lockbits). Prefers zb_token_partition when
+	  present; otherwise uses storage_partition. When PSA secure storage
+	  also uses storage_partition, provide a dedicated zb_token_partition
+	  so the two NVS mounts do not collide.
 
 if SILABS_ZIGBEE_TOKEN_NVS
 
@@ -207,8 +208,11 @@ config SILABS_ZIGBEE_RUNTIME_THREAD
 
 config SILABS_ZIGBEE_RUNTIME_THREAD_STACK_SIZE
 	int "Zigbee runtime thread stack size"
-	default 4096
+	default 16384
 	depends on SILABS_ZIGBEE_RUNTIME_THREAD
+	help
+	  Stack for the dedicated Zigbee tick thread. 4 KiB is too small once
+	  commissioning / RAIL / PSA run; overflow corrupts neighboring stacks.
 
 config SILABS_ZIGBEE_RUNTIME_THREAD_PRIORITY
 	int "Zigbee runtime thread priority"
