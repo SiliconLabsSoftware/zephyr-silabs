@@ -14,6 +14,7 @@ zephyr_include_directories(${CMAKE_CURRENT_SOURCE_DIR}/autogen)
 
 target_sources(app PRIVATE
   src/main.c
+  src/app.c
   autogen/zap-event.c
   autogen/zap-cluster-command-parser.c
   autogen/sl_cluster_service_gen.c
