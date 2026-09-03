@@ -25,7 +25,7 @@ manifest:
   projects:
     - name: zephyr
       remote: silabs
-      revision: 54cdacb16600a90a4e4b29f4538bd090666f5662
+      revision: 4f7858710fa6aa326df314b0103180ed5f458584
       import:
         # Simplicity SDK for Zephyr imports the Zephyr main tree at the
         # revision given above. Only the modules named below are imported.
@@ -46,7 +46,7 @@ manifest:
           - zcbor
     - name: hal_silabs
       remote: silabs
-      revision: 28eb6670caf3486321a033c7f08687867a7ef4f4
+      revision: 1093933f15c4ad606059441a96b1433d53df1a84
       path: modules/hal/silabs
     - name: mcuboot
       remote: silabs
