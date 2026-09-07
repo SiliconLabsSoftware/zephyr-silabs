@@ -55,7 +55,7 @@ void test_aead_aes_ccm(bool generate_key, psa_key_location_t location)
 	};
 	uint8_t cipher_tag_buf[32] = {0};
 	uint8_t decrypted[sizeof(aes_plaintext)] = {0};
-	size_t out_len;
+	size_t enc_len, out_len;
 
 	psa_key_id_t key_id;
 	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
@@ -80,22 +80,28 @@ void test_aead_aes_ccm(bool generate_key, psa_key_location_t location)
 	zassert_equal(psa_aead_encrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
 				       aes_ad_buf, sizeof(aes_ad_buf), aes_plaintext,
 				       sizeof(aes_plaintext), cipher_tag_buf,
-				       sizeof(cipher_tag_buf), &out_len),
+				       sizeof(cipher_tag_buf), &enc_len),
 		      PSA_SUCCESS, "Failed to encrypt");
 
-	zassert_equal(out_len, sizeof(expect_cipher_tag_buf));
+	zassert_equal(enc_len, sizeof(expect_cipher_tag_buf));
 	if (!generate_key) {
 		zassert_mem_equal(cipher_tag_buf, expect_cipher_tag_buf,
 				  sizeof(expect_cipher_tag_buf));
 	}
 
 	zassert_equal(psa_aead_decrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
-				       aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, out_len,
+				       aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, enc_len,
 				       decrypted, sizeof(decrypted), &out_len),
 		      PSA_SUCCESS, "Failed to decrypt");
 
 	zassert_equal(out_len, sizeof(aes_plaintext));
 	zassert_mem_equal(decrypted, aes_plaintext, sizeof(aes_plaintext));
+
+	memset(&cipher_tag_buf[sizeof(aes_plaintext)], 0, 16);
+	zassert_equal(psa_aead_decrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
+				       aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, enc_len,
+				       decrypted, sizeof(decrypted), &out_len),
+		      PSA_ERROR_INVALID_SIGNATURE, "Decrypt succeeded despite bad tag");
 
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
@@ -151,7 +157,7 @@ void test_aead_aes_gcm(bool generate_key, psa_key_location_t location)
 	};
 	uint8_t cipher_tag_buf[32];
 	uint8_t decrypted[sizeof(aes_plaintext)] = {0};
-	size_t out_len;
+	size_t enc_len, out_len;
 
 	psa_key_id_t key_id;
 	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
@@ -176,22 +182,36 @@ void test_aead_aes_gcm(bool generate_key, psa_key_location_t location)
 	zassert_equal(psa_aead_encrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
 				       aes_ad_buf, sizeof(aes_ad_buf), aes_plaintext,
 				       sizeof(aes_plaintext), cipher_tag_buf,
-				       sizeof(cipher_tag_buf), &out_len),
+				       sizeof(cipher_tag_buf), &enc_len),
 		      PSA_SUCCESS, "Failed to encrypt");
 
-	zassert_equal(out_len, sizeof(expect_cipher_tag_buf));
+	zassert_equal(enc_len, sizeof(expect_cipher_tag_buf));
 	if (!generate_key) {
+		size_t i = 0;
+
+		for (i = 0; i < sizeof(expect_cipher_tag_buf); i++) {
+			if (cipher_tag_buf[i] != expect_cipher_tag_buf[i]) {
+				break;
+			}
+		}
 		zassert_mem_equal(cipher_tag_buf, expect_cipher_tag_buf,
-				  sizeof(expect_cipher_tag_buf));
+				  sizeof(expect_cipher_tag_buf), "First mismatch at offset %d/%d",
+				  i, sizeof(expect_cipher_tag_buf));
 	}
 
 	zassert_equal(psa_aead_decrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
-				       aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, out_len,
+				       aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, enc_len,
 				       decrypted, sizeof(decrypted), &out_len),
 		      PSA_SUCCESS, "Failed to decrypt");
 
 	zassert_equal(out_len, sizeof(aes_plaintext));
 	zassert_mem_equal(decrypted, aes_plaintext, sizeof(aes_plaintext));
+
+	memset(&cipher_tag_buf[sizeof(aes_plaintext)], 0, 16);
+	zassert_equal(psa_aead_decrypt(key_id, alg, aes_nonce_buf, sizeof(aes_nonce_buf),
+				       aes_ad_buf, sizeof(aes_ad_buf), cipher_tag_buf, enc_len,
+				       decrypted, sizeof(decrypted), &out_len),
+		      PSA_ERROR_INVALID_SIGNATURE, "Decrypt succeeded despite bad tag");
 
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
@@ -234,7 +254,16 @@ void test_aead_aes_gcm_long(bool generate_key, psa_key_location_t location)
 		      PSA_SUCCESS, "Failed to decrypt");
 
 	zassert_equal(out_len, sizeof(long_plaintext));
-	zassert_mem_equal(long_decrypted, long_plaintext, sizeof(long_plaintext));
+
+	size_t i = 0;
+
+	for (i = 0; i < sizeof(long_plaintext); i++) {
+		if (long_decrypted[i] != long_plaintext[i]) {
+			break;
+		}
+	}
+	zassert_mem_equal(long_decrypted, long_plaintext, sizeof(long_plaintext),
+			  "First mismatch at offset %d/%d", i, sizeof(long_plaintext));
 
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
@@ -243,7 +272,7 @@ void test_aead_chacha20_poly1305(bool generate_key, psa_key_location_t location)
 {
 	uint8_t cipher_tag_buf[130]; /* Ciphertext + Tag */
 	uint8_t decrypted[sizeof(chachapoly_plaintext)] = {0};
-	size_t out_len;
+	size_t enc_len, out_len;
 
 	psa_key_id_t key_id;
 	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
@@ -269,23 +298,39 @@ void test_aead_chacha20_poly1305(bool generate_key, psa_key_location_t location)
 				       sizeof(chachapoly_nonce_buf), chachapoly_ad_buf,
 				       sizeof(chachapoly_ad_buf), chachapoly_plaintext,
 				       sizeof(chachapoly_plaintext), cipher_tag_buf,
-				       sizeof(cipher_tag_buf), &out_len),
+				       sizeof(cipher_tag_buf), &enc_len),
 		      PSA_SUCCESS, "Failed to encrypt");
 
-	zassert_equal(out_len, sizeof(chachapoly_expect_cipher_tag_buf));
+	zassert_equal(enc_len, sizeof(chachapoly_expect_cipher_tag_buf));
 	if (!generate_key) {
+		size_t i = 0;
+
+		for (i = 0; i < sizeof(chachapoly_expect_cipher_tag_buf); i++) {
+			if (cipher_tag_buf[i] != chachapoly_expect_cipher_tag_buf[i]) {
+				break;
+			}
+		}
 		zassert_mem_equal(cipher_tag_buf, chachapoly_expect_cipher_tag_buf,
+				  sizeof(chachapoly_expect_cipher_tag_buf),
+				  "First mismatch at offset %d/%d", i,
 				  sizeof(chachapoly_expect_cipher_tag_buf));
 	}
 
 	zassert_equal(psa_aead_decrypt(key_id, alg, chachapoly_nonce_buf,
 				       sizeof(chachapoly_nonce_buf), chachapoly_ad_buf,
-				       sizeof(chachapoly_ad_buf), cipher_tag_buf, out_len,
+				       sizeof(chachapoly_ad_buf), cipher_tag_buf, enc_len,
 				       decrypted, sizeof(decrypted), &out_len),
 		      PSA_SUCCESS, "Failed to decrypt");
 
 	zassert_equal(out_len, sizeof(chachapoly_plaintext));
 	zassert_mem_equal(decrypted, chachapoly_plaintext, sizeof(chachapoly_plaintext));
+
+	memset(&cipher_tag_buf[sizeof(chachapoly_plaintext)], 0, 16);
+	zassert_equal(psa_aead_decrypt(key_id, alg, chachapoly_nonce_buf,
+				       sizeof(chachapoly_nonce_buf), chachapoly_ad_buf,
+				       sizeof(chachapoly_ad_buf), cipher_tag_buf, enc_len,
+				       decrypted, sizeof(decrypted), &out_len),
+		      PSA_ERROR_INVALID_SIGNATURE, "Decrypt succeeded despite bad tag");
 
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
