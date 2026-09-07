@@ -35,7 +35,8 @@ endif()
 if(CONFIG_PSA_CRYPTO_DRIVER_SILABS_SIWX91X)
 target_compile_definitions(app PUBLIC
   TEST_OPAQUE_AEAD=1
-  TEST_OPAQUE_SIGN=1
+  # Disable opaque signing test while hardware acceleration is disabled
+  # TEST_OPAQUE_SIGN=1
   TEST_OPAQUE_NO_IMPORT_KEY=1
   TEST_OPAQUE_NO_MULTIPART=1
   TEST_OPAQUE_NO_VERIFY=1
