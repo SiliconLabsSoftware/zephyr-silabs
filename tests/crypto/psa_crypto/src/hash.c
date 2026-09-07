@@ -82,3 +82,49 @@ ZTEST(psa_crypto_test, test_hash_sha256_multipart)
 	zassert_mem_equal(hash_buf, expect_sha256_hash, sizeof(expect_sha256_hash),
 			  "Hash mismatch");
 }
+
+ZTEST(psa_crypto_test, test_hash_sha256_multipart_parallel)
+{
+	uint8_t hash_buf1[32], hash_buf2[32];
+	size_t hash_len1, hash_len2;
+	uint32_t stream_block_size = 128;
+	size_t hash_total1 = 0, hash_total2 = 0;
+
+	psa_hash_operation_t hash_op1 = psa_hash_operation_init();
+	psa_hash_operation_t hash_op2 = psa_hash_operation_init();
+
+	zassert_equal(psa_hash_setup(&hash_op1, PSA_ALG_SHA_256), PSA_SUCCESS,
+		      "Failed to setup hash");
+
+	zassert_equal(psa_hash_setup(&hash_op2, PSA_ALG_SHA_256), PSA_SUCCESS,
+		      "Failed to setup hash");
+
+	while ((sizeof(plaintext) - hash_total1) > stream_block_size) {
+		zassert_equal(
+			psa_hash_update(&hash_op1, (plaintext + hash_total1), stream_block_size),
+			PSA_SUCCESS, "Failed to update hash");
+		hash_total1 += stream_block_size;
+		zassert_equal(
+			psa_hash_update(&hash_op2, (plaintext + hash_total2), stream_block_size),
+			PSA_SUCCESS, "Failed to update hash");
+		hash_total2 += stream_block_size;
+	}
+	zassert_equal(psa_hash_update(&hash_op1, (plaintext + hash_total1),
+				      sizeof(plaintext) - hash_total1),
+		      PSA_SUCCESS, "Failed to update hash");
+	zassert_equal(psa_hash_update(&hash_op2, (plaintext + hash_total2),
+				      sizeof(plaintext) - hash_total2),
+		      PSA_SUCCESS, "Failed to update hash");
+
+	zassert_equal(psa_hash_finish(&hash_op1, hash_buf1, sizeof(hash_buf1), &hash_len1),
+		      PSA_SUCCESS, "Failed to finish hash");
+	zassert_equal(hash_len1, sizeof(expect_sha256_hash), "Hash length mismatch");
+	zassert_mem_equal(hash_buf1, expect_sha256_hash, sizeof(expect_sha256_hash),
+			  "Hash mismatch");
+
+	zassert_equal(psa_hash_finish(&hash_op2, hash_buf2, sizeof(hash_buf2), &hash_len2),
+		      PSA_SUCCESS, "Failed to finish hash");
+	zassert_equal(hash_len2, sizeof(expect_sha256_hash), "Hash length mismatch");
+	zassert_mem_equal(hash_buf2, expect_sha256_hash, sizeof(expect_sha256_hash),
+			  "Hash mismatch");
+}
