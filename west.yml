@@ -56,9 +56,9 @@ manifest:
     - name: tf-psa-crypto
       remote: silabs
       repo-path: zephyr-tf-psa-crypto
-      revision: 495a207fb17938041cad5d419fba1275b076c39f
+      revision: 98c6e5b2c40336b5ac840efd42822f82bccfa7ba
       path: modules/crypto/tf-psa-crypto
     - name: zephyr-hal-silabs-extra
       remote: silabs
-      revision: 5f7327c94bd73116bc92cb220d3c85356a57fe11
+      revision: 8aa1800556b32fc4fb4d46ef4d880c05ee0ea5a8
       path: modules/hal/silabs_extra

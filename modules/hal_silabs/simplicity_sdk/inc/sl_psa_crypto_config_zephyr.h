@@ -32,10 +32,12 @@
 
 #include "sli_psa_acceleration.h"
 /* Convert definitions to be compatible with TF-PSA-Crypto 1.1 */
+#if defined(MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_KEY_PAIR)
 #undef MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_KEY_PAIR
 #define MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_KEY_PAIR_BASIC
 #define MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_KEY_PAIR_IMPORT
 #define MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_KEY_PAIR_EXPORT
 #define MBEDTLS_PSA_ACCEL_KEY_TYPE_ECC_KEY_PAIR_GENERATE
+#endif
 
 #endif

@@ -39,6 +39,7 @@ zephyr_include_directories(
   ${SECURITY_DIR}/sl_component/sl_psa_driver/inc
   ${SECURITY_DIR}/sl_component/sl_mbedtls_support/config
   ${SECURITY_DIR}/sl_component/sl_mbedtls_support/inc
+  ${SECURITY_DIR}/sl_component/sli_psec_common/inc
 )
 zephyr_library_sources(
   ${SECURITY_DIR}/sl_component/sl_psa_driver/src/sli_psa_driver_common.c
