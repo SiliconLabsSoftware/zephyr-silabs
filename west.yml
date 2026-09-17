@@ -40,7 +40,6 @@ manifest:
           - lvgl
           - mbedtls
           - mldsa-native
-          - openthread
           - picolibc
           - segger
           - zcbor
@@ -48,6 +47,11 @@ manifest:
       remote: silabs
       revision: 1093933f15c4ad606059441a96b1433d53df1a84
       path: modules/hal/silabs
+    - name: openthread
+      remote: silabs
+      repo-path: zephyr-openthread
+      revision: e3ee3c9c4ce492835e3e7fa8663aa90765773823
+      path: modules/lib/openthread
     - name: mcuboot
       remote: silabs
       repo-path: zephyr-mcuboot
