@@ -4,7 +4,7 @@
  */
 
 #include <psa_crypto_driver_wrappers.h>
-#include <zephyr/secure_storage/its/transform/aead_get.h>
+#include <zephyr/secure_storage/its/transform/aead.h>
 #include <zephyr/drivers/hwinfo.h>
 #include <zephyr/logging/log.h>
 #include <psa/crypto.h>
