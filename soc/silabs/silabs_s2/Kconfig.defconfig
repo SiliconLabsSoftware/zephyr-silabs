@@ -17,6 +17,9 @@ endif
 # Disable the upstream TRNG driver and use the downstream TRNG driver
 # that integrates with the rest of the PSA Crypto drivers instead
 configdefault ENTROPY_GECKO_TRNG
-	default n if PSA_CRYPTO_DRIVER_SILABS_VSE
+	default n if SILABS_SISDK_PSA_CRYPTO
+
+configdefault SILABS_SISDK_PSA_CRYPTO
+	default y if DT_HAS_SILABS_GECKO_TRNG_ENABLED
 
 endif
