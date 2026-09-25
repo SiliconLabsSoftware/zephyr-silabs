@@ -21,13 +21,20 @@ target_sources(app PRIVATE
 # in out-of-tree tests due to the compliance script failing.
 
 # HSE fully supports opaque keys and multipart operations
-if(CONFIG_PSA_CRYPTO_DRIVER_SILABS_HSE)
-target_compile_definitions(app PUBLIC
-  TEST_OPAQUE_AEAD=1
-  TEST_OPAQUE_CIPHER=1
-  TEST_OPAQUE_KEY_AGREEMENT=1
-  TEST_OPAQUE_SIGN=1
-)
+dt_nodelabel(se_path NODELABEL "se")
+if(CONFIG_SILABS_SISDK_PSA_CRYPTO AND DEFINED se_path)
+  target_compile_definitions(app PUBLIC
+    TEST_OPAQUE_AEAD=1
+    TEST_OPAQUE_CIPHER=1
+    TEST_OPAQUE_KEY_AGREEMENT=1
+    TEST_OPAQUE_SIGN=1
+  )
+  # SixG301 does not hardware accelerate ChaCha20, so opaque keys can't be used
+  if(CONFIG_SOC_FAMILY_SILABS_S3_SIX301)
+    target_compile_definitions(app PUBLIC
+      TEST_OPAQUE_NO_CHACHA=1
+    )
+  endif()
 endif()
 
 # SiWx917 only supports one-shot operations on internally generated opaque keys
