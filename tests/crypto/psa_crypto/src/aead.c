@@ -444,7 +444,7 @@ ZTEST(psa_crypto_test, test_aead_chacha20_poly1305_long_transparent)
 
 ZTEST(psa_crypto_test, test_aead_chacha20_poly1305_opaque)
 {
-	if (!IS_ENABLED(TEST_OPAQUE_AEAD)) {
+	if (!IS_ENABLED(TEST_OPAQUE_AEAD) || IS_ENABLED(TEST_OPAQUE_NO_CHACHA)) {
 		ztest_test_skip();
 	}
 

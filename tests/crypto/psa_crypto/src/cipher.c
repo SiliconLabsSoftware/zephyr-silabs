@@ -356,7 +356,7 @@ ZTEST(psa_crypto_test, test_cipher_chacha20_single_transparent)
 
 ZTEST(psa_crypto_test, test_cipher_chacha20_single_opaque)
 {
-	if (!IS_ENABLED(TEST_OPAQUE_CIPHER)) {
+	if (!IS_ENABLED(TEST_OPAQUE_CIPHER) || IS_ENABLED(TEST_OPAQUE_NO_CHACHA)) {
 		ztest_test_skip();
 	}
 
