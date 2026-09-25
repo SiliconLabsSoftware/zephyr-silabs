@@ -1,0 +1,13 @@
+# Copyright (c) 2026 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+if SOC_FAMILY_SILABS_SIWX91X
+
+configdefault TF_PSA_CRYPTO_DISPATCH_DIR
+	default "${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/util/third_party/mbedtls/dispatch" \
+		if SILABS_WISECONNECT_PSA_CRYPTO
+
+configdefault TF_PSA_CRYPTO_DRIVER_CONFIG_FILE
+	default "sl_psa_crypto_config_zephyr.h" if SILABS_WISECONNECT_PSA_CRYPTO
+
+endif # SOC_FAMILY_SILABS_SIWX91X
