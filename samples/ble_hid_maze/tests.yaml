@@ -1,0 +1,18 @@
+sample:
+  name: Bluetooth LE HID mouse display maze
+  description: Control a display maze with a Bluetooth LE HID mouse
+common:
+  build_only: true
+  tags:
+    - bluetooth
+    - display
+tests:
+  sample.bluetooth.display_maze:
+    platform_allow:
+      - siwx917_dk2605a
+      - xg24_dk2601b
+      - xg24_rb4187c
+    integration_platforms:
+      - siwx917_dk2605a
+      - xg24_dk2601b
+      - xg24_rb4187c

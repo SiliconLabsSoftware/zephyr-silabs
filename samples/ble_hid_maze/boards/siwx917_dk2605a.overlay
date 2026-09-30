@@ -1,0 +1,59 @@
+/*
+ * Copyright (c) 2026 Silicon Laboratories Inc.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+#include <zephyr/dt-bindings/mipi_dbi/mipi_dbi.h>
+
+/* Disable the unused Wi-Fi network interface. */
+&wifi0 {
+	status = "disabled";
+};
+
+/ {
+	chosen {
+		zephyr,display = &display;
+	};
+
+	mipi_dbi {
+		compatible = "zephyr,mipi-dbi-spi";
+		spi-dev = <&spi0>;
+		dc-gpios = <&gpioa 6 GPIO_ACTIVE_HIGH>; /* EXP21 */
+		reset-gpios = <&gpioa 10 GPIO_ACTIVE_LOW>; /* EXP23 */
+		write-only;
+		#address-cells = <1>;
+		#size-cells = <0>;
+
+		display: display@0 {
+			compatible = "sitronix,st7796s";
+			reg = <0>;
+			mipi-max-frequency = <DT_FREQ_M(40)>;
+			mipi-mode = "MIPI_DBI_MODE_SPI_4WIRE";
+			color-coding = "MIPI_DBI_MODE_RGB565";
+			height = <320>;
+			width = <480>;
+			color-invert;
+			madctl = <0x3e>;
+			pgc = [f0 06 0b 07 06 05 2e 33 47 3a 17 16 2e 31];
+			ngc = [f0 09 0d 09 08 23 2e 33 46 38 13 13 2c 32];
+		};
+	};
+};
+
+&pinctrl0 {
+	spi_default: spi_default {
+		group {
+			pinmux = <GSPI_CLK_HP25>,  /* EXP03 */
+				 <GSPI_CS0_HP28>,  /* EXP09 */
+				 <GSPI_MOSI_HP27>; /* EXP07 */
+		};
+	};
+};
+
+&spi0 {
+	pinctrl-0 = <&spi_default>;
+	pinctrl-names = "default";
+	clock-frequency = <DT_FREQ_M(60)>;
+	status = "okay";
+};
