@@ -5,7 +5,6 @@ if SOC_FAMILY_SILABS_SIWX91X
 
 config SILABS_WISECONNECT_PSA_CRYPTO
 	bool "TF-PSA-Crypto driver with hardware acceleration"
-	default y
 	depends on MBEDTLS_PSA_CRYPTO_C
 	select SILABS_SIWX91X_NWP
 	help
