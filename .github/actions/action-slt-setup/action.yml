@@ -20,7 +20,9 @@ runs:
     - name: Download and extract SLT
       shell: bash
       run: |
-        wget -q ${{ inputs.slt-url }} -O slt.zip
+        wget -q ${{ inputs.slt-url }} -O slt.zip \
+          --header "User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:143.0) Gecko/20100101 Firefox/143.0" \
+          --header "Accept-Encoding: gzip, deflate, br, zstd"
         unzip -q slt.zip -d $GITHUB_WORKSPACE/slt
         chmod +x $GITHUB_WORKSPACE/slt/slt
         rm slt.zip
