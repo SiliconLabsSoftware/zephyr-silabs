@@ -14,8 +14,6 @@
  *                    silabs,mono-tx-slot = "left" via boards/mono_left.overlay)
  *   mono_right (2) - audio in R slot, L silent (channels=1 + driver DMASPLIT;
  *                    default silabs,mono-tx-slot = "right")
-
- *   stereo     (3) - interleaved L+R (native stereo source or duplicate mono)
  */
 
 #include <string.h>
@@ -27,10 +25,8 @@
 #include <zephyr/logging/log.h>
 
 #include "audio.h"
-
-#if TAS2505_BOARD
+#include "app_config.h"
 #include "tas2505.h"
-#endif
 
 #define CODEC_I2C_NODE DT_ALIAS(codec_tas2505)
 
@@ -49,37 +45,6 @@
 
 LOG_MODULE_REGISTER(tas2505_sample, LOG_LEVEL_INF);
 
-#ifndef FRAME_CLK_HZ
-#define FRAME_CLK_HZ 16000
-#endif
-
-#ifndef WORD_SIZE_BITS
-#define WORD_SIZE_BITS 16
-#endif
-
-/* Channel routing IDs -- keep in sync with CMakeLists.txt. */
-#define CHANNEL_MODE_MONO_LEFT  1
-#define CHANNEL_MODE_MONO_RIGHT 2
-#define CHANNEL_MODE_STEREO     3
-
-#ifndef CHANNEL_MODE_ID
-#define CHANNEL_MODE_ID  CHANNEL_MODE_MONO_RIGHT
-#endif
-#ifndef CHANNEL_MODE_NAME
-#define CHANNEL_MODE_NAME "mono_right"
-#endif
-
-/*
- * PLAYBACK_LOOP / PLAYBACK_MODE_NAME come from CMake (PLAYBACK_MODE):
- *   PLAYBACK_LOOP=0 -> "one_shot": play once, drain, gate BCLK/LRCLK.
- *   PLAYBACK_LOOP=1 -> "loopback": play forever, no drain/gating.
- */
-#ifndef PLAYBACK_LOOP
-#define PLAYBACK_LOOP 0
-#endif
-#ifndef PLAYBACK_MODE_NAME
-#define PLAYBACK_MODE_NAME "one_shot"
-#endif
 
 #if WORD_SIZE_BITS == 16
 typedef int16_t sample_t;
@@ -108,28 +73,13 @@ typedef int32_t sample_t;
 #define TAIL_SILENT_BLOCKS 0
 #define BLOCK_FRAMES       SAMPLES_PER_BLOCK
 #define DRAIN_TIMEOUT_MS   2000U
-
-#if CHANNEL_MODE_ID == CHANNEL_MODE_MONO_LEFT || CHANNEL_MODE_ID == CHANNEL_MODE_MONO_RIGHT
-/*
- * mono_left / mono_right: i2s_configure(channels=1) enables USART
- * I2SCTRL.DMASPLIT. App buffer is [M0, M1, ...]; driver LDMA feeds silence
- * on one slot and samples on the other. Slot pick is via silabs,mono-tx-slot
- * (mono_left adds boards/mono_left.overlay; mono_right uses the DT default).
- * Half the TX mem_slab RAM vs stereo interleave.
- */
 #define I2S_CHANNELS 1U
 #define BLOCK_SIZE   (SAMPLES_PER_BLOCK * (int)sizeof(sample_t))
-#else
-#define I2S_CHANNELS 2U
-#define BLOCK_SIZE   (SAMPLES_PER_BLOCK * 2 * (int)sizeof(sample_t))
-#endif
-
 #define I2S_OPTIONS (I2S_OPT_FRAME_CLK_CONTROLLER | I2S_OPT_BIT_CLK_CONTROLLER)
 
 K_MEM_SLAB_DEFINE(tx_slab, WB_UP(BLOCK_SIZE), NUM_BLOCKS, WB_UP(32));
 
-#if CHANNEL_MODE_ID == CHANNEL_MODE_MONO_LEFT || CHANNEL_MODE_ID == CHANNEL_MODE_MONO_RIGHT
-static void fill_block_mono(sample_t *tx, unsigned n)
+static void fill_block(sample_t *tx, unsigned n)
 {
 #if WORD_SIZE_BITS == 16
   audio_fill_mono(tx, n);
@@ -142,31 +92,6 @@ static void fill_block_mono(sample_t *tx, unsigned n)
   }
 #endif
 }
-#define fill_block(tx, n) fill_block_mono((tx), (n))
-#else
-/*
- * fill_block_stereo() -- fill one TX mem_slab block (n frames).
- *
- * Pulls n mono samples via audio_fill_mono(), then writes interleaved
- * L/R into *tx per CHANNEL_MODE_ID. i2s_configure uses channels=2 here;
- * every LRCLK frame on the wire has two slots. CHANNEL_MODE_STEREO still
- * duplicates mono to both slots until a true stereo source is added.
- */
-static void fill_block_stereo(sample_t *tx, unsigned n)
-{
-  int16_t mono[SAMPLES_PER_BLOCK];
-
-  audio_fill_mono(mono, n);
-
-  for (unsigned i = 0; i < n; i++) {
-    sample_t ex = SAMPLE_EXPAND(mono[i]);
-
-    tx[2 * i]     = ex;
-    tx[2 * i + 1] = ex;
-  }
-}
-#define fill_block(tx, n) fill_block_stereo((tx), (n))
-#endif
 
 int main(void)
 {
@@ -204,7 +129,6 @@ int main(void)
   }
   LOG_INF("i2s_configure ok");
 
-#if TAS2505_BOARD
   const struct device *codec_i2c = DEVICE_DT_GET(CODEC_I2C_NODE);
   const struct tas2505_init_params codec_p = {
     .mclk_hz = CODEC_MCLK_HZ,
@@ -219,7 +143,6 @@ int main(void)
     LOG_ERR("tas2505_init failed: %d", ret);
     return ret;
   }
-#endif
 
   for (unsigned int i = 0U; i < PREROLL_BLOCKS; i++) {
     ret = k_mem_slab_alloc(&tx_slab, &tx_block, K_FOREVER);

@@ -16,14 +16,7 @@
 #include <string.h>
 
 #include "audio.h"
-
-#ifndef FRAME_CLK_HZ
-#define FRAME_CLK_HZ 16000
-#endif
-
-#ifndef PLAYBACK_LOOP
-#define PLAYBACK_LOOP 0
-#endif
+#include "app_config.h"
 
 #define SINE_TABLE_LEN 64
 #define SONG_GAP_MS    400U

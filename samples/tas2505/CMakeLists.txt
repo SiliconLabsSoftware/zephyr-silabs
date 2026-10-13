@@ -2,33 +2,31 @@
 
 cmake_minimum_required(VERSION 3.20.0)
 
+find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
+project(tas2505)
+
+# Application configuratons
+set(FRAME_CLK_HZ 16000 CACHE STRING "I2S frame clock (Hz) for this sample")
+set(PLAYBACK_SECONDS 30 CACHE STRING "Used when regenerating song_pcm.c (pcm mode only)")
+set(WORD_SIZE 16 CACHE STRING "I2S sample word size in bits (16 or 32)")
+set(AUDIO_SOURCE short_songs CACHE STRING "short_songs: runtime PD melodies | sine1khz: 1 kHz clock-validation tone (SRS 2.b)")
+set(PLAYBACK_MODE one_shot CACHE STRING
+	"Playback lifetime: one_shot (play once + stop + gate BCLK/LRCLK) | loopback (replay forever)")
 set(CHANNEL_MODE mono_right CACHE STRING
-	"Channel routing: mono_left | mono_right | stereo")
+	"Channel routing: mono_left | mono_right")
 
 if(CHANNEL_MODE STREQUAL "mono_left")
 	set(EXTRA_DTC_OVERLAY_FILE ${CMAKE_CURRENT_SOURCE_DIR}/boards/mono_left.overlay)
 endif()
 
-find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
-project(tas2505)
-
-set(FRAME_CLK_HZ 16000 CACHE STRING "I2S frame clock (Hz) for this sample")
-set(PLAYBACK_SECONDS 30 CACHE STRING "Used when regenerating song_pcm.c (pcm mode only)")
-set(WORD_SIZE 16 CACHE STRING "I2S sample word size in bits (16 or 32)")
-set(TAS2505_BOARD 0 CACHE STRING "Enable TAS2505 board support (1 or 0)")
-set(AUDIO_SOURCE pcm CACHE STRING "pcm: embedded song_pcm.c | short_songs: runtime PD melodies | sine1khz: 1 kHz clock-validation tone (SRS 2.b)")
-set(PLAYBACK_MODE one_shot CACHE STRING
-	"Playback lifetime: one_shot (play once + stop + gate BCLK/LRCLK) | loopback (replay forever)")
-
 if(NOT WORD_SIZE STREQUAL "16" AND NOT WORD_SIZE STREQUAL "32")
 	message(FATAL_ERROR "WORD_SIZE must be 16 or 32 (got ${WORD_SIZE})")
 endif()
 
-if(NOT AUDIO_SOURCE STREQUAL "pcm"
-   AND NOT AUDIO_SOURCE STREQUAL "short_songs"
+if(NOT AUDIO_SOURCE STREQUAL "short_songs"
    AND NOT AUDIO_SOURCE STREQUAL "sine1khz")
 	message(FATAL_ERROR
-		"AUDIO_SOURCE must be pcm | short_songs | sine1khz "
+		"AUDIO_SOURCE must be short_songs | sine1khz "
 		"(got ${AUDIO_SOURCE})")
 endif()
 
@@ -58,11 +56,9 @@ if(CHANNEL_MODE STREQUAL "mono_left")
 	set(CHANNEL_MODE_ID 1)
 elseif(CHANNEL_MODE STREQUAL "mono_right")
 	set(CHANNEL_MODE_ID 2)
-elseif(CHANNEL_MODE STREQUAL "stereo")
-	set(CHANNEL_MODE_ID 3)
 else()
 	message(FATAL_ERROR
-		"CHANNEL_MODE must be mono_left | mono_right | stereo "
+		"CHANNEL_MODE must be mono_left | mono_right "
 		"(got ${CHANNEL_MODE})")
 endif()
 
@@ -70,7 +66,6 @@ target_compile_definitions(app PRIVATE
 	"FRAME_CLK_HZ=${FRAME_CLK_HZ}"
 	"PLAYBACK_SECONDS=${PLAYBACK_SECONDS}"
 	"WORD_SIZE_BITS=${WORD_SIZE}"
-	"TAS2505_BOARD=${TAS2505_BOARD}"
 	"CHANNEL_MODE_ID=${CHANNEL_MODE_ID}"
 	"CHANNEL_MODE_NAME=\"${CHANNEL_MODE}\""
 	"PLAYBACK_LOOP=${PLAYBACK_LOOP}"
@@ -82,11 +77,7 @@ message(STATUS "tas2505: PLAYBACK_MODE=${PLAYBACK_MODE} (loop=${PLAYBACK_LOOP})"
 
 target_sources(app PRIVATE src/main.c src/tas2505.c)
 
-if(AUDIO_SOURCE STREQUAL "pcm")
-	target_compile_definitions(app PRIVATE AUDIO_SOURCE_PCM=1)
-	target_sources(app PRIVATE src/audio_pcm.c src/song_pcm.c)
-	message(STATUS "tas2505: AUDIO_SOURCE=pcm (embedded song_pcm.c)")
-elseif(AUDIO_SOURCE STREQUAL "sine1khz")
+if(AUDIO_SOURCE STREQUAL "sine1khz")
 	target_compile_definitions(app PRIVATE AUDIO_SOURCE_SINE1KHZ=1)
 	# Link exactly one pre-quantized clip matching FRAME_CLK_HZ; the others
 	# stay out of the build entirely so flash usage is the cost of one clip.
