@@ -1,0 +1,63 @@
+sample:
+  description: I2S TX to TAS2505 codec using EFR32 USART (xG27-DK2602A overlay)
+  name: TAS2505 I2S TX
+common:
+  tags:
+    - drivers
+    - i2s
+tests:
+  sample.drivers.i2s.tas2505:
+    build_only: true
+    filter: dt_alias_exists("i2s-tx")
+    platform_allow:
+      - xg27_dk2602a
+      - xg27_rb4194a
+    integration_platforms:
+      - xg27_dk2602a
+      - xg27_rb4194a
+  sample.drivers.i2s.tas2505.word_size_32:
+    build_only: true
+    filter: dt_alias_exists("i2s-tx")
+    platform_allow:
+      - xg27_dk2602a
+      - xg27_rb4194a
+    integration_platforms:
+      - xg27_dk2602a
+      - xg27_rb4194a
+    extra_args: WORD_SIZE=32
+  sample.drivers.i2s.tas2505.short_songs:
+    build_only: true
+    filter: dt_alias_exists("i2s-tx")
+    platform_allow:
+      - xg27_dk2602a
+      - xg27_rb4194a
+    integration_platforms:
+      - xg27_rb4194a
+    extra_args: AUDIO_SOURCE=short_songs FRAME_CLK_HZ=16000 WORD_SIZE=16
+  sample.drivers.i2s.tas2505.mono_left:
+    build_only: true
+    filter: dt_alias_exists("i2s-tx")
+    platform_allow:
+      - xg27_dk2602a
+      - xg27_rb4194a
+    integration_platforms:
+      - xg27_rb4194a
+    extra_args: AUDIO_SOURCE=short_songs CHANNEL_MODE=mono_left
+  sample.drivers.i2s.tas2505.mono_right:
+    build_only: true
+    filter: dt_alias_exists("i2s-tx")
+    platform_allow:
+      - xg27_dk2602a
+      - xg27_rb4194a
+    integration_platforms:
+      - xg27_rb4194a
+    extra_args: AUDIO_SOURCE=short_songs CHANNEL_MODE=mono_right
+  sample.drivers.i2s.tas2505.stereo:
+    build_only: true
+    filter: dt_alias_exists("i2s-tx")
+    platform_allow:
+      - xg27_dk2602a
+      - xg27_rb4194a
+    integration_platforms:
+      - xg27_rb4194a
+    extra_args: AUDIO_SOURCE=short_songs CHANNEL_MODE=stereo

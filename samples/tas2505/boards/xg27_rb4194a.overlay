@@ -1,0 +1,120 @@
+/*
+ * xG27-RB4194A (BRD4194A): EUSART0 uses PC0/PC1/PC2 for the on-board MX25R8035F
+ * SPI flash. This overlay disables that flash (and EUSART0), then configures
+ * USART0 in I2S mode on the same pins plus PC3 for word select.
+ *
+ * I2C0 stays on PB2/PB3 (board default) for the TAS2505 control bus.
+ * USART1 remains the console (PA5/PA6).
+ *
+ * Wire I2S to the expansion header: PC0=TX (EXP4), PC1=RX (EXP6),
+ * PC2=BCLK (EXP8), PC3=LRCLK (EXP10).
+ * MCLK is CMU CLKOUT2 on PB0 (EXP7), 19.2 MHz (EXPORTCLK / 4).
+ * Note: PB0 is shared with on-board LED0 / button0.
+ */
+
+#include <zephyr/dt-bindings/pinctrl/silabs/xg27-pinctrl.h>
+#include <zephyr/dt-bindings/dma/silabs/xg27-dma.h>
+
+&dma0 {
+	status = "okay";
+};
+
+/ {
+	aliases {
+		i2s-tx = &usart0;
+		/delete-property/ spi-flash0;
+	};
+};
+
+&pinctrl {
+	usart0_i2s_default: usart0_i2s_default {
+		group0 {
+			pins = <USART0_TX_PC0>, <USART0_CLK_PC2>, <USART0_CS_PC3>;
+			drive-push-pull;
+			output-high;
+		};
+
+		group1 {
+			pins = <USART0_RX_PC1>;
+			input-enable;
+		};
+	};
+};
+
+&mx25r80 {
+	status = "disabled";
+};
+
+&ls013b7dh03 {
+	status = "disabled";
+};
+
+&eusart0 {
+	status = "disabled";
+};
+
+&usart0 {
+	compatible = "silabs,efr32-usart-i2s";
+	#address-cells = <1>;
+	#size-cells = <0>;
+	status = "okay";
+	pinctrl-0 = <&usart0_i2s_default>;
+	pinctrl-names = "default";
+	/*
+	 * MCLK via silabs,mclk-out (not clocks/clock-names): listing &clkout2
+	 * under clocks hung boot on RB4194A before UART (bisect a1a174a92).
+	 */
+	silabs,mclk-out = <&clkout2>;
+	dmas = <&dma0 DMA_REQSEL_USART0TXBL>,
+	       <&dma0 DMA_REQSEL_USART0TXBLRIGHT>,
+	       <&dma0 DMA_REQSEL_USART0RXDATAV>;
+	dma-names = "txbl", "txblright", "rx";
+};
+
+/* MCLK via CMU CLKOUT2 on PB0 (EXP7): EXPORTCLK / clock-div 4 = 19.2 MHz. */
+&pinctrl {
+	clkout_default: clkout_default {
+		group0 {
+			pins = <CMU_CLKOUT2_PB0>;
+			drive-push-pull;
+		};
+	};
+};
+
+/ {
+	exportclk: exportclk {
+		compatible = "silabs,series2-exportclk";
+		#clock-cells = <0>;
+		status = "okay";
+	};
+};
+
+&cmu {
+	#address-cells = <1>;
+	#size-cells = <0>;
+	pinctrl-0 = <&clkout_default>;
+	pinctrl-names = "default";
+
+	clkout2: clkout@2 {
+		compatible = "silabs,series-clock-clkout";
+		reg = <2>;
+		#clock-cells = <0>;
+		clocks = <&exportclk>;
+		clock-div = <4>;
+		status = "okay";
+	};
+};
+
+&i2c0 {
+	tas2505: tas2505@18 {
+		compatible = "ti,tas2505";
+		reg = <0x18>;
+		status = "okay";
+	};
+};
+
+/ {
+	aliases {
+		codec-tas2505 = &i2c0;
+	};
+};
