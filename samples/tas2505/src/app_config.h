@@ -1,5 +1,13 @@
-#ifndef __APP_CONFIG__
-#define __APP_CONFIG__
+/*
+ * Copyright (c) 2026 Silicon Laboratories Inc.
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Fallback defaults when CMake target_compile_definitions are absent (e.g. IDE).
+ */
+
+#ifndef APP_CONFIG_H
+#define APP_CONFIG_H
 
 #ifndef PLAYBACK_LOOP
 #define PLAYBACK_LOOP           0
@@ -13,13 +21,6 @@
 #define WORD_SIZE_BITS          16
 #endif
 
-/* Channel routing IDs -- keep in sync with CMakeLists.txt. */
-#define CHANNEL_MODE_MONO_LEFT  1
-#define CHANNEL_MODE_MONO_RIGHT 2
-
-#ifndef CHANNEL_MODE_ID
-#define CHANNEL_MODE_ID         CHANNEL_MODE_MONO_RIGHT
-#endif
 #ifndef CHANNEL_MODE_NAME
 #define CHANNEL_MODE_NAME       "mono_right"
 #endif
@@ -28,8 +29,4 @@
 #define PLAYBACK_MODE_NAME      "one_shot"
 #endif
 
-#ifndef PLAYBACK_SECONDS
-#define PLAYBACK_SECONDS        30
-#endif
-
-#endif // __APP_CONFIG__
+#endif /* APP_CONFIG_H */

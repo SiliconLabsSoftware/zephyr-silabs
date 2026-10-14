@@ -6,14 +6,13 @@
  * Plays audio on USART0 I2S for TAS2505 / I2S DAC.
  *
  * Build-time audio source (CMake AUDIO_SOURCE):
- *   pcm         - embedded song_pcm.c
  *   short_songs - runtime public-domain melodies (FRAME_CLK_HZ, WORD_SIZE_BITS)
+ *   sine1khz    - pre-quantized 1 kHz clip (FRAME_CLK_HZ must match clip rate)
  *
- * Build-time channel routing (CMake CHANNEL_MODE -> CHANNEL_MODE_ID):
- *   mono_left  (1) - audio in L slot, R silent (channels=1 + DMASPLIT +
- *                    silabs,mono-tx-slot = "left" via boards/mono_left.overlay)
- *   mono_right (2) - audio in R slot, L silent (channels=1 + driver DMASPLIT;
- *                    default silabs,mono-tx-slot = "right")
+ * Build-time channel routing (CMake CHANNEL_MODE, mono DMASPLIT only):
+ *   mono_left  - audio in L slot, R silent (boards/mono_left.overlay sets
+ *                silabs,mono-tx-slot = "left")
+ *   mono_right - audio in R slot, L silent (default silabs,mono-tx-slot)
  */
 
 #include <string.h>

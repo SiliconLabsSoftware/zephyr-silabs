@@ -1,5 +1,11 @@
 #!/usr/bin/env python3
 """
+Optional offline tool — not wired into CMake for this downstream sample.
+
+Default builds use AUDIO_SOURCE=short_songs or sine1khz only. Use this script
+only if you reintroduce embedded PCM locally (song_pcm.c + audio_pcm.c and
+CMake AUDIO_SOURCE=pcm).
+
 Decode a slice of an audio file (MP3 / WAV / M4A / ...) into a mono signed
 PCM C array and write src/song_pcm.c.
 

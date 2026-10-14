@@ -5,9 +5,8 @@ cmake_minimum_required(VERSION 3.20.0)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(tas2505)
 
-# Application configuratons
+# Application configurations
 set(FRAME_CLK_HZ 16000 CACHE STRING "I2S frame clock (Hz) for this sample")
-set(PLAYBACK_SECONDS 30 CACHE STRING "Used when regenerating song_pcm.c (pcm mode only)")
 set(WORD_SIZE 16 CACHE STRING "I2S sample word size in bits (16 or 32)")
 set(AUDIO_SOURCE short_songs CACHE STRING "short_songs: runtime PD melodies | sine1khz: 1 kHz clock-validation tone (SRS 2.b)")
 set(PLAYBACK_MODE one_shot CACHE STRING
@@ -52,11 +51,8 @@ else()
 		"PLAYBACK_MODE must be one_shot or loopback (got ${PLAYBACK_MODE})")
 endif()
 
-if(CHANNEL_MODE STREQUAL "mono_left")
-	set(CHANNEL_MODE_ID 1)
-elseif(CHANNEL_MODE STREQUAL "mono_right")
-	set(CHANNEL_MODE_ID 2)
-else()
+if(NOT CHANNEL_MODE STREQUAL "mono_left"
+   AND NOT CHANNEL_MODE STREQUAL "mono_right")
 	message(FATAL_ERROR
 		"CHANNEL_MODE must be mono_left | mono_right "
 		"(got ${CHANNEL_MODE})")
@@ -64,15 +60,13 @@ endif()
 
 target_compile_definitions(app PRIVATE
 	"FRAME_CLK_HZ=${FRAME_CLK_HZ}"
-	"PLAYBACK_SECONDS=${PLAYBACK_SECONDS}"
 	"WORD_SIZE_BITS=${WORD_SIZE}"
-	"CHANNEL_MODE_ID=${CHANNEL_MODE_ID}"
 	"CHANNEL_MODE_NAME=\"${CHANNEL_MODE}\""
 	"PLAYBACK_LOOP=${PLAYBACK_LOOP}"
 	"PLAYBACK_MODE_NAME=\"${PLAYBACK_MODE}\""
 )
 
-message(STATUS "tas2505: CHANNEL_MODE=${CHANNEL_MODE} (id=${CHANNEL_MODE_ID})")
+message(STATUS "tas2505: CHANNEL_MODE=${CHANNEL_MODE}")
 message(STATUS "tas2505: PLAYBACK_MODE=${PLAYBACK_MODE} (loop=${PLAYBACK_LOOP})")
 
 target_sources(app PRIVATE src/main.c src/tas2505.c)

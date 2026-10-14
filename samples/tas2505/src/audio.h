@@ -12,7 +12,7 @@
 #include <stdint.h>
 
 /*
- * Mono int16_t source; main.c applies WORD_SIZE_BITS / stereo duplicate.
+ * Mono int16_t source; main.c applies WORD_SIZE_BITS slot expansion when needed.
  *
  * Playback is one-shot: once the underlying clip / playlist has been pulled
  * once, audio_is_done() returns true and audio_fill_mono() emits silence so

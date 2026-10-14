@@ -111,6 +111,15 @@ Regenerate the clips (optional) with:
    python3 src/tools/gen_sine_pcm.py                 # all rates, -6 dBFS
    python3 src/tools/gen_sine_pcm.py --fs 44100 --level -12 --cycles 200
 
+Optional embedded PCM (not used by default)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``src/tools/gen_song_mp3.py`` can generate ``src/song_pcm.c`` from an audio
+file, but this sample does **not** link embedded PCM: CMake only supports
+``short_songs`` and ``sine1khz``. Keep the script for manual experiments if
+you add ``song_pcm.c``, ``audio_pcm.c``, and an ``AUDIO_SOURCE=pcm`` build
+path locally.
+
 Expected on the bench
 ~~~~~~~~~~~~~~~~~~~~~
 

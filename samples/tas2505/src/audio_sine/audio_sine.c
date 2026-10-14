@@ -24,20 +24,9 @@
 
 #include <string.h>
 
+#include "../app_config.h"
 #include "../audio.h"
 #include "sine.h"
-
-#ifndef FRAME_CLK_HZ
-#define FRAME_CLK_HZ 16000
-#endif
-
-#ifndef WORD_SIZE_BITS
-#define WORD_SIZE_BITS 16
-#endif
-
-#ifndef PLAYBACK_LOOP
-#define PLAYBACK_LOOP 0
-#endif
 
 /* Pick the matching pre-quantized clip + a human-readable Fs string. */
 #if FRAME_CLK_HZ == 8000
