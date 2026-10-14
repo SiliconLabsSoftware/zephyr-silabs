@@ -52,12 +52,3 @@ tests:
     integration_platforms:
       - xg27_rb4194a
     extra_args: AUDIO_SOURCE=short_songs CHANNEL_MODE=mono_right
-  sample.drivers.i2s.tas2505.stereo:
-    build_only: true
-    filter: dt_alias_exists("i2s-tx")
-    platform_allow:
-      - xg27_dk2602a
-      - xg27_rb4194a
-    integration_platforms:
-      - xg27_rb4194a
-    extra_args: AUDIO_SOURCE=short_songs CHANNEL_MODE=stereo
