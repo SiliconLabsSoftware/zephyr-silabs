@@ -25,7 +25,7 @@ manifest:
   projects:
     - name: zephyr
       remote: silabs
-      revision: e35b686be50a224e381fd35174be9fcb1a4ddd37
+      revision: 03b0b5443c7a760745826cc53c40e1986d753f86
       import:
         # Simplicity SDK for Zephyr imports the Zephyr main tree at the
         # revision given above. Only the modules named below are imported.
