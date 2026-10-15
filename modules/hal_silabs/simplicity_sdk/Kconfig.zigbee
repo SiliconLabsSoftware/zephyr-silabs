@@ -22,6 +22,15 @@ config SILABS_SISDK_ZIGBEE
 	help
 	  Internal symbol gating generated Zigbee component Kconfig and sources.
 
+config SILABS_SISDK_CLI
+	bool "Silicon Labs CLI command stack (Zephyr Shell front-end)"
+	select SHELL
+	select SHELL_BACKEND_SERIAL
+	help
+	  Build SiSDK sl_cli command parse/dispatch (tokenize, arguments,
+	  command tables) for Zigbee CLI handlers. Interactive I/O is via
+	  Zephyr Shell (e.g. "zigbee info"), not SiSDK iostream.
+
 # Aliases for blob/prebuilt options referenced by generated component Kconfig.
 config SILABS_SISDK_ZIGBEE_DEBUG_BASIC
 	bool

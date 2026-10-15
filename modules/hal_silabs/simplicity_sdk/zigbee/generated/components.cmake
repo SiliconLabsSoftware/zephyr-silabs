@@ -94,10 +94,6 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/basic/basic.c
   )
 
-  zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_CLI
-    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/util/serial/sl_zigbee_command_interpreter.c
-  )
-
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_CLUSTER_SERVICE
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/service-function/sl_service_function.c
   )
@@ -110,6 +106,7 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_COUNTERS
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/counters/af-counters.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/counters/counters-cb.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/counters/counters-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/counters/counters-ota.c
   )
 
@@ -122,11 +119,16 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_FIND_AND_BIND_TARGET
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/find-and-bind-target/find-and-bind-target-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/find-and-bind-target/find-and-bind-target.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_GREEN_POWER_CLIENT
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/green-power-client/green-power-client.c
+  )
+
+  zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_GREEN_POWER_CLIENT_CLI
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/green-power-client/green-power-client-cli.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_GREEN_POWER_COMMON
@@ -135,17 +137,20 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_GROUPS_SERVER
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/groups-server/groups-server-cb.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/groups-server/groups-server-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/groups-server/groups-server-common.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/groups-server/groups-server.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_IDENTIFY
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/identify/identify-cb.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/identify/identify-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/identify/identify.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_INTERPAN
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/interpan/interpan-cb.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/interpan/interpan-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/interpan/interpan-soc.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/interpan/interpan.c
   )
@@ -157,15 +162,18 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_NETWORK_CREATOR
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/network-creator/network-creator-cb.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/network-creator/network-creator-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/network-creator/network-creator.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_NETWORK_CREATOR_SECURITY
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/network-creator-security/network-creator-security-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/network-creator-security/network-creator-security.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_NETWORK_STEERING
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/network-steering/network-steering-cb.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/network-steering/network-steering-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/network-steering/network-steering-v2.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/network-steering/network-steering.c
   )
@@ -177,6 +185,7 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_REPORTING
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/reporting/reporting-cb.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/reporting/reporting-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/reporting/reporting-default-configuration.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/reporting/reporting.c
   )
@@ -187,6 +196,7 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_SCENES
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/scenes/scenes-cb.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/scenes/scenes-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/scenes/scenes.c
   )
 
@@ -208,7 +218,7 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_STACK_COMMON
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/util/counters/counters.c
-    # ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/platform/service/legacy_hal_wdog/src/sl_legacy_hal_wdog_stub.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/platform/service/legacy_hal_wdog/src/sl_legacy_hal_wdog_stub.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/stack/config/sl_zigbee_callback_stubs.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/stack/config/sl_zigbee_configuration.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/stack/config/sl_zigbee_configuration_access.c
@@ -239,6 +249,10 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/stack/zigbee/zdo-r22-stub.c
   )
 
+  zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_STACK_DIAGNOSTICS
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/stack-diagnostics/stack-diagnostics.c
+  )
+
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_STRONG_RANDOM_API_PSA
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/stack/framework/strong-random-api.c
   )
@@ -252,19 +266,28 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_SYSTEM_COMMON_APP_FRAMEWORK
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/common/zigbee_app_framework_sleep.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/common/zigbee_app_framework_sleep_cli.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_UPDATE_TC_LINK_KEY
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/update-tc-link-key/update-tc-link-key-cb.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/update-tc-link-key/update-tc-link-key-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/update-tc-link-key/update-tc-link-key.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_ZCL_CLI
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/zcl_cli/zigbee-zcl-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/zcl_cli/zigbee-zcl-custom-cluster-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/zcl_cli/zigbee-zcl-global-cli.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_ZCL_FRAMEWORK_CORE
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/cli/core-cli.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/cli/network-cli.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/cli/option-cli.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/cli/security-cli.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/cli/zcl-cli.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/cli/zdo-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/security/af-node.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/security/af-security-common.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/security/af-trust-center.c
@@ -290,11 +313,13 @@ if(CONFIG_SILABS_SISDK_ZIGBEE)
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/util/util.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/util/zcl-util.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/util/common/library.c
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/util/serial/sl_zigbee_command_interpreter.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/util/zigbee-framework/zigbee-device-common.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/util/zigbee-framework/zigbee-device-library.c
   )
 
   zephyr_library_sources_ifdef(CONFIG_SILABS_SISDK_ZIGBEE_ZLL_COMMISSIONING_COMMON
+    ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/zll-commissioning-common/zll-commissioning-cli.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/zll-commissioning-common/zll-commissioning-common-cb.c
     ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee/app/framework/plugin/zll-commissioning-common/zll-commissioning-common.c
   )

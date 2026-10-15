@@ -71,6 +71,7 @@ endif() # PSA Crypto
 # RAIL, blobs, common token_manager headers) stays in hal_silabs.
 set(BLOBS_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/zephyr/blobs/simplicity_sdk)
 set(ZIGBEE_DIR ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee)
+set(OPEN_SERVICE_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/service)
 set(SERVICE_DIR ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/platform/service)
 set(LEGACY_HAL_DIR ${SERVICE_DIR}/legacy_hal)
 # Common Token Manager headers in open HAL; MFG typedefs stay under
@@ -185,10 +186,13 @@ if(CONFIG_ZIGBEE_SILABS)
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/binding-table-baremetal-wrapper.c
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/bootload_baremetal_callbacks.c
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/child_baremetal_callbacks.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/child_baremetal_wrapper.c
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/gp-types-baremetal-wrapper.c
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/gp-proxy-table-baremetal-wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/library_baremetal_wrapper.c
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/message_baremetal_callbacks.c
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/message_baremetal_wrapper.c
+    ${ZIGBEE_DIR}/stack/internal/src/baremetal/multi-phy-baremetal-wrapper.c
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/network-formation-baremetal-callbacks.c
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/network-formation-baremetal-wrapper.c
     ${ZIGBEE_DIR}/stack/internal/src/baremetal/raw-message-baremetal-callbacks.c
@@ -211,6 +215,52 @@ if(CONFIG_ZIGBEE_SILABS)
     ${ZIGBEE_DIR}/stack/platform/sl_zigbee_token.c
     ${ZIGBEE_DIR}/stack/platform/sl_zigbee_token_defines.c
   )
+
+  if(CONFIG_SILABS_SISDK_CLI)
+    set(CLI_DIR ${OPEN_SERVICE_DIR}/cli)
+    zephyr_include_directories(
+      ${CLI_DIR}/inc
+      ${CLI_DIR}/config
+      ${CLI_DIR}/src
+    )
+    zephyr_library_sources(
+      zigbee/src/sl_cli_io_zephyr.c
+      zigbee/src/sl_cli_zephyr_runtime.c
+      ${CLI_DIR}/src/sl_cli.c
+      ${CLI_DIR}/src/sl_cli_arguments.c
+      ${CLI_DIR}/src/sl_cli_command.c
+      ${CLI_DIR}/src/sl_cli_input.c
+      ${CLI_DIR}/src/sl_cli_tokenize.c
+      ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/common/src/sl_string.c
+    )
+  endif()
+
+  # Zigbee links RAIL IEEE802154 PHYs via built_in_phys; upstream only compiles
+  # the HFXO-matched config for CONFIG_IEEE802154_SILABS_EFR32.
+  if(CONFIG_SOC_GECKO_USE_RAIL AND NOT CONFIG_SILABS_DEVICE_IS_MODULE
+      AND NOT CONFIG_IEEE802154_SILABS_EFR32)
+    set(ZIGBEE_RADIO_DIR
+      ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/radio)
+    if(CONFIG_SOC_SILABS_XG24 OR CONFIG_SOC_SILABS_XG26)
+      dt_nodelabel(zb_hfxo_node NODELABEL "hfxo" REQUIRED)
+      dt_prop(zb_hfxo_freq PATH "${zb_hfxo_node}" PROPERTY "clock-frequency")
+      if(zb_hfxo_freq EQUAL "38400000")
+        set(zb_phy_suffix "_38M4Hz")
+      elseif(zb_hfxo_freq EQUAL "39000000")
+        set(zb_phy_suffix "_39MHz")
+      elseif(zb_hfxo_freq EQUAL "40000000")
+        set(zb_phy_suffix "_40MHz")
+      else()
+        message(FATAL_ERROR
+          "Unknown HFXO frequency, not compatible with Zigbee radio PHYs")
+      endif()
+      set(ZIGBEE_PHY_DIR
+        ${ZIGBEE_RADIO_DIR}/rail_lib/plugin/sl_rail_util_built_in_phys/efr32xg${SILABS_DEVICE_FAMILY_NUMBER})
+      zephyr_library_sources(
+        ${ZIGBEE_PHY_DIR}/sl_rail_ieee802154_config${zb_phy_suffix}.c
+      )
+    endif()
+  endif()
 
   if(EXISTS ${CMAKE_CURRENT_LIST_DIR}/zigbee/generated/components.cmake)
     include(zigbee/generated/components.cmake)
