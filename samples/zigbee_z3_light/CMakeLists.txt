@@ -22,3 +22,13 @@ target_sources(app PRIVATE
   autogen/zigbee_zcl_callback_dispatcher.c
   autogen/zigbee_common_callback_dispatcher.c
 )
+
+if(CONFIG_SILABS_SISDK_CLI)
+  target_sources(app PRIVATE
+    src/zigbee_shell.c
+    src/sl_cli_phase_a_stubs.c
+    autogen/sl_cli_command_table.c
+    autogen/zap-cli.c
+  )
+endif()
+

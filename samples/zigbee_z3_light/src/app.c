@@ -141,8 +141,8 @@ static void finding_and_binding_event_handler(sl_zigbee_af_event_t *event)
 
 	if (sl_zigbee_af_network_state() == SL_ZIGBEE_JOINED_NETWORK) {
 		sl_zigbee_af_event_set_inactive(&finding_and_binding_event);
-		LOG_INF("Find and bind target start: 0x%02X",
-			sl_zigbee_af_find_and_bind_target_start(LIGHT_ENDPOINT));
+		sl_zigbee_app_debug_println("Find and bind target start: 0x%02X",
+					   sl_zigbee_af_find_and_bind_target_start(LIGHT_ENDPOINT));
 	}
 }
 
@@ -207,17 +207,18 @@ void sl_zigbee_af_network_steering_complete_cb(sl_status_t status,
 	(void)joinAttempts;
 	(void)finalState;
 
-	LOG_INF("Join network complete: 0x%02X", status);
+	sl_zigbee_app_debug_println("Join network complete: 0x%02X", status);
 
 	if (status != SL_STATUS_OK) {
 #ifdef SL_CATALOG_ZIGBEE_ZLL_COMMISSIONING_COMMON_PRESENT
 		status = sl_zigbee_af_zll_set_initial_security_state();
 		if (status != SL_STATUS_OK) {
-			LOG_ERR("cannot initialize ZLL security: 0x%02X", status);
+			sl_zigbee_app_debug_println("Error: cannot initialize ZLL security: 0x%02X",
+						    status);
 		}
 #endif
 		status = sl_zigbee_af_network_creator_start(false); /* distributed */
-		LOG_INF("Form network start: 0x%02X", status);
+		sl_zigbee_app_debug_println("Form network start: 0x%02X", status);
 	}
 }
 
@@ -238,7 +239,7 @@ void sl_zigbee_af_network_creator_complete_cb(const sl_zigbee_network_parameters
 	(void)network;
 	(void)usedSecondaryChannels;
 
-	LOG_INF("Form Network Complete");
+	sl_zigbee_app_debug_println("Form Network Complete: 0x%02X", SL_STATUS_OK);
 }
 
 /** @brief Post Attribute Change
