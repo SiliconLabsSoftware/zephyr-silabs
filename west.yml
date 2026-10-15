@@ -45,7 +45,7 @@ manifest:
           - zcbor
     - name: hal_silabs
       remote: silabs
-      revision: ca5f98ea5588fd6aefcb03cb6ea9898ed90ecf15
+      revision: 85b1ece4abbba4db7e8a32777840ff420f325929
       path: modules/hal/silabs
     - name: openthread
       remote: silabs
