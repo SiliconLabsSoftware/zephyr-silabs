@@ -13,14 +13,44 @@
 #include <zephyr/drivers/gpio.h>
 #include <zephyr/kernel.h>
 #include <zephyr/random/random.h>
+#include <zephyr/sys/reboot.h>
 
 #include "hal.h"
 #include "led.h"
 #include "micro.h"
+#include "sl_status.h"
 
 #if DT_NODE_HAS_STATUS(DT_ALIAS(led0), okay)
 #define ZIGBEE_ACTIVITY_LED_NODE DT_ALIAS(led0)
 #endif
+
+void halReboot(void)
+{
+	sys_reboot(SYS_REBOOT_COLD);
+}
+
+/* CCITT CRC-16 (poly 0x1021), matching legacy HAL. */
+uint16_t halCommonCrc16(uint8_t newByte, uint16_t prevResult)
+{
+	uint16_t crc = prevResult;
+
+	crc ^= (uint16_t)newByte << 8;
+	for (uint8_t i = 0; i < 8U; i++) {
+		if ((crc & 0x8000U) != 0U) {
+			crc = (uint16_t)((crc << 1) ^ 0x1021U);
+		} else {
+			crc <<= 1;
+		}
+	}
+
+	return crc;
+}
+
+sl_status_t sli_legacy_serial_wait_send(uint8_t port)
+{
+	ARG_UNUSED(port);
+	return SL_STATUS_OK;
+}
 
 void halResetWatchdog(void)
 {

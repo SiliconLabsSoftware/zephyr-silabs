@@ -104,7 +104,7 @@ uint32_t halCommonCrc32(uint8_t newByte, uint32_t prevResult)
  * - PTI: owned by Zephyr's silabs,pti driver (debug_silabs_pti.c) when &pti
  *   is okay in DTS — do not call RAIL_ConfigPti here
  * - coex: not ported yet
- * - power manager: gated on CONFIG_PM
+ * - power manager: CONFIG_PM → Silabs SISDK power_manager (Zephyr idle)
  */
 
 /* Antenna diversity disabled: satisfy Zigbee stack / runtime link refs. */
@@ -134,9 +134,9 @@ sl_status_t sl_rail_util_ant_div_toggle_tx_antenna(void)
 void sl_rail_util_power_manager_init(void)
 {
 	/*
-	 * SiSDK calls sl_rail_init_power_manager() here. That pulls
-	 * sl_power_manager_* symbols; enable once CONFIG_PM + Silabs PM are
-	 * wired for Zigbee. Until then keep the sl_stack_init call site.
+	 * Studio sl_stack_init() calls this before Zigbee sleep_init. With
+	 * CONFIG_PM, Silabs SISDK power_manager is built and Zephyr idle
+	 * enters sleep via soc_power_pmgr.c.
 	 */
 #if defined(CONFIG_SOC_GECKO_USE_RAIL) && defined(CONFIG_PM)
 	(void)sl_rail_init_power_manager();
