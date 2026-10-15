@@ -50,7 +50,7 @@ manifest:
     - name: openthread
       remote: silabs
       repo-path: zephyr-openthread
-      revision: e3ee3c9c4ce492835e3e7fa8663aa90765773823
+      revision: 5f457da8c60976a9f3c16ce8c93bed05414e19bd
       path: modules/lib/openthread
     - name: mcuboot
       remote: silabs
