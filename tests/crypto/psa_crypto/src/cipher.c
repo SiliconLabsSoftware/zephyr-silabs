@@ -85,7 +85,7 @@ void test_cipher_aes_cbc_256_multipart(bool generate_key, psa_key_location_t loc
 
 	zassert_mem_equal(decrypted, plaintext, sizeof(plaintext));
 
-	psa_destroy_key(key_id);
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
 void test_cipher_aes_cbc_256_single(bool generate_key, psa_key_location_t location)
@@ -134,7 +134,7 @@ void test_cipher_aes_cbc_256_single(bool generate_key, psa_key_location_t locati
 	zassert(memcmp(decrypted, plaintext, sizeof(plaintext)) != 0,
 		"Decrypted modified data identical to original plaintext");
 
-	psa_destroy_key(key_id);
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
 void test_cipher_aes_cbc_256_long_single(bool generate_key, psa_key_location_t location)
@@ -183,7 +183,7 @@ void test_cipher_aes_cbc_256_long_single(bool generate_key, psa_key_location_t l
 	zassert(memcmp(long_decrypted, long_plaintext, sizeof(long_plaintext)) != 0,
 		"Decrypted modified data identical to original plaintext");
 
-	psa_destroy_key(key_id);
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
 void test_cipher_aes_ecb_128_single(bool generate_key, psa_key_location_t location)
@@ -230,7 +230,7 @@ void test_cipher_aes_ecb_128_single(bool generate_key, psa_key_location_t locati
 	zassert(memcmp(decrypted, plaintext, sizeof(plaintext)) != 0,
 		"Decrypted modified data identical to original plaintext");
 
-	psa_destroy_key(key_id);
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
 void test_cipher_chacha20_single(bool generate_key, psa_key_location_t location)
@@ -267,6 +267,8 @@ void test_cipher_chacha20_single(bool generate_key, psa_key_location_t location)
 		      PSA_SUCCESS, "Failed to decrypt");
 
 	zassert_mem_equal(decrypted, plaintext, sizeof(plaintext));
+
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
 /* AES-CBC-256 Multipart */

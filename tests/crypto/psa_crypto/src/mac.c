@@ -87,6 +87,8 @@ void test_mac(bool generate_key, psa_key_location_t location, const uint8_t *inp
 
 	zassert_equal(psa_mac_verify(key_id, alg, input, input_len, mac, mac_len), PSA_SUCCESS,
 		      "Failed to verify MAC");
+
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
 ZTEST(psa_crypto_test, test_mac_hmac_transparent)
