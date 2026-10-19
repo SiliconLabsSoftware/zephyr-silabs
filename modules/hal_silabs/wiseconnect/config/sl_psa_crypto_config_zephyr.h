@@ -20,7 +20,8 @@
 #define SLI_TRNG_DEVICE_SI91X               1
 #define SLI_ECDH_DEVICE_SI91X               1
 #define SLI_MAC_DEVICE_SI91X                1
-#define SLI_SHA_DEVICE_SI91X                1
+/* Disable hardware acceleration for SHA: NWP doesn't support psa_hash_clone(), only one context */
+/* #define SLI_SHA_DEVICE_SI91X                1 */
 #define SLI_MULTITHREAD_DEVICE_SI91X        1
 #define SLI_SECURE_KEY_STORAGE_DEVICE_SI91X 1
 #define SL_SI91X_SIDE_BAND_CRYPTO           1
