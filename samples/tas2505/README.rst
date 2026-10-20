@@ -34,6 +34,75 @@ Requirements
 * TAS2505 codec wired to the I2S, MCLK and I2C pins (or a logic analyzer for
   bench checks; codec init will log an error if the codec does not respond).
 
+Hardware wiring
+---------------
+
+The figure below shows the sample wired between a **TAS2505EVM** codec board
+and an **xG27-DK2602A** (BRD2602A) board, with a speaker connected to the
+EVM speaker output (``SPKP``/``SPKM``). Pin numbers on the DK2602A refer to
+its expansion header (EXP).
+
+.. figure:: resource/wiring_diagram.png
+   :alt: TAS2505EVM to xG27-DK2602A wiring diagram
+   :align: center
+   :width: 100%
+
+   TAS2505EVM to xG27-DK2602A wiring (wire colours match the table below).
+
+.. list-table::
+   :header-rows: 1
+   :widths: 15 15 15 25 30
+
+   * - Signal
+     - TAS2505EVM
+     - DK2602A (EXP)
+     - Wire colour
+     - Function
+   * - GND
+     - GND
+     - Pin 1
+     - Black
+     - Common ground.
+   * - SCL
+     - SCL
+     - Pin 15
+     - Orange
+     - I2C0 clock (codec control, address ``0x18``).
+   * - SDA
+     - SDA
+     - Pin 16
+     - Green
+     - I2C0 data (codec control).
+   * - MCLK
+     - MCLK
+     - Pin 7
+     - Red
+     - 19.2 MHz master clock (PB0, CMU CLKOUT2).
+   * - WCLK
+     - WCLK
+     - Pin 10
+     - Yellow
+     - I2S word select / LRCLK.
+   * - DMDIN
+     - DMDIN (J9)
+     - Pin 4
+     - Purple
+     - I2S serial data from the xG27 (USART0 TX, PC0).
+   * - DMCLK
+     - DMCLK (J9)
+     - Pin 8
+     - Brown
+     - I2S bit clock / BCLK (USART0 CLK, PC2).
+
+Notes:
+
+* The speaker is wired to the ``SPKP``/``SPKM`` terminals of the TAS2505EVM
+  (red wire to ``SPKP``, black wire to ``SPKM``).
+* The TAS2505EVM is powered separately (USB) in the diagram; keep the grounds
+  of both boards common through the GND wire.
+* The EXP pin assignments above come from the diagram. If you change the
+  pins, update ``boards/xg27_dk2602a.overlay`` accordingly.
+
 Build options
 -------------
 
