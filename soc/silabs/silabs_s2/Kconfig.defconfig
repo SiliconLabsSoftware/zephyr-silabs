@@ -22,4 +22,17 @@ configdefault ENTROPY_GECKO_TRNG
 configdefault SILABS_SISDK_PSA_CRYPTO
 	default y if DT_HAS_SILABS_GECKO_TRNG_ENABLED
 
+# Zigbee + RAIL / SE ISRs with FPU sharing need more than Zephyr's default
+# stacks. Undersized ISR/main stacks corrupt EXC_RETURN (USAGE FAULT
+# attributed to idle). Apply when Zigbee is enabled so other S2 apps keep
+# leaner defaults.
+configdefault ISR_STACK_SIZE
+	default 8192 if ZIGBEE_SILABS
+
+configdefault MAIN_STACK_SIZE
+	default 4096 if ZIGBEE_SILABS
+
+configdefault IDLE_STACK_SIZE
+	default 1024 if ZIGBEE_SILABS
+
 endif
