@@ -1,7 +1,8 @@
 # Copyright (c) 2025 Silicon Laboratories Inc.
 # SPDX-License-Identifier: Apache-2.0
 
-set(security_dir ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/security)
+set(SECURITY_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/security)
+set(security_dir ${SECURITY_DIR})
 set(SECURITY_EXTRA_DIR ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/platform/security)
 set(libcryptosoc_dir ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/util/third_party/crypto_ip/libcryptosoc)
 
@@ -169,6 +170,11 @@ if(CONFIG_ZIGBEE_SILABS)
     STACK_HEADER=\"stack/include/sl_zigbee.h\"
   )
   zephyr_include_directories(zigbee/config)
+  # hal_silabs owns sl_component_catalog.h (platform catalogs). Zigbee
+  # SL_CATALOG_ZIGBEE_* comes from the generated translation header.
+  zephyr_compile_options(
+    "SHELL:-include${CMAKE_CURRENT_LIST_DIR}/zigbee/config/sl_catalog_kconfig_translation.h"
+  )
 
   zephyr_library_sources(
     zigbee/src/sl_zigbee_platform_shim.c
@@ -229,7 +235,6 @@ if(CONFIG_ZIGBEE_SILABS)
       ${CLI_DIR}/src/sl_cli.c
       ${CLI_DIR}/src/sl_cli_arguments.c
       ${CLI_DIR}/src/sl_cli_command.c
-      ${CLI_DIR}/src/sl_cli_input.c
       ${CLI_DIR}/src/sl_cli_tokenize.c
       ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/common/src/sl_string.c
     )

@@ -135,7 +135,7 @@ void sl_rail_util_power_manager_init(void)
 {
 	/*
 	 * Studio sl_stack_init() calls this before Zigbee sleep_init. With
-	 * CONFIG_PM, Silabs SISDK power_manager is built and Zephyr idle
+	 * CONFIG_PM, power_manager is built and Zephyr idle
 	 * enters sleep via soc_power_pmgr.c.
 	 */
 #if defined(CONFIG_SOC_GECKO_USE_RAIL) && defined(CONFIG_PM)

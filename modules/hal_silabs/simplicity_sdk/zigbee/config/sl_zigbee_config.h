@@ -10,7 +10,11 @@
 #ifndef SL_ZIGBEE_CONFIG_H
 #define SL_ZIGBEE_CONFIG_H
 
+/* Platform catalogs: zephyr/modules/hal_silabs/.../inc/sl_component_catalog.h.
+ * Zigbee catalogs: sl_catalog_kconfig_translation.h (also -included by CMake).
+ */
 #include "sl_component_catalog.h"
+#include "sl_catalog_kconfig_translation.h"
 
 /* SL_RAIL_IEEE802154_CCA_MODE_RSSI; avoid pulling RAIL headers at compile time. */
 #ifndef SL_ZIGBEE_RADIO_802154_CCA_MODE

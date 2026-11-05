@@ -3,7 +3,7 @@
 
 menuconfig ZIGBEE_SILABS
 	bool "Silicon Labs Zigbee stack (prebuilt libraries)"
-	depends on SOC_GECKO_HAS_RADIO
+	depends on SOC_VENDOR_SILABS_HAS_RADIO
 	depends on ZEPHYR_HAL_SILABS_MODULE_BLOBS || BUILD_ONLY_NO_BLOBS
 	select SOC_GECKO_USE_RAIL
 	select SILABS_SISDK_PROTOCOL_CRYPTO
