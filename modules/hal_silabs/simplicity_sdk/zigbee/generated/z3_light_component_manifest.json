@@ -1,0 +1,5751 @@
+{
+  "components": [
+    {
+      "catalog_values": [
+        "zigbee_application_bootloader"
+      ],
+      "category": "Zigbee|Bootloader",
+      "copied_files": [],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_application_bootloader",
+      "kconfig": "SILABS_SISDK_ZIGBEE_APPLICATION_BOOTLOADER",
+      "label": "Zigbee Application Bootloader",
+      "scope": "app_framework",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_basic"
+      ],
+      "category": "Zigbee|Cluster Library|Common",
+      "copied_files": [
+        "app/framework/plugin/basic/basic-cb.c",
+        "app/framework/plugin/basic/basic.c",
+        "app/framework/plugin/basic/basic.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_basic",
+      "kconfig": "SILABS_SISDK_ZIGBEE_BASIC",
+      "label": "Basic Server Cluster",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/basic/basic-cb.c",
+        "app/framework/plugin/basic/basic.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_basic_cluster_server_command_parse"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_cli"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/util/serial/sl_zigbee_command_interpreter.c",
+        "app/util/serial/sl_zigbee_command_interpreter.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_cli",
+      "kconfig": "SILABS_SISDK_ZIGBEE_CLI",
+      "label": "Zigbee CLI",
+      "scope": "app_framework",
+      "source_files": [
+        "app/util/serial/sl_zigbee_command_interpreter.c"
+      ],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/service-function/sl_service_function.c",
+        "app/framework/service-function/sl_service_function.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_cluster_service",
+      "kconfig": "SILABS_SISDK_ZIGBEE_CLUSTER_SERVICE",
+      "label": "Zigbee Cluster Service",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/service-function/sl_service_function.c"
+      ],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_color_control_server"
+      ],
+      "category": "Zigbee|Cluster Library|Home Automation",
+      "copied_files": [
+        "app/framework/plugin/color-control-server/color-control-server-cb.c",
+        "app/framework/plugin/color-control-server/color-control-server.c",
+        "app/framework/plugin/color-control-server/color-control-server.h",
+        "app/framework/plugin/color-control-server/config/color-control-server-config.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_color_control_server",
+      "kconfig": "SILABS_SISDK_ZIGBEE_COLOR_CONTROL_SERVER",
+      "label": "Color Control Cluster Server",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/color-control-server/color-control-server-cb.c",
+        "app/framework/plugin/color-control-server/color-control-server.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_color_control_server_init_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_color_control_cluster_server_command_parse"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_core_cli"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/common/config/zigbee_core_cli_config.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_CLI"
+      ],
+      "id": "zigbee_core_cli",
+      "kconfig": "SILABS_SISDK_ZIGBEE_CORE_CLI",
+      "label": "Zigbee Core CLI",
+      "scope": "app_framework",
+      "source_files": [],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_cli_info_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "printAllLibraryStatus"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_cli_bsend_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_cli_send_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_zcl_read_cli_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_zcl_write_cli_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "resetCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_cli_factory_reset_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_cli_raw_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_cli_send_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_cli_send_using_multicast_binding_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_cli_timesync_command"
+          }
+        },
+        {
+          "condition": [
+            "sl_rail_util_ieee802154_phy_select"
+          ],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_get_pti_radio_config"
+          }
+        },
+        {
+          "condition": [
+            "cli",
+            "sl_rail_util_ieee802154_phy_select"
+          ],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_cli_get_active_phy_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_cli_config_cca_mode_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_cli_version_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "endpointPrint"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "enableDisableEndpoint"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "enableDisableEndpoint"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "printEvents"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "getSetMfgToken"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "getSetMfgToken"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_simulation"
+          ],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "blackListCommand"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_counters"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/plugin/counters/af-counters.c",
+        "app/framework/plugin/counters/config/counters-config.h",
+        "app/framework/plugin/counters/counters-cb.c",
+        "app/framework/plugin/counters/counters-cli.h",
+        "app/framework/plugin/counters/counters-ota.c",
+        "app/framework/plugin/counters/counters-ota.h",
+        "app/framework/plugin/counters/counters.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_counters",
+      "kconfig": "SILABS_SISDK_ZIGBEE_COUNTERS",
+      "label": "Counters",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/counters/af-counters.c",
+        "app/framework/plugin/counters/counters-cb.c",
+        "app/framework/plugin/counters/counters-ota.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_counter_rollover_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_counters_init_cb"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ezsp"
+          ],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_counters_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_counters_print_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_counters_print_counters_type_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_counters_simple_print_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_counters_clear_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_counters_print_thresholds_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_counters_set_threshold_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_counters_reset_thresholds_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_counters_send_request_command"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_debug_basic"
+      ],
+      "category": "Zigbee|Stack",
+      "copied_files": [
+        "stack/framework/zigbee_debug_channel.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_debug_basic",
+      "kconfig": "SILABS_SISDK_ZIGBEE_DEBUG_BASIC_COMPONENT",
+      "label": "Debug Basic",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [],
+      "category": "Zigbee|Stack",
+      "copied_files": [],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_debug_basic_library",
+      "kconfig": "SILABS_SISDK_ZIGBEE_DEBUG_BASIC_LIBRARY",
+      "label": "Debug Basic (Library)",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_debug_print"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/plugin/debug-print/config/sl_zigbee_debug_print_config.h",
+        "app/framework/plugin/debug-print/sl_zigbee_debug_print.c",
+        "app/framework/plugin/debug-print/sl_zigbee_debug_print.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_debug_print",
+      "kconfig": "SILABS_SISDK_ZIGBEE_DEBUG_PRINT",
+      "label": "Debug Print",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/debug-print/sl_zigbee_debug_print.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_debug_print_enable_stack_type_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_debug_print_enable_core_type_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_debug_print_enable_app_type_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_debug_print_enable_zcl_type_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_debug_print_enable_legacy_af_debug_type_command"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_device_config"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/common/config/zigbee_device_config.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_device_config",
+      "kconfig": "SILABS_SISDK_ZIGBEE_DEVICE_CONFIG",
+      "label": "Zigbee Device Config",
+      "scope": "app_framework",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_enhanced_routing"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/common/zigbee_enhanced_routing.c"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_enhanced_routing",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ENHANCED_ROUTING",
+      "label": "Zigbee Enhanced Routing With LQI",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/common/zigbee_enhanced_routing.c"
+      ],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_find_and_bind_target"
+      ],
+      "category": "Zigbee|Zigbee 3.0",
+      "copied_files": [
+        "app/framework/plugin/find-and-bind-target/config/find-and-bind-target-config.h",
+        "app/framework/plugin/find-and-bind-target/find-and-bind-target.c",
+        "app/framework/plugin/find-and-bind-target/find-and-bind-target.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_find_and_bind_target",
+      "kconfig": "SILABS_SISDK_ZIGBEE_FIND_AND_BIND_TARGET",
+      "label": "Find and Bind Target",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/find-and-bind-target/find-and-bind-target.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_find_and_bind_target_start_command"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_green_power"
+      ],
+      "category": "Zigbee|Stack",
+      "copied_files": [
+        "stack/config/component_config/sl_zigbee_green_power_config.h",
+        "stack/gp/sli-gp-proxy-table.h",
+        "stack/gp/sli-gp-sink-table.h",
+        "stack/include/gp-proxy-table.h",
+        "stack/include/gp-sink-table.h",
+        "stack/include/gp-token-config.h",
+        "stack/include/gp-types.h",
+        "stack/internal/inc/gp-proxy-table-internal-def.h",
+        "stack/internal/inc/gp-sink-table-internal-def.h",
+        "stack/internal/inc/gp-types-internal-def.h",
+        "stack/internal/src/baremetal/gp-proxy-table-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/gp-sink-table-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/gp-types-baremetal-wrapper.c"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_gp",
+      "kconfig": "SILABS_SISDK_ZIGBEE_GP",
+      "label": "Green Power",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": [
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_d_gp_sent_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_gpep_incoming_message_callback"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [],
+      "category": "Zigbee|Stack",
+      "copied_files": [],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_gp_library",
+      "kconfig": "SILABS_SISDK_ZIGBEE_GP_LIBRARY",
+      "label": "Green Power (Library)",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_green_power_client"
+      ],
+      "category": "Zigbee|Green Power",
+      "copied_files": [
+        "app/framework/plugin/green-power-client/config/green-power-client-config.h",
+        "app/framework/plugin/green-power-client/green-power-client.c",
+        "app/framework/plugin/green-power-client/green-power-client.h",
+        "stack/gp/sli-gp-proxy-table.h",
+        "stack/include/gp-proxy-table.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_GP",
+        "SILABS_SISDK_ZIGBEE_GREEN_POWER_COMMON"
+      ],
+      "id": "zigbee_green_power_client",
+      "kconfig": "SILABS_SISDK_ZIGBEE_GREEN_POWER_CLIENT",
+      "label": "Green Power Client",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/green-power-client/green-power-client.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_green_power_cluster_client_command_parse"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_green_power_client_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_green_power_client_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_green_power_client_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_green_power_client_retrieve_attribute_and_craft_response"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_green_power_client_stack_status_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_green_power_client_d_gp_sent_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_green_power_client_gpep_incoming_message_callback"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_green_power_client_cli"
+      ],
+      "category": "Zigbee|Green Power",
+      "copied_files": [
+        "app/framework/plugin/green-power-client/green-power-client.h",
+        "stack/gp/sli-gp-proxy-table.h",
+        "stack/include/gp-proxy-table.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_green_power_client_cli",
+      "kconfig": "SILABS_SISDK_ZIGBEE_GREEN_POWER_CLIENT_CLI",
+      "label": "Green Power Client CLI",
+      "scope": "app_framework",
+      "source_files": [],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_green_power_client_set_proxy_entry"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_green_power_client_add_sink"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_green_power_client_add_groupcast_sink"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_green_power_client_remove_proxy_table_entry"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_green_power_client_add_sink"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_green_power_client_print_proxy_table"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_green_power_client_clear_proxy_table_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_green_power_client_duplicate_filtering_test"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_green_power_client_set_key"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_green_power_common"
+      ],
+      "category": "Zigbee|Green Power",
+      "copied_files": [
+        "app/framework/plugin/green-power-common/green-power-common.c",
+        "app/framework/plugin/green-power-common/green-power-common.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_GP"
+      ],
+      "id": "zigbee_green_power_common",
+      "kconfig": "SILABS_SISDK_ZIGBEE_GREEN_POWER_COMMON",
+      "label": "Green Power Common",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/green-power-common/green-power-common.c"
+      ],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_groups_server"
+      ],
+      "category": "Zigbee|Cluster Library|Common",
+      "copied_files": [
+        "app/framework/plugin/groups-server/groups-server-cb.c",
+        "app/framework/plugin/groups-server/groups-server-common.c",
+        "app/framework/plugin/groups-server/groups-server-common.h",
+        "app/framework/plugin/groups-server/groups-server.c",
+        "app/framework/plugin/groups-server/groups-server.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_groups_server",
+      "kconfig": "SILABS_SISDK_ZIGBEE_GROUPS_SERVER",
+      "label": "Groups Server Cluster",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/groups-server/groups-server-cb.c",
+        "app/framework/plugin/groups-server/groups-server-common.c",
+        "app/framework/plugin/groups-server/groups-server.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_groups_server_cli_print"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_groups_server_cli_clear"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_groups_cluster_server_command_parse"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_identify"
+      ],
+      "category": "Zigbee|Cluster Library|Common",
+      "copied_files": [
+        "app/framework/plugin/identify/identify-cb.c",
+        "app/framework/plugin/identify/identify.c",
+        "app/framework/plugin/identify/identify.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_identify",
+      "kconfig": "SILABS_SISDK_ZIGBEE_IDENTIFY",
+      "label": "Identify Cluster",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/identify/identify-cb.c",
+        "app/framework/plugin/identify/identify.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_identify_cli_print"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_identify_cluster_server_command_parse"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_interpan"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/plugin/interpan/config/interpan-config.h",
+        "app/framework/plugin/interpan/interpan-cb.c",
+        "app/framework/plugin/interpan/interpan-soc.c",
+        "app/framework/plugin/interpan/interpan.c",
+        "app/framework/plugin/interpan/interpan.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_interpan",
+      "kconfig": "SILABS_SISDK_ZIGBEE_INTERPAN",
+      "label": "Interpan",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/interpan/interpan-cb.c",
+        "app/framework/plugin/interpan/interpan-soc.c",
+        "app/framework/plugin/interpan/interpan.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_interpan_mac_filter_match_message_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_interpan_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_interpan_init_cb"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ezsp"
+          ],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_interpan_ncp_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_interpan_enable_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_interpan_disable_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_interpan_fragment_test_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_interpan_set_message_timeout_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_interpan_group_short_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_interpan_group_short_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_interpan_long_command"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_level_control"
+      ],
+      "category": "Zigbee|Cluster Library|Common",
+      "copied_files": [
+        "app/framework/plugin/level-control/config/level-control-config.h",
+        "app/framework/plugin/level-control/level-control-cb.c",
+        "app/framework/plugin/level-control/level-control.c",
+        "app/framework/plugin/level-control/level-control.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_level_control",
+      "kconfig": "SILABS_SISDK_ZIGBEE_LEVEL_CONTROL",
+      "label": "Level Control Server Cluster",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/level-control/level-control-cb.c",
+        "app/framework/plugin/level-control/level-control.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_level_control_cluster_server_command_parse"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_network_creator"
+      ],
+      "category": "Zigbee|Zigbee 3.0",
+      "copied_files": [
+        "app/framework/plugin/network-creator/config/network-creator-config.h",
+        "app/framework/plugin/network-creator/network-creator-cb.c",
+        "app/framework/plugin/network-creator/network-creator-composite.h",
+        "app/framework/plugin/network-creator/network-creator.c",
+        "app/framework/plugin/network-creator/network-creator.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_SCAN_DISPATCH",
+        "SILABS_SISDK_ZIGBEE_NETWORK_CREATOR_SECURITY"
+      ],
+      "id": "zigbee_network_creator",
+      "kconfig": "SILABS_SISDK_ZIGBEE_NETWORK_CREATOR",
+      "label": "Network Creator",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/network-creator/network-creator-cb.c",
+        "app/framework/plugin/network-creator/network-creator.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_creator_start_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_creator_stop_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_creator_form_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_creator_channel_mask_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_creator_channel_mask_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_creator_channel_mask_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_creator_status_command"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_network_creator_security"
+      ],
+      "category": "Zigbee|Zigbee 3.0",
+      "copied_files": [
+        "app/framework/plugin/network-creator-security/config/network-creator-security-config.h",
+        "app/framework/plugin/network-creator-security/network-creator-security.c",
+        "app/framework/plugin/network-creator-security/network-creator-security.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_network_creator_security",
+      "kconfig": "SILABS_SISDK_ZIGBEE_NETWORK_CREATOR_SECURITY",
+      "label": "Network Creator Security",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/network-creator-security/network-creator-security.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_network_creator_security_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_network_creator_security_stack_status_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_network_creator_security_zigbee_key_establishment_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_network_creator_security_set_joining_link_key_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_network_creator_security_clear_joining_link_key_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_network_creator_security_open_or_close_network_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_network_creator_security_open_or_close_network_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_network_creator_security_open_network_with_key_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_network_creator_security_configure_distributed_key"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_network_creator_security_set_install_code_require"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_network_creator_security_allow_tc_rejoin_wellknown_key"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_network_creator_security_set_tc_rejoin_wellknown_key_time_out"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_network_steering"
+      ],
+      "category": "Zigbee|Zigbee 3.0",
+      "copied_files": [
+        "app/framework/plugin/network-steering/config/network-steering-config.h",
+        "app/framework/plugin/network-steering/network-steering-cb.c",
+        "app/framework/plugin/network-steering/network-steering-internal.h",
+        "app/framework/plugin/network-steering/network-steering-v2.c",
+        "app/framework/plugin/network-steering/network-steering.c",
+        "app/framework/plugin/network-steering/network-steering.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_SCAN_DISPATCH"
+      ],
+      "id": "zigbee_network_steering",
+      "kconfig": "SILABS_SISDK_ZIGBEE_NETWORK_STEERING",
+      "label": "Network Steering",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/network-steering/network-steering-cb.c",
+        "app/framework/plugin/network-steering/network-steering-v2.c",
+        "app/framework/plugin/network-steering/network-steering.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_network_steering_stack_status_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_network_steering_init_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_steering_status_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_steering_start_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_steering_stop_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_steering_set_preconfigured_key_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_steering_channel_set_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_steering_channel_add_or_subtract_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_network_steering_channel_add_or_subtract_command"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_on_off"
+      ],
+      "category": "Zigbee|Cluster Library|Home Automation",
+      "copied_files": [
+        "app/framework/plugin/on-off/on-off-cb.c",
+        "app/framework/plugin/on-off/on-off.c",
+        "app/framework/plugin/on-off/on-off.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_on_off",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ON_OFF",
+      "label": "On/Off Server Cluster",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/on-off/on-off-cb.c",
+        "app/framework/plugin/on-off/on-off.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_on_off_cluster_server_command_parse"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_phy_2_4"
+      ],
+      "category": "Zigbee|Stack|PHY support",
+      "copied_files": [],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_phy_2_4",
+      "kconfig": "SILABS_SISDK_ZIGBEE_PHY_2_4",
+      "label": "Zigbee 2.4GHz Device",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_pro_stack"
+      ],
+      "category": "Zigbee|Stack|Pro Core",
+      "copied_files": [
+        "stack/config/component_config/sl_zigbee_pro_stack_config.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_pro_stack",
+      "kconfig": "SILABS_SISDK_ZIGBEE_PRO_STACK",
+      "label": "Pro Stack (Common)",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [],
+      "category": "Zigbee|Stack|Pro Core",
+      "copied_files": [],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_pro_stack_basic",
+      "kconfig": "SILABS_SISDK_ZIGBEE_PRO_STACK_BASIC",
+      "label": "Pro Stack (Basic)",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [],
+      "category": "Zigbee|Stack",
+      "copied_files": [],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_pro_stack_library",
+      "kconfig": "SILABS_SISDK_ZIGBEE_PRO_STACK_LIBRARY",
+      "label": "Zigbee PRO Stack (Library)",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_reporting"
+      ],
+      "category": "Zigbee|Cluster Library|Common",
+      "copied_files": [
+        "app/framework/plugin/reporting/config/reporting-config.h",
+        "app/framework/plugin/reporting/reporting-cb.c",
+        "app/framework/plugin/reporting/reporting-default-configuration.c",
+        "app/framework/plugin/reporting/reporting-tokens.h",
+        "app/framework/plugin/reporting/reporting.c",
+        "app/framework/plugin/reporting/reporting.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_reporting",
+      "kconfig": "SILABS_SISDK_ZIGBEE_REPORTING",
+      "label": "Reporting",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/reporting/reporting-cb.c",
+        "app/framework/plugin/reporting/reporting-default-configuration.c",
+        "app/framework/plugin/reporting/reporting.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_reporting_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_reporting_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_reporting_stack_status_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_reporting_cli_print"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_reporting_cli_clear"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_reporting_cli_remove"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_reporting_cli_add"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_reporting_cli_clear_last_report_time"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_reporting_cli_test_timing"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_scan_dispatch"
+      ],
+      "category": "Zigbee|Network Form and Join",
+      "copied_files": [
+        "app/framework/plugin/scan-dispatch/config/scan-dispatch-config.h",
+        "app/framework/plugin/scan-dispatch/scan-dispatch.c",
+        "app/framework/plugin/scan-dispatch/scan-dispatch.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_scan_dispatch",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SCAN_DISPATCH",
+      "label": "Scan Dispatch",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/scan-dispatch/scan-dispatch.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_zigbee_af_scan_dispatch_energy_scan_cli_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_scan_dispatch_init_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_scan_dispatch_energy_scan_result_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_scan_dispatch_scan_complete_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_scan_dispatch_network_found_callback"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_scenes"
+      ],
+      "category": "Zigbee|Cluster Library|Common",
+      "copied_files": [
+        "app/framework/plugin/scenes/config/scenes-config.h",
+        "app/framework/plugin/scenes/scenes-cb.c",
+        "app/framework/plugin/scenes/scenes-tokens.h",
+        "app/framework/plugin/scenes/scenes.c",
+        "app/framework/plugin/scenes/scenes.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_scenes",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SCENES",
+      "label": "Scenes Server Cluster",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/scenes/scenes-cb.c",
+        "app/framework/plugin/scenes/scenes.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_plugin_scenes_server_print_info"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sli_plugin_scenes_server_clear"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_scenes_cluster_server_command_parse"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_scenes_init"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_secure_key_storage"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "stack/security/zigbee-security-manager-vault-support.c",
+        "stack/security/zigbee-security-manager-vault-support.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_secure_key_storage",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SECURE_KEY_STORAGE",
+      "label": "Zigbee Secure Key Storage",
+      "scope": "stack",
+      "source_files": [
+        "stack/security/zigbee-security-manager-vault-support.c"
+      ],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_secure_key_storage_upgrade"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "stack/security/zigbee-secure-key-storage-upgrade.c",
+        "stack/security/zigbee-secure-key-storage-upgrade.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_secure_key_storage_upgrade",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SECURE_KEY_STORAGE_UPGRADE",
+      "label": "Zigbee Secure Key Storage Upgrade",
+      "scope": "stack",
+      "source_files": [
+        "stack/security/zigbee-secure-key-storage-upgrade.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zb_sec_man_upgrade_key_storage"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_security_manager"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "stack/include/aes-mmo.h",
+        "stack/include/security.h",
+        "stack/include/zigbee-security-manager-types.h",
+        "stack/include/zigbee-security-manager.h",
+        "stack/internal/inc/aes-mmo-internal-def.h",
+        "stack/internal/inc/security_internal_def.h",
+        "stack/internal/inc/zigbee-security-manager-internal-def.h",
+        "stack/internal/src/baremetal/aes-mmo-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/security_baremetal_callbacks.c",
+        "stack/internal/src/baremetal/security_baremetal_wrapper.c",
+        "stack/internal/src/baremetal/zigbee-security-manager-baremetal-wrapper.c",
+        "stack/security/zigbee-security-manager-internal.h",
+        "stack/security/zigbee-security-manager-vault-support.h",
+        "stack/security/zigbee-security-manager.c"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_SECURE_KEY_STORAGE"
+      ],
+      "id": "zigbee_security_manager",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SECURITY_MANAGER",
+      "label": "Zigbee Security Manager",
+      "scope": "stack",
+      "source_files": [
+        "stack/security/zigbee-security-manager.c"
+      ],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_signature_decode"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/signature-decode/sl_signature_decode.c",
+        "app/framework/signature-decode/sl_signature_decode.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_signature_decode",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SIGNATURE_DECODE",
+      "label": "Zigbee Signature Decode",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/signature-decode/sl_signature_decode.c"
+      ],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_source_route"
+      ],
+      "category": "Zigbee|Stack",
+      "copied_files": [
+        "stack/config/component_config/sl_zigbee_source_route_config.h",
+        "stack/include/source-route.h",
+        "stack/internal/inc/source-route-internal-def.h",
+        "stack/internal/src/baremetal/source-route-baremetal-wrapper.c"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_source_route",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SOURCE_ROUTE_COMPONENT",
+      "label": "Source route",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_source_route_set_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_source_route_get_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_incoming_route_record_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_override_furthur_index_for_source_route_add_entry_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_override_incoming_route_record_callback"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [],
+      "category": "Zigbee|Stack",
+      "copied_files": [],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_source_route_library",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SOURCE_ROUTE_LIBRARY",
+      "label": "Source Routing (Library)",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_stack_common"
+      ],
+      "category": "Zigbee|Stack|Pro Core",
+      "copied_files": [
+        "app/em260/command-handlers-binding.h",
+        "app/framework/plugin/dhc/dhc-ncp.h",
+        "app/util/counters/counters.c",
+        "app/util/counters/counters.h",
+        "platform/radio/mac/indirect-queue.h",
+        "platform/radio/mac/lower-mac-common.h",
+        "platform/radio/mac/lower-mac-debug.h",
+        "platform/radio/mac/lower-mac.h",
+        "platform/radio/mac/mac-child.h",
+        "platform/radio/mac/mac-command.h",
+        "platform/radio/mac/mac-flat-header.h",
+        "platform/radio/mac/mac-header.h",
+        "platform/radio/mac/mac-multi-network.h",
+        "platform/radio/mac/mac-packet-header.h",
+        "platform/radio/mac/mac-phy.h",
+        "platform/radio/mac/mac-types.h",
+        "platform/radio/mac/multi-mac.h",
+        "platform/radio/mac/rail_mux/sl_rail_mux.h",
+        "platform/radio/mac/rail_mux/sl_rail_mux_rename.h",
+        "platform/radio/mac/scan.h",
+        "platform/radio/mac/upper-mac.h",
+        "platform/service/legacy_hal_wdog/src/sl_legacy_hal_wdog_stub.c",
+        "stack/config/config.h",
+        "stack/config/sl_zigbee_callback_stubs.c",
+        "stack/config/sl_zigbee_configuration.c",
+        "stack/config/sl_zigbee_configuration_access.c",
+        "stack/config/sl_zigbee_configuration_defaults.h",
+        "stack/config/sl_zigbee_endpoint_stubs.c",
+        "stack/config/sl_zigbee_token_defines.h",
+        "stack/config/token-phy.h",
+        "stack/config/token-stack.h",
+        "stack/core/multi-pan-common.c",
+        "stack/core/multi-pan-stub.c",
+        "stack/core/multi-pan-token-config.h",
+        "stack/core/multi-pan.h",
+        "stack/core/sl_zigbee_multi_network.h",
+        "stack/core/sl_zigbee_multi_network_stub.c",
+        "stack/core/sl_zigbee_stack.h",
+        "stack/framework/debug-extended-stub.c",
+        "stack/framework/zigbee-event-logger-stub-gen.c",
+        "stack/include/binding-table.h",
+        "stack/include/bootload.h",
+        "stack/include/cbke-crypto-engine.h",
+        "stack/include/child.h",
+        "stack/include/gp-proxy-table.h",
+        "stack/include/gp-sink-table.h",
+        "stack/include/gp-token-config.h",
+        "stack/include/gp-types.h",
+        "stack/include/library.h",
+        "stack/include/mac-layer.h",
+        "stack/include/message.h",
+        "stack/include/mfglib.h",
+        "stack/include/multi-network.h",
+        "stack/include/multi-phy.h",
+        "stack/include/network-formation.h",
+        "stack/include/raw-message.h",
+        "stack/include/security.h",
+        "stack/include/sl_zigbee.h",
+        "stack/include/sl_zigbee_address_info.h",
+        "stack/include/sl_zigbee_alternate_mac.h",
+        "stack/include/sl_zigbee_debug.h",
+        "stack/include/sl_zigbee_dhc.h",
+        "stack/include/sl_zigbee_dlk_negotiation.h",
+        "stack/include/sl_zigbee_duty_cycle.h",
+        "stack/include/sl_zigbee_dynamic_commissioning.h",
+        "stack/include/sl_zigbee_random_api.h",
+        "stack/include/sl_zigbee_security_manager_dlk_ecc.h",
+        "stack/include/sl_zigbee_security_manager_dlk_ecc_test_vectors.h",
+        "stack/include/sl_zigbee_stack_specific_tlv.h",
+        "stack/include/sl_zigbee_tlv_core.h",
+        "stack/include/sl_zigbee_token.h",
+        "stack/include/sl_zigbee_types.h",
+        "stack/include/sl_zigbee_types_internal.h",
+        "stack/include/sl_zigbee_zdo_configuration.h",
+        "stack/include/sl_zigbee_zdo_dlk_negotiation.h",
+        "stack/include/sl_zigbee_zdo_management.h",
+        "stack/include/sl_zigbee_zdo_security.h",
+        "stack/include/source-route.h",
+        "stack/include/stack-info.h",
+        "stack/include/trust-center.h",
+        "stack/include/zigbee-device-stack.h",
+        "stack/include/zigbee-event-logger-gen.h",
+        "stack/include/zigbee_packet_types.h",
+        "stack/include/zll-api.h",
+        "stack/include/zll-types.h",
+        "stack/internal/inc/aes-mmo-internal-def.h",
+        "stack/internal/inc/binding-table-internal-def.h",
+        "stack/internal/inc/bootload_internal_def.h",
+        "stack/internal/inc/child_internal_def.h",
+        "stack/internal/inc/internal-callbacks-patch.h",
+        "stack/internal/inc/internal-defs-patch.h",
+        "stack/internal/inc/library_internal_def.h",
+        "stack/internal/inc/mac-layer-internal-def.h",
+        "stack/internal/inc/message_internal_def.h",
+        "stack/internal/inc/mfglib_internal_def.h",
+        "stack/internal/inc/multi-network-internal-def.h",
+        "stack/internal/inc/multi-phy-internal-def.h",
+        "stack/internal/inc/network-formation-internal-def.h",
+        "stack/internal/inc/raw-message-internal-def.h",
+        "stack/internal/inc/security_internal_def.h",
+        "stack/internal/inc/sl_zigbee_address_info_internal_def.h",
+        "stack/internal/inc/sl_zigbee_duty_cycle_internal_def.h",
+        "stack/internal/inc/sl_zigbee_random_api_internal_def.h",
+        "stack/internal/inc/sl_zigbee_token_internal_def.h",
+        "stack/internal/inc/sl_zigbee_zdo_security_internal_def.h",
+        "stack/internal/inc/stack-info-internal-def.h",
+        "stack/internal/inc/trust-center-internal-def.h",
+        "stack/internal/inc/zigbee-device-stack-internal-def.h",
+        "stack/internal/inc/zigbee-security-manager-internal-def.h",
+        "stack/internal/src/baremetal/binding-table-baremetal-callbacks.c",
+        "stack/internal/src/baremetal/binding-table-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/bootload_baremetal_callbacks.c",
+        "stack/internal/src/baremetal/bootload_baremetal_wrapper.c",
+        "stack/internal/src/baremetal/child_baremetal_callbacks.c",
+        "stack/internal/src/baremetal/child_baremetal_wrapper.c",
+        "stack/internal/src/baremetal/library_baremetal_wrapper.c",
+        "stack/internal/src/baremetal/mac-layer-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/message_baremetal_callbacks.c",
+        "stack/internal/src/baremetal/message_baremetal_wrapper.c",
+        "stack/internal/src/baremetal/multi-phy-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/network-formation-baremetal-callbacks.c",
+        "stack/internal/src/baremetal/network-formation-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/raw-message-baremetal-callbacks.c",
+        "stack/internal/src/baremetal/raw-message-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/sl_zigbee_address_info_baremetal_wrapper.c",
+        "stack/internal/src/baremetal/sl_zigbee_duty_cycle_baremetal_callbacks.c",
+        "stack/internal/src/baremetal/sl_zigbee_duty_cycle_baremetal_wrapper.c",
+        "stack/internal/src/baremetal/sl_zigbee_random_api_baremetal_wrapper.c",
+        "stack/internal/src/baremetal/sl_zigbee_token_baremetal_wrapper.c",
+        "stack/internal/src/baremetal/stack-info-baremetal-callbacks.c",
+        "stack/internal/src/baremetal/stack-info-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/trust-center-baremetal-callbacks.c",
+        "stack/internal/src/baremetal/trust-center-baremetal-wrapper.c",
+        "stack/internal/src/baremetal/zigbee-device-stack-baremetal-wrapper.c",
+        "stack/internal/src/stubs/sl_zigbee_dhc_internal_weak_stubs.c",
+        "stack/internal/src/stubs/sl_zigbee_token_internal_weak_stubs.c",
+        "stack/internal/src/stubs/sl_zigbee_zdo_security_internal_weak_stubs.c",
+        "stack/internal/src/stubs/stack-info-internal-weak-stubs.c",
+        "stack/mac/mac-info-element-parsing-stub.c",
+        "stack/mac/multi-mac.h",
+        "stack/platform/sl_zigbee_token_legacy.c",
+        "stack/routing/zigbee/enhanced-beacon-request-stub.c",
+        "stack/routing/zigbee/zigbee.h",
+        "stack/security/cbke-crypto-engine-163k1-stub.c",
+        "stack/security/cbke-crypto-engine-283k1-stub.c",
+        "stack/security/cbke-crypto-engine-dsa-sign-stub.c",
+        "stack/security/cbke-crypto-engine-dsa-verify-283k1-stub.c",
+        "stack/security/cbke-crypto-engine-dsa-verify-stub.c",
+        "stack/security/cbke-crypto-engine-stub.c",
+        "stack/security/security-address-cache.c",
+        "stack/stubs/sl_zigbee_dynamic_commissioning_stubs.c",
+        "stack/stubs/sl_zigbee_fragmentation_stubs.c",
+        "stack/stubs/sl_zigbee_r23_misc_support_stubs.c",
+        "stack/stubs/sli_zigbee_zdo_cluster_filter_stubs.c",
+        "stack/zigbee/aps-keys-full-stub.c",
+        "stack/zigbee/sli_zigbee_zdo_cluster_filter.h",
+        "stack/zigbee/source-route-table-update.h",
+        "stack/zigbee/zdo-r22-stub.c",
+        "stack/zll/zll-token-config.h",
+        "util/silicon_labs/silabs_core/buffer_manager/buffer-management.h",
+        "util/silicon_labs/silabs_core/buffer_manager/buffer-queue.h",
+        "util/silicon_labs/silabs_core/buffer_manager/legacy-packet-buffer.h",
+        "util/silicon_labs/silabs_core/event_queue/event-queue.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_STRONG_RANDOM_API_PSA",
+        "SILABS_SISDK_ZIGBEE_SECURITY_MANAGER"
+      ],
+      "id": "zigbee_stack_common",
+      "kconfig": "SILABS_SISDK_ZIGBEE_STACK_COMMON",
+      "label": "Stack Common",
+      "scope": "stack",
+      "source_files": [
+        "app/util/counters/counters.c",
+        "platform/service/legacy_hal_wdog/src/sl_legacy_hal_wdog_stub.c",
+        "stack/config/sl_zigbee_callback_stubs.c",
+        "stack/config/sl_zigbee_configuration.c",
+        "stack/config/sl_zigbee_configuration_access.c",
+        "stack/config/sl_zigbee_endpoint_stubs.c",
+        "stack/core/multi-pan-common.c",
+        "stack/core/multi-pan-stub.c",
+        "stack/core/sl_zigbee_multi_network_stub.c",
+        "stack/framework/debug-extended-stub.c",
+        "stack/framework/zigbee-event-logger-stub-gen.c",
+        "stack/internal/src/stubs/sl_zigbee_dhc_internal_weak_stubs.c",
+        "stack/internal/src/stubs/sl_zigbee_token_internal_weak_stubs.c",
+        "stack/internal/src/stubs/sl_zigbee_zdo_security_internal_weak_stubs.c",
+        "stack/internal/src/stubs/stack-info-internal-weak-stubs.c",
+        "stack/mac/mac-info-element-parsing-stub.c",
+        "stack/platform/sl_zigbee_token_legacy.c",
+        "stack/routing/zigbee/enhanced-beacon-request-stub.c",
+        "stack/security/cbke-crypto-engine-163k1-stub.c",
+        "stack/security/cbke-crypto-engine-283k1-stub.c",
+        "stack/security/cbke-crypto-engine-dsa-sign-stub.c",
+        "stack/security/cbke-crypto-engine-dsa-verify-283k1-stub.c",
+        "stack/security/cbke-crypto-engine-dsa-verify-stub.c",
+        "stack/security/cbke-crypto-engine-stub.c",
+        "stack/security/security-address-cache.c",
+        "stack/stubs/sl_zigbee_dynamic_commissioning_stubs.c",
+        "stack/stubs/sl_zigbee_fragmentation_stubs.c",
+        "stack/stubs/sl_zigbee_r23_misc_support_stubs.c",
+        "stack/stubs/sli_zigbee_zdo_cluster_filter_stubs.c",
+        "stack/zigbee/aps-keys-full-stub.c",
+        "stack/zigbee/zdo-r22-stub.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zigbee_pro_set_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zigbee_pro_policy_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zigbee_pro_policy_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zigbee_pro_get_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zigbee_pro_modify_memory_allocation_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zigbee_pro_get_extended_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zigbee_pro_set_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zigbee_pro_get_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_security_set_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_security_policy_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_security_policy_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_security_get_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_security_set_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_security_get_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_binding_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_binding_policy_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_binding_policy_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_binding_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sli_zigbee_initialize_binding_table"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_binding_permit_host_to_ncp_frame_cb"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_mac_filter_match_message_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_bootload_transmit_complete_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_incoming_bootload_message_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_raw_transmit_complete_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_mac_passthrough_message_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_id_conflict_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_incoming_network_status_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_incoming_route_error_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_incoming_many_to_one_route_request_cb"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_duty_cycle_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_child_join_cb"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_network_found_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_scan_complete_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_incoming_message_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_message_sent_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_switch_network_key_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_zigbee_key_establishment_callback"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_stack_diagnostics"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/plugin/stack-diagnostics/config/stack-diagnostics-config.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_stack_diagnostics",
+      "kconfig": "SILABS_SISDK_ZIGBEE_STACK_DIAGNOSTICS",
+      "label": "Stack Diagnostics",
+      "scope": "app_framework",
+      "source_files": [],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "printInfo"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "printChildTable"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "printNeighborTable"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "printRouteTable"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_strong_random_api_psa"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "stack/framework/strong-random-api.c"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_strong_random_api_psa",
+      "kconfig": "SILABS_SISDK_ZIGBEE_STRONG_RANDOM_API_PSA",
+      "label": "Strong Random Api (PSA)",
+      "scope": "stack",
+      "source_files": [
+        "stack/framework/strong-random-api.c"
+      ],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_system_common"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/common/config/sl_zigbee_rtos_task_config.h",
+        "app/framework/common/config/zigbee_sleep_config.h",
+        "app/framework/common/sl_zigbee_system_common.c",
+        "app/framework/common/sl_zigbee_system_common.h",
+        "app/framework/common/zigbee_app_framework_callback.h",
+        "app/framework/common/zigbee_app_framework_event.h",
+        "app/framework/common/zigbee_app_framework_stack_cb.c",
+        "app/framework/common/zigbee_stack_sleep.c",
+        "app/util/security/security.h",
+        "stack/internal/inc/security_internal_def.h",
+        "stack/internal/src/baremetal/security_baremetal_callbacks.c",
+        "stack/internal/src/baremetal/security_baremetal_wrapper.c",
+        "stack/internal/src/ipc/zigbee_ipc_callback_events.h",
+        "stack/internal/src/ipc/zigbee_ipc_command_messages.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_ENHANCED_ROUTING",
+        "SILABS_SISDK_ZIGBEE_PHY_2_4"
+      ],
+      "id": "zigbee_system_common",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SYSTEM_COMMON",
+      "label": "Application Framework Common",
+      "scope": "stack",
+      "source_files": [
+        "app/framework/common/sl_zigbee_system_common.c",
+        "app/framework/common/zigbee_app_framework_stack_cb.c",
+        "app/framework/common/zigbee_stack_sleep.c",
+        "app/util/security/security.h"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_stack_init_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_app_framework_init_callback"
+          }
+        },
+        {
+          "condition": [
+            "cmsis_rtos2"
+          ],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_stack_rtos_task_init_cb"
+          }
+        },
+        {
+          "condition": [
+            "sl_main",
+            "cmsis_rtos2"
+          ],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_stack_rtos_perm_allocation"
+          }
+        },
+        {
+          "condition": [
+            "sl_main"
+          ],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_legacy_buffer_manager_initialize_buffers"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_stack_tick_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_app_framework_tick_callback"
+          }
+        },
+        {
+          "condition": [
+            "power_manager"
+          ],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_stack_sleep_init"
+          }
+        },
+        {
+          "condition": [
+            "power_manager",
+            "zigbee_zcl_framework_core"
+          ],
+          "contribution": "power_manager_handler",
+          "details": {
+            "handler": "sli_zigbee_app_framework_is_ok_to_sleep"
+          }
+        },
+        {
+          "condition": [
+            "power_manager"
+          ],
+          "contribution": "power_manager_handler",
+          "details": {
+            "handler": "sli_zigbee_stack_is_ok_to_sleep"
+          }
+        },
+        {
+          "condition": [
+            "power_manager"
+          ],
+          "contribution": "power_manager_handler",
+          "details": {
+            "handler": "sli_zigbee_stack_sleep_on_isr_exit"
+          }
+        },
+        {
+          "condition": [
+            "power_manager",
+            "zigbee_zcl_framework_core"
+          ],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_idle_sleep_status_command"
+          }
+        },
+        {
+          "condition": [
+            "power_manager",
+            "zigbee_zcl_framework_core"
+          ],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_idle_sleep_stay_awake_command"
+          }
+        },
+        {
+          "condition": [
+            "power_manager",
+            "zigbee_zcl_framework_core"
+          ],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_idle_sleep_awake_when_not_joined_command"
+          }
+        },
+        {
+          "condition": [
+            "power_manager",
+            "zigbee_zcl_framework_core",
+            "device_series_3"
+          ],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_idle_sleep_power_mode_performance_command"
+          }
+        },
+        {
+          "condition": [
+            "power_manager",
+            "zigbee_zcl_framework_core",
+            "device_series_3"
+          ],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_idle_sleep_power_mode_eco_command"
+          }
+        },
+        {
+          "condition": [
+            "sl_rail_util_ieee802154_rx_duty_cycling",
+            "device_series_3"
+          ],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_radio_rx_duty_cycle_command"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_system_common_app_framework"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/common/zigbee_app_framework_sleep.c"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_system_common_app_framework",
+      "kconfig": "SILABS_SISDK_ZIGBEE_SYSTEM_COMMON_APP_FRAMEWORK",
+      "label": "Zigbee System Common, Application Framework Task",
+      "scope": "stack",
+      "source_files": [
+        "app/framework/common/zigbee_app_framework_sleep.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [
+            "cmsis_rtos2"
+          ],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_app_framework_rtos_task_init_cb"
+          }
+        },
+        {
+          "condition": [
+            "sl_main",
+            "cmsis_rtos2"
+          ],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_app_framework_rtos_perm_allocation"
+          }
+        },
+        {
+          "condition": [
+            "power_manager"
+          ],
+          "contribution": "event_handler",
+          "details": {
+            "handler": "sli_zigbee_app_framework_sleep_init"
+          }
+        },
+        {
+          "condition": [
+            "power_manager"
+          ],
+          "contribution": "power_manager_handler",
+          "details": {
+            "handler": "sli_zigbee_af_sleep_on_isr_exit"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_update_tc_link_key"
+      ],
+      "category": "Zigbee|Zigbee 3.0",
+      "copied_files": [
+        "app/framework/plugin/update-tc-link-key/config/update-tc-link-key-config.h",
+        "app/framework/plugin/update-tc-link-key/update-tc-link-key-cb.c",
+        "app/framework/plugin/update-tc-link-key/update-tc-link-key.c",
+        "app/framework/plugin/update-tc-link-key/update-tc-link-key.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_update_tc_link_key",
+      "kconfig": "SILABS_SISDK_ZIGBEE_UPDATE_TC_LINK_KEY",
+      "label": "Update TC Link Key",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/update-tc-link-key/update-tc-link-key-cb.c",
+        "app/framework/plugin/update-tc-link-key/update-tc-link-key.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_update_tc_link_key_zigbee_key_establishment_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_update_tc_link_key_begin_tc_link_key_update_init"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_update_tc_link_key_stack_status_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_set_tc_link_key_update_timer_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_set_tc_link_key_update_retry_backoff_timer_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_set_tc_link_key_update_now_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_set_tc_link_key_update_max_attempts_per_iteration_command"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "sl_zigbee_af_set_tc_link_key_update_max_iterations_command"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_zcl_cli"
+      ],
+      "category": "Zigbee|Utility",
+      "copied_files": [
+        "app/framework/plugin/zcl_cli/zigbee-zcl-custom-cluster-cli.c",
+        "app/framework/plugin/zcl_cli/zigbee-zcl-global-cli.c"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_CLI",
+        "SILABS_SISDK_ZIGBEE_ZCL_FRAMEWORK_CORE"
+      ],
+      "id": "zigbee_zcl_cli",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZCL_CLI",
+      "label": "Zigbee ZCL CLI",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/zcl_cli/zigbee-zcl-custom-cluster-cli.c",
+        "app/framework/plugin/zcl_cli/zigbee-zcl-global-cli.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_zcl_cli_init"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_zcl_framework_core"
+      ],
+      "category": "Zigbee|Cluster Library",
+      "copied_files": [
+        "app/framework/cli/option-cli.h",
+        "app/framework/cli/security-cli.h",
+        "app/framework/include/af-storage.h",
+        "app/framework/include/af-types.h",
+        "app/framework/include/af.h",
+        "app/framework/include/plugin-component-mappings.h",
+        "app/framework/plugin/zcl-framework-core/config/zcl-framework-core-config.h",
+        "app/framework/security/af-node.c",
+        "app/framework/security/af-security-common.c",
+        "app/framework/security/af-security.h",
+        "app/framework/security/af-trust-center.c",
+        "app/framework/security/crypto-state.c",
+        "app/framework/security/crypto-state.h",
+        "app/framework/security/security-config.h",
+        "app/framework/security/security-profile-data.h",
+        "app/framework/util/af-common.c",
+        "app/framework/util/af-event.c",
+        "app/framework/util/af-event.h",
+        "app/framework/util/af-main.h",
+        "app/framework/util/af-soc-common.c",
+        "app/framework/util/af-soc.c",
+        "app/framework/util/af-token.h",
+        "app/framework/util/attribute-size.c",
+        "app/framework/util/attribute-storage.c",
+        "app/framework/util/attribute-storage.h",
+        "app/framework/util/attribute-table.c",
+        "app/framework/util/attribute-table.h",
+        "app/framework/util/client-api.c",
+        "app/framework/util/client-api.h",
+        "app/framework/util/common.h",
+        "app/framework/util/config.h",
+        "app/framework/util/global-callback.c",
+        "app/framework/util/global-callback.h",
+        "app/framework/util/global-other-callback.c",
+        "app/framework/util/global-other-callback.h",
+        "app/framework/util/message.c",
+        "app/framework/util/multi-network.c",
+        "app/framework/util/print-formatter.c",
+        "app/framework/util/print.c",
+        "app/framework/util/print.h",
+        "app/framework/util/process-cluster-message.c",
+        "app/framework/util/process-global-message.c",
+        "app/framework/util/service-discovery-common.c",
+        "app/framework/util/service-discovery-soc.c",
+        "app/framework/util/service-discovery.h",
+        "app/framework/util/time-util.c",
+        "app/framework/util/time-util.h",
+        "app/framework/util/util.c",
+        "app/framework/util/util.h",
+        "app/framework/util/zcl-debug-print.h",
+        "app/framework/util/zcl-util.c",
+        "app/util/common/common.h",
+        "app/util/common/form-and-join.h",
+        "app/util/common/library.c",
+        "app/util/common/library.h",
+        "app/util/counters/counters.h",
+        "app/util/security/security.h",
+        "app/util/zigbee-framework/zigbee-device-common.c",
+        "app/util/zigbee-framework/zigbee-device-common.h",
+        "app/util/zigbee-framework/zigbee-device-library.c",
+        "app/util/zigbee-framework/zigbee-device-library.h",
+        "stack/config/sl_zigbee_token_defines.h",
+        "stack/config/token-cache.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_DEVICE_CONFIG",
+        "SILABS_SISDK_ZIGBEE_CLUSTER_SERVICE",
+        "SILABS_SISDK_ZIGBEE_SIGNATURE_DECODE",
+        "SILABS_SISDK_ZIGBEE_SYSTEM_COMMON_APP_FRAMEWORK"
+      ],
+      "id": "zigbee_zcl_framework_core",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZCL_FRAMEWORK_CORE",
+      "label": "ZCL Framework Core",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/security/af-node.c",
+        "app/framework/security/af-security-common.c",
+        "app/framework/security/af-trust-center.c",
+        "app/framework/security/crypto-state.c",
+        "app/framework/util/af-common.c",
+        "app/framework/util/af-event.c",
+        "app/framework/util/af-soc-common.c",
+        "app/framework/util/af-soc.c",
+        "app/framework/util/attribute-size.c",
+        "app/framework/util/attribute-storage.c",
+        "app/framework/util/attribute-table.c",
+        "app/framework/util/client-api.c",
+        "app/framework/util/global-callback.c",
+        "app/framework/util/global-other-callback.c",
+        "app/framework/util/message.c",
+        "app/framework/util/multi-network.c",
+        "app/framework/util/print-formatter.c",
+        "app/framework/util/print.c",
+        "app/framework/util/process-cluster-message.c",
+        "app/framework/util/process-global-message.c",
+        "app/framework/util/service-discovery-common.c",
+        "app/framework/util/service-discovery-soc.c",
+        "app/framework/util/time-util.c",
+        "app/framework/util/util.c",
+        "app/framework/util/zcl-util.c",
+        "app/util/common/library.c",
+        "app/util/zigbee-framework/zigbee-device-common.c",
+        "app/util/zigbee-framework/zigbee-device-library.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_zcl_framework_core_init_events_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_service_discovery_init_events_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_init"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_network_init"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_stack_status_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_incoming_message_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkFormCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkJoinCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkPermitJoinCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkLeaveCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkRejoinCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkRejoinDiffDeviceTypeCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkExtendedPanIdCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkCheckPjoinCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkPermitJoinCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "findJoinableNetworkCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "findUnusedPanIdCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkChangeChannelCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkSetCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkInitCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkIdCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "changeKeepAliveModeCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkChangeChildTimeoutOptionMaskCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkMultiPhyStartCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "networkMultiPhyStopCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "keysPrintCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "keysDeleteCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "keysClearCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionBindingTablePrintCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionBindingTableClearCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionBindingTableSetCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionPrintRxCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionPrintRxCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionRegisterCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionDiscoveryTargetCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionDiscoverCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionApsRetryCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionApsRetryCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionApsRetryCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionApsSecurityCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionApsSecurityCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionSecurityAllowTrustCenterRejoinUsingWellKnownKey"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionSecurityAllowTrustCenterRejoinUsingWellKnownKeyTimeout"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionSecuritySetKeyRequestPolicy"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "changeKeyCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "changeKeyCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionLinkCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "optionInstallCodeCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoRouteRequestCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoPowerDescriptorRequestCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoMgmtLqiCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoMgmtBindCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoLeaveRequestCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoUnbindGroupCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoUnbindUnicastCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoActiveEpCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoBindCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoNodeCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoMatchCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoSimpleCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoIeeeAddressRequestCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoNwkAddressRequestCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoNetworkUpdateScanCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoNetworkUpdateSetCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoNetworkUpdateScanCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoNetworkUpdateChannelCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoNetworkUpdateChannelCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoAddClusterCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoClearClusterCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoAddClusterCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "zdoClearClusterCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "printAttributeTable"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "printTimeCommand"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_light_link"
+      ],
+      "category": "Zigbee|Stack",
+      "copied_files": [
+        "app/em260/command-handlers-zll.h",
+        "stack/config/component_config/sl_zigbee_light_link_config.h",
+        "stack/include/zll-api.h",
+        "stack/include/zll-types.h",
+        "stack/internal/inc/zll-api-internal-def.h",
+        "stack/internal/src/baremetal/zll-api-baremetal-callbacks.c",
+        "stack/internal/src/baremetal/zll-api-baremetal-wrapper.c",
+        "stack/zll/zll-token-config.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_zll",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZLL",
+      "label": "Zigbee light link",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zll_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zll_policy_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zll_policy_command_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_ncp_callback",
+          "details": {
+            "function_name": "sl_zigbee_xncp_zll_configuration_value_command_cb"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_zll_touch_link_target_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_zll_address_assignment_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_zll_scan_complete_callback"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ncp"
+          ],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_zll_network_found_callback"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_zll_commissioning_common"
+      ],
+      "category": "Zigbee|Zigbee Light Link",
+      "copied_files": [
+        "app/framework/plugin/zll-commissioning-common/config/zll-commissioning-common-config.h",
+        "app/framework/plugin/zll-commissioning-common/zll-commissioning-common-cb.c",
+        "app/framework/plugin/zll-commissioning-common/zll-commissioning-common.c",
+        "app/framework/plugin/zll-commissioning-common/zll-commissioning-common.h",
+        "app/framework/plugin/zll-commissioning-common/zll-commissioning.h",
+        "stack/config/sl_zigbee_token_defines.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_ZLL",
+        "SILABS_SISDK_ZIGBEE_INTERPAN"
+      ],
+      "id": "zigbee_zll_commissioning_common",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZLL_COMMISSIONING_COMMON",
+      "label": "ZLL Commissioning Common",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/zll-commissioning-common/zll-commissioning-common-cb.c",
+        "app/framework/plugin/zll-commissioning-common/zll-commissioning-common.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_zll_commissioning_common_init_cb"
+          }
+        },
+        {
+          "condition": [
+            "zigbee_ezsp"
+          ],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sl_zigbee_af_zll_commissioning_common_ncp_init_cb"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_zll_commissioning_common_stack_status_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "formNetwork"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "scanTouchLink"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "scanTouchLink"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "scanTouchLink"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "abortTouchLink"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "initiateTouchLink"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "setIdentifyDuration"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "endpointInformation"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "getGroupIdentifiersRequest"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "getEndpointListRequest"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "printZllTokens"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "setScanChannel"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "setSecondaryScanChannel"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "setScanMask"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "statusCommand"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "joinable"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "unused"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "resetToFactoryNew"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "noTouchlinkForNFN"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "noResetForNFN"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "disable"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "enable"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "setRxOn"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "cancelRxOn"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cli_command",
+          "details": {
+            "handler": "rxOnStatus"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_zll_commissioning_server"
+      ],
+      "category": "Zigbee|Zigbee Light Link",
+      "copied_files": [
+        "app/framework/plugin/zll-commissioning-server/config/zll-commissioning-server-config.h",
+        "app/framework/plugin/zll-commissioning-server/zll-commissioning-server-cb.c",
+        "app/framework/plugin/zll-commissioning-server/zll-commissioning-server.c",
+        "app/framework/plugin/zll-commissioning-server/zll-commissioning-server.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_ZLL",
+        "SILABS_SISDK_ZIGBEE_INTERPAN",
+        "SILABS_SISDK_ZIGBEE_ZLL_COMMISSIONING_COMMON"
+      ],
+      "id": "zigbee_zll_commissioning_server",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZLL_COMMISSIONING_SERVER",
+      "label": "ZLL Commissioning Server",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/zll-commissioning-server/zll-commissioning-server-cb.c",
+        "app/framework/plugin/zll-commissioning-server/zll-commissioning-server.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_stack_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_zll_touch_link_target_callback"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_zll_identify_server"
+      ],
+      "category": "Zigbee|Zigbee Light Link",
+      "copied_files": [
+        "app/framework/plugin/zll-identify-server/config/zll-identify-server-config.h",
+        "app/framework/plugin/zll-identify-server/zll-identify-server.c"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_IDENTIFY"
+      ],
+      "id": "zigbee_zll_identify_server",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZLL_IDENTIFY_SERVER",
+      "label": "ZLL Identify Server",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/zll-identify-server/zll-identify-server.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "zigbee_af_callback",
+          "details": {
+            "function_name": "sli_zigbee_af_zll_identify_server_init_callback"
+          }
+        },
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_zll_identify_cluster_server_command_parse"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_zll_level_control_server"
+      ],
+      "category": "Zigbee|Zigbee Light Link",
+      "copied_files": [
+        "app/framework/plugin/zll-level-control-server/zll-level-control-server.c",
+        "app/framework/plugin/zll-level-control-server/zll-level-control-server.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_LEVEL_CONTROL"
+      ],
+      "id": "zigbee_zll_level_control_server",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZLL_LEVEL_CONTROL_SERVER",
+      "label": "ZLL Level Control Server Cluster Enhancements",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/zll-level-control-server/zll-level-control-server.c"
+      ],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [],
+      "category": "Zigbee|Stack",
+      "copied_files": [],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_zll_library",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZLL_LIBRARY",
+      "label": "Zigbee Light Link (Library)",
+      "scope": "stack",
+      "source_files": [],
+      "template_functions": []
+    },
+    {
+      "catalog_values": [
+        "zigbee_zll_on_off_server"
+      ],
+      "category": "Zigbee|Zigbee Light Link",
+      "copied_files": [
+        "app/framework/plugin/zll-on-off-server/zll-on-off-server-cb.c",
+        "app/framework/plugin/zll-on-off-server/zll-on-off-server.c",
+        "app/framework/plugin/zll-on-off-server/zll-on-off-server.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_ON_OFF"
+      ],
+      "id": "zigbee_zll_on_off_server",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZLL_ON_OFF_SERVER",
+      "label": "ZLL On/Off Server Cluster Enhancements",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/zll-on-off-server/zll-on-off-server-cb.c",
+        "app/framework/plugin/zll-on-off-server/zll-on-off-server.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_zll_on_off_cluster_server_command_parse"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_zll_scenes_server"
+      ],
+      "category": "Zigbee|Zigbee Light Link",
+      "copied_files": [
+        "app/framework/plugin/zll-scenes-server/zll-scenes-server.c",
+        "app/framework/plugin/zll-scenes-server/zll-scenes-server.h"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [
+        "SILABS_SISDK_ZIGBEE_SCENES"
+      ],
+      "id": "zigbee_zll_scenes_server",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZLL_SCENES_SERVER",
+      "label": "ZLL Scenes Server Cluster Enhancements",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/zll-scenes-server/zll-scenes-server.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_zll_scenes_cluster_server_command_parse"
+          }
+        }
+      ]
+    },
+    {
+      "catalog_values": [
+        "zigbee_zll_utility_server"
+      ],
+      "category": "Zigbee|Zigbee Light Link",
+      "copied_files": [
+        "app/framework/plugin/zll-utility-server/zll-utility-server.c"
+      ],
+      "cyclic_kconfig_deps": [],
+      "hard_kconfig_deps": [],
+      "id": "zigbee_zll_utility_server",
+      "kconfig": "SILABS_SISDK_ZIGBEE_ZLL_UTILITY_SERVER",
+      "label": "ZLL Utility Server Cluster",
+      "scope": "app_framework",
+      "source_files": [
+        "app/framework/plugin/zll-utility-server/zll-utility-server.c"
+      ],
+      "template_functions": [
+        {
+          "condition": [],
+          "contribution": "cluster_service",
+          "details": {
+            "service_function": "sl_zigbee_af_zll_commissioning_cluster_server_command_parse"
+          }
+        }
+      ]
+    }
+  ],
+  "copied_files": [
+    "app/em260/command-handlers-binding.h",
+    "app/em260/command-handlers-zll.h",
+    "app/framework/cli/option-cli.h",
+    "app/framework/cli/security-cli.h",
+    "app/framework/common/config/sl_zigbee_rtos_task_config.h",
+    "app/framework/common/config/zigbee_core_cli_config.h",
+    "app/framework/common/config/zigbee_device_config.h",
+    "app/framework/common/config/zigbee_sleep_config.h",
+    "app/framework/common/sl_zigbee_system_common.c",
+    "app/framework/common/sl_zigbee_system_common.h",
+    "app/framework/common/zigbee_app_framework_callback.h",
+    "app/framework/common/zigbee_app_framework_event.h",
+    "app/framework/common/zigbee_app_framework_sleep.c",
+    "app/framework/common/zigbee_app_framework_stack_cb.c",
+    "app/framework/common/zigbee_enhanced_routing.c",
+    "app/framework/common/zigbee_stack_sleep.c",
+    "app/framework/include/af-storage.h",
+    "app/framework/include/af-types.h",
+    "app/framework/include/af.h",
+    "app/framework/include/plugin-component-mappings.h",
+    "app/framework/plugin/basic/basic-cb.c",
+    "app/framework/plugin/basic/basic.c",
+    "app/framework/plugin/basic/basic.h",
+    "app/framework/plugin/color-control-server/color-control-server-cb.c",
+    "app/framework/plugin/color-control-server/color-control-server.c",
+    "app/framework/plugin/color-control-server/color-control-server.h",
+    "app/framework/plugin/color-control-server/config/color-control-server-config.h",
+    "app/framework/plugin/counters/af-counters.c",
+    "app/framework/plugin/counters/config/counters-config.h",
+    "app/framework/plugin/counters/counters-cb.c",
+    "app/framework/plugin/counters/counters-cli.h",
+    "app/framework/plugin/counters/counters-ota.c",
+    "app/framework/plugin/counters/counters-ota.h",
+    "app/framework/plugin/counters/counters.h",
+    "app/framework/plugin/debug-print/config/sl_zigbee_debug_print_config.h",
+    "app/framework/plugin/debug-print/sl_zigbee_debug_print.c",
+    "app/framework/plugin/debug-print/sl_zigbee_debug_print.h",
+    "app/framework/plugin/dhc/dhc-ncp.h",
+    "app/framework/plugin/find-and-bind-target/config/find-and-bind-target-config.h",
+    "app/framework/plugin/find-and-bind-target/find-and-bind-target.c",
+    "app/framework/plugin/find-and-bind-target/find-and-bind-target.h",
+    "app/framework/plugin/green-power-client/config/green-power-client-config.h",
+    "app/framework/plugin/green-power-client/green-power-client.c",
+    "app/framework/plugin/green-power-client/green-power-client.h",
+    "app/framework/plugin/green-power-common/green-power-common.c",
+    "app/framework/plugin/green-power-common/green-power-common.h",
+    "app/framework/plugin/groups-server/groups-server-cb.c",
+    "app/framework/plugin/groups-server/groups-server-common.c",
+    "app/framework/plugin/groups-server/groups-server-common.h",
+    "app/framework/plugin/groups-server/groups-server.c",
+    "app/framework/plugin/groups-server/groups-server.h",
+    "app/framework/plugin/identify/identify-cb.c",
+    "app/framework/plugin/identify/identify.c",
+    "app/framework/plugin/identify/identify.h",
+    "app/framework/plugin/interpan/config/interpan-config.h",
+    "app/framework/plugin/interpan/interpan-cb.c",
+    "app/framework/plugin/interpan/interpan-soc.c",
+    "app/framework/plugin/interpan/interpan.c",
+    "app/framework/plugin/interpan/interpan.h",
+    "app/framework/plugin/level-control/config/level-control-config.h",
+    "app/framework/plugin/level-control/level-control-cb.c",
+    "app/framework/plugin/level-control/level-control.c",
+    "app/framework/plugin/level-control/level-control.h",
+    "app/framework/plugin/network-creator-security/config/network-creator-security-config.h",
+    "app/framework/plugin/network-creator-security/network-creator-security.c",
+    "app/framework/plugin/network-creator-security/network-creator-security.h",
+    "app/framework/plugin/network-creator/config/network-creator-config.h",
+    "app/framework/plugin/network-creator/network-creator-cb.c",
+    "app/framework/plugin/network-creator/network-creator-composite.h",
+    "app/framework/plugin/network-creator/network-creator.c",
+    "app/framework/plugin/network-creator/network-creator.h",
+    "app/framework/plugin/network-steering/config/network-steering-config.h",
+    "app/framework/plugin/network-steering/network-steering-cb.c",
+    "app/framework/plugin/network-steering/network-steering-internal.h",
+    "app/framework/plugin/network-steering/network-steering-v2.c",
+    "app/framework/plugin/network-steering/network-steering.c",
+    "app/framework/plugin/network-steering/network-steering.h",
+    "app/framework/plugin/on-off/on-off-cb.c",
+    "app/framework/plugin/on-off/on-off.c",
+    "app/framework/plugin/on-off/on-off.h",
+    "app/framework/plugin/reporting/config/reporting-config.h",
+    "app/framework/plugin/reporting/reporting-cb.c",
+    "app/framework/plugin/reporting/reporting-default-configuration.c",
+    "app/framework/plugin/reporting/reporting-tokens.h",
+    "app/framework/plugin/reporting/reporting.c",
+    "app/framework/plugin/reporting/reporting.h",
+    "app/framework/plugin/scan-dispatch/config/scan-dispatch-config.h",
+    "app/framework/plugin/scan-dispatch/scan-dispatch.c",
+    "app/framework/plugin/scan-dispatch/scan-dispatch.h",
+    "app/framework/plugin/scenes/config/scenes-config.h",
+    "app/framework/plugin/scenes/scenes-cb.c",
+    "app/framework/plugin/scenes/scenes-tokens.h",
+    "app/framework/plugin/scenes/scenes.c",
+    "app/framework/plugin/scenes/scenes.h",
+    "app/framework/plugin/stack-diagnostics/config/stack-diagnostics-config.h",
+    "app/framework/plugin/update-tc-link-key/config/update-tc-link-key-config.h",
+    "app/framework/plugin/update-tc-link-key/update-tc-link-key-cb.c",
+    "app/framework/plugin/update-tc-link-key/update-tc-link-key.c",
+    "app/framework/plugin/update-tc-link-key/update-tc-link-key.h",
+    "app/framework/plugin/zcl-framework-core/config/zcl-framework-core-config.h",
+    "app/framework/plugin/zcl_cli/zigbee-zcl-custom-cluster-cli.c",
+    "app/framework/plugin/zcl_cli/zigbee-zcl-global-cli.c",
+    "app/framework/plugin/zll-commissioning-common/config/zll-commissioning-common-config.h",
+    "app/framework/plugin/zll-commissioning-common/zll-commissioning-common-cb.c",
+    "app/framework/plugin/zll-commissioning-common/zll-commissioning-common.c",
+    "app/framework/plugin/zll-commissioning-common/zll-commissioning-common.h",
+    "app/framework/plugin/zll-commissioning-common/zll-commissioning.h",
+    "app/framework/plugin/zll-commissioning-server/config/zll-commissioning-server-config.h",
+    "app/framework/plugin/zll-commissioning-server/zll-commissioning-server-cb.c",
+    "app/framework/plugin/zll-commissioning-server/zll-commissioning-server.c",
+    "app/framework/plugin/zll-commissioning-server/zll-commissioning-server.h",
+    "app/framework/plugin/zll-identify-server/config/zll-identify-server-config.h",
+    "app/framework/plugin/zll-identify-server/zll-identify-server.c",
+    "app/framework/plugin/zll-level-control-server/zll-level-control-server.c",
+    "app/framework/plugin/zll-level-control-server/zll-level-control-server.h",
+    "app/framework/plugin/zll-on-off-server/zll-on-off-server-cb.c",
+    "app/framework/plugin/zll-on-off-server/zll-on-off-server.c",
+    "app/framework/plugin/zll-on-off-server/zll-on-off-server.h",
+    "app/framework/plugin/zll-scenes-server/zll-scenes-server.c",
+    "app/framework/plugin/zll-scenes-server/zll-scenes-server.h",
+    "app/framework/plugin/zll-utility-server/zll-utility-server.c",
+    "app/framework/security/af-node.c",
+    "app/framework/security/af-security-common.c",
+    "app/framework/security/af-security.h",
+    "app/framework/security/af-trust-center.c",
+    "app/framework/security/crypto-state.c",
+    "app/framework/security/crypto-state.h",
+    "app/framework/security/security-config.h",
+    "app/framework/security/security-profile-data.h",
+    "app/framework/service-function/sl_service_function.c",
+    "app/framework/service-function/sl_service_function.h",
+    "app/framework/signature-decode/sl_signature_decode.c",
+    "app/framework/signature-decode/sl_signature_decode.h",
+    "app/framework/util/af-common.c",
+    "app/framework/util/af-event.c",
+    "app/framework/util/af-event.h",
+    "app/framework/util/af-main.h",
+    "app/framework/util/af-soc-common.c",
+    "app/framework/util/af-soc.c",
+    "app/framework/util/af-token.h",
+    "app/framework/util/attribute-size.c",
+    "app/framework/util/attribute-storage.c",
+    "app/framework/util/attribute-storage.h",
+    "app/framework/util/attribute-table.c",
+    "app/framework/util/attribute-table.h",
+    "app/framework/util/client-api.c",
+    "app/framework/util/client-api.h",
+    "app/framework/util/common.h",
+    "app/framework/util/config.h",
+    "app/framework/util/global-callback.c",
+    "app/framework/util/global-callback.h",
+    "app/framework/util/global-other-callback.c",
+    "app/framework/util/global-other-callback.h",
+    "app/framework/util/message.c",
+    "app/framework/util/multi-network.c",
+    "app/framework/util/print-formatter.c",
+    "app/framework/util/print.c",
+    "app/framework/util/print.h",
+    "app/framework/util/process-cluster-message.c",
+    "app/framework/util/process-global-message.c",
+    "app/framework/util/service-discovery-common.c",
+    "app/framework/util/service-discovery-soc.c",
+    "app/framework/util/service-discovery.h",
+    "app/framework/util/time-util.c",
+    "app/framework/util/time-util.h",
+    "app/framework/util/util.c",
+    "app/framework/util/util.h",
+    "app/framework/util/zcl-debug-print.h",
+    "app/framework/util/zcl-util.c",
+    "app/util/common/common.h",
+    "app/util/common/form-and-join.h",
+    "app/util/common/library.c",
+    "app/util/common/library.h",
+    "app/util/counters/counters.c",
+    "app/util/counters/counters.h",
+    "app/util/security/security.h",
+    "app/util/serial/sl_zigbee_command_interpreter.c",
+    "app/util/serial/sl_zigbee_command_interpreter.h",
+    "app/util/zigbee-framework/zigbee-device-common.c",
+    "app/util/zigbee-framework/zigbee-device-common.h",
+    "app/util/zigbee-framework/zigbee-device-library.c",
+    "app/util/zigbee-framework/zigbee-device-library.h",
+    "platform/radio/mac/indirect-queue.h",
+    "platform/radio/mac/lower-mac-common.h",
+    "platform/radio/mac/lower-mac-debug.h",
+    "platform/radio/mac/lower-mac.h",
+    "platform/radio/mac/mac-child.h",
+    "platform/radio/mac/mac-command.h",
+    "platform/radio/mac/mac-flat-header.h",
+    "platform/radio/mac/mac-header.h",
+    "platform/radio/mac/mac-multi-network.h",
+    "platform/radio/mac/mac-packet-header.h",
+    "platform/radio/mac/mac-phy.h",
+    "platform/radio/mac/mac-types.h",
+    "platform/radio/mac/multi-mac.h",
+    "platform/radio/mac/rail_mux/sl_rail_mux.h",
+    "platform/radio/mac/rail_mux/sl_rail_mux_rename.h",
+    "platform/radio/mac/scan.h",
+    "platform/radio/mac/upper-mac.h",
+    "platform/service/legacy_hal_wdog/src/sl_legacy_hal_wdog_stub.c",
+    "stack/config/component_config/sl_zigbee_green_power_config.h",
+    "stack/config/component_config/sl_zigbee_light_link_config.h",
+    "stack/config/component_config/sl_zigbee_pro_stack_config.h",
+    "stack/config/component_config/sl_zigbee_source_route_config.h",
+    "stack/config/config.h",
+    "stack/config/sl_zigbee_callback_stubs.c",
+    "stack/config/sl_zigbee_configuration.c",
+    "stack/config/sl_zigbee_configuration_access.c",
+    "stack/config/sl_zigbee_configuration_defaults.h",
+    "stack/config/sl_zigbee_endpoint_stubs.c",
+    "stack/config/sl_zigbee_token_defines.h",
+    "stack/config/token-cache.h",
+    "stack/config/token-phy.h",
+    "stack/config/token-stack.h",
+    "stack/core/multi-pan-common.c",
+    "stack/core/multi-pan-stub.c",
+    "stack/core/multi-pan-token-config.h",
+    "stack/core/multi-pan.h",
+    "stack/core/sl_zigbee_multi_network.h",
+    "stack/core/sl_zigbee_multi_network_stub.c",
+    "stack/core/sl_zigbee_stack.h",
+    "stack/framework/debug-extended-stub.c",
+    "stack/framework/strong-random-api.c",
+    "stack/framework/zigbee-event-logger-stub-gen.c",
+    "stack/framework/zigbee_debug_channel.h",
+    "stack/gp/sli-gp-proxy-table.h",
+    "stack/gp/sli-gp-sink-table.h",
+    "stack/include/aes-mmo.h",
+    "stack/include/binding-table.h",
+    "stack/include/bootload.h",
+    "stack/include/cbke-crypto-engine.h",
+    "stack/include/child.h",
+    "stack/include/gp-proxy-table.h",
+    "stack/include/gp-sink-table.h",
+    "stack/include/gp-token-config.h",
+    "stack/include/gp-types.h",
+    "stack/include/library.h",
+    "stack/include/mac-layer.h",
+    "stack/include/message.h",
+    "stack/include/mfglib.h",
+    "stack/include/multi-network.h",
+    "stack/include/multi-phy.h",
+    "stack/include/network-formation.h",
+    "stack/include/raw-message.h",
+    "stack/include/security.h",
+    "stack/include/sl_zigbee.h",
+    "stack/include/sl_zigbee_address_info.h",
+    "stack/include/sl_zigbee_alternate_mac.h",
+    "stack/include/sl_zigbee_debug.h",
+    "stack/include/sl_zigbee_dhc.h",
+    "stack/include/sl_zigbee_dlk_negotiation.h",
+    "stack/include/sl_zigbee_duty_cycle.h",
+    "stack/include/sl_zigbee_dynamic_commissioning.h",
+    "stack/include/sl_zigbee_random_api.h",
+    "stack/include/sl_zigbee_security_manager_dlk_ecc.h",
+    "stack/include/sl_zigbee_security_manager_dlk_ecc_test_vectors.h",
+    "stack/include/sl_zigbee_stack_specific_tlv.h",
+    "stack/include/sl_zigbee_tlv_core.h",
+    "stack/include/sl_zigbee_token.h",
+    "stack/include/sl_zigbee_types.h",
+    "stack/include/sl_zigbee_types_internal.h",
+    "stack/include/sl_zigbee_zdo_configuration.h",
+    "stack/include/sl_zigbee_zdo_dlk_negotiation.h",
+    "stack/include/sl_zigbee_zdo_management.h",
+    "stack/include/sl_zigbee_zdo_security.h",
+    "stack/include/source-route.h",
+    "stack/include/stack-info.h",
+    "stack/include/trust-center.h",
+    "stack/include/zigbee-device-stack.h",
+    "stack/include/zigbee-event-logger-gen.h",
+    "stack/include/zigbee-security-manager-types.h",
+    "stack/include/zigbee-security-manager.h",
+    "stack/include/zigbee_packet_types.h",
+    "stack/include/zll-api.h",
+    "stack/include/zll-types.h",
+    "stack/internal/inc/aes-mmo-internal-def.h",
+    "stack/internal/inc/binding-table-internal-def.h",
+    "stack/internal/inc/bootload_internal_def.h",
+    "stack/internal/inc/child_internal_def.h",
+    "stack/internal/inc/gp-proxy-table-internal-def.h",
+    "stack/internal/inc/gp-sink-table-internal-def.h",
+    "stack/internal/inc/gp-types-internal-def.h",
+    "stack/internal/inc/internal-callbacks-patch.h",
+    "stack/internal/inc/internal-defs-patch.h",
+    "stack/internal/inc/library_internal_def.h",
+    "stack/internal/inc/mac-layer-internal-def.h",
+    "stack/internal/inc/message_internal_def.h",
+    "stack/internal/inc/mfglib_internal_def.h",
+    "stack/internal/inc/multi-network-internal-def.h",
+    "stack/internal/inc/multi-phy-internal-def.h",
+    "stack/internal/inc/network-formation-internal-def.h",
+    "stack/internal/inc/raw-message-internal-def.h",
+    "stack/internal/inc/security_internal_def.h",
+    "stack/internal/inc/sl_zigbee_address_info_internal_def.h",
+    "stack/internal/inc/sl_zigbee_duty_cycle_internal_def.h",
+    "stack/internal/inc/sl_zigbee_random_api_internal_def.h",
+    "stack/internal/inc/sl_zigbee_token_internal_def.h",
+    "stack/internal/inc/sl_zigbee_zdo_security_internal_def.h",
+    "stack/internal/inc/source-route-internal-def.h",
+    "stack/internal/inc/stack-info-internal-def.h",
+    "stack/internal/inc/trust-center-internal-def.h",
+    "stack/internal/inc/zigbee-device-stack-internal-def.h",
+    "stack/internal/inc/zigbee-security-manager-internal-def.h",
+    "stack/internal/inc/zll-api-internal-def.h",
+    "stack/internal/src/baremetal/aes-mmo-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/binding-table-baremetal-callbacks.c",
+    "stack/internal/src/baremetal/binding-table-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/bootload_baremetal_callbacks.c",
+    "stack/internal/src/baremetal/bootload_baremetal_wrapper.c",
+    "stack/internal/src/baremetal/child_baremetal_callbacks.c",
+    "stack/internal/src/baremetal/child_baremetal_wrapper.c",
+    "stack/internal/src/baremetal/gp-proxy-table-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/gp-sink-table-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/gp-types-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/library_baremetal_wrapper.c",
+    "stack/internal/src/baremetal/mac-layer-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/message_baremetal_callbacks.c",
+    "stack/internal/src/baremetal/message_baremetal_wrapper.c",
+    "stack/internal/src/baremetal/multi-phy-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/network-formation-baremetal-callbacks.c",
+    "stack/internal/src/baremetal/network-formation-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/raw-message-baremetal-callbacks.c",
+    "stack/internal/src/baremetal/raw-message-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/security_baremetal_callbacks.c",
+    "stack/internal/src/baremetal/security_baremetal_wrapper.c",
+    "stack/internal/src/baremetal/sl_zigbee_address_info_baremetal_wrapper.c",
+    "stack/internal/src/baremetal/sl_zigbee_duty_cycle_baremetal_callbacks.c",
+    "stack/internal/src/baremetal/sl_zigbee_duty_cycle_baremetal_wrapper.c",
+    "stack/internal/src/baremetal/sl_zigbee_random_api_baremetal_wrapper.c",
+    "stack/internal/src/baremetal/sl_zigbee_token_baremetal_wrapper.c",
+    "stack/internal/src/baremetal/source-route-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/stack-info-baremetal-callbacks.c",
+    "stack/internal/src/baremetal/stack-info-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/trust-center-baremetal-callbacks.c",
+    "stack/internal/src/baremetal/trust-center-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/zigbee-device-stack-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/zigbee-security-manager-baremetal-wrapper.c",
+    "stack/internal/src/baremetal/zll-api-baremetal-callbacks.c",
+    "stack/internal/src/baremetal/zll-api-baremetal-wrapper.c",
+    "stack/internal/src/ipc/zigbee_ipc_callback_events.h",
+    "stack/internal/src/ipc/zigbee_ipc_command_messages.h",
+    "stack/internal/src/stubs/sl_zigbee_dhc_internal_weak_stubs.c",
+    "stack/internal/src/stubs/sl_zigbee_token_internal_weak_stubs.c",
+    "stack/internal/src/stubs/sl_zigbee_zdo_security_internal_weak_stubs.c",
+    "stack/internal/src/stubs/stack-info-internal-weak-stubs.c",
+    "stack/mac/mac-info-element-parsing-stub.c",
+    "stack/mac/multi-mac.h",
+    "stack/platform/sl_zigbee_token_legacy.c",
+    "stack/routing/zigbee/enhanced-beacon-request-stub.c",
+    "stack/routing/zigbee/zigbee.h",
+    "stack/security/cbke-crypto-engine-163k1-stub.c",
+    "stack/security/cbke-crypto-engine-283k1-stub.c",
+    "stack/security/cbke-crypto-engine-dsa-sign-stub.c",
+    "stack/security/cbke-crypto-engine-dsa-verify-283k1-stub.c",
+    "stack/security/cbke-crypto-engine-dsa-verify-stub.c",
+    "stack/security/cbke-crypto-engine-stub.c",
+    "stack/security/security-address-cache.c",
+    "stack/security/zigbee-secure-key-storage-upgrade.c",
+    "stack/security/zigbee-secure-key-storage-upgrade.h",
+    "stack/security/zigbee-security-manager-internal.h",
+    "stack/security/zigbee-security-manager-vault-support.c",
+    "stack/security/zigbee-security-manager-vault-support.h",
+    "stack/security/zigbee-security-manager.c",
+    "stack/stubs/sl_zigbee_dynamic_commissioning_stubs.c",
+    "stack/stubs/sl_zigbee_fragmentation_stubs.c",
+    "stack/stubs/sl_zigbee_r23_misc_support_stubs.c",
+    "stack/stubs/sli_zigbee_zdo_cluster_filter_stubs.c",
+    "stack/zigbee/aps-keys-full-stub.c",
+    "stack/zigbee/sli_zigbee_zdo_cluster_filter.h",
+    "stack/zigbee/source-route-table-update.h",
+    "stack/zigbee/zdo-r22-stub.c",
+    "stack/zll/zll-token-config.h",
+    "util/silicon_labs/silabs_core/buffer_manager/buffer-management.h",
+    "util/silicon_labs/silabs_core/buffer_manager/buffer-queue.h",
+    "util/silicon_labs/silabs_core/buffer_manager/legacy-packet-buffer.h",
+    "util/silicon_labs/silabs_core/event_queue/event-queue.h"
+  ],
+  "dependency_cycles": [
+    [
+      "zigbee_debug_basic",
+      "zigbee_debug_basic_library"
+    ],
+    [
+      "zigbee_gp",
+      "zigbee_gp_library"
+    ],
+    [
+      "zigbee_network_steering",
+      "zigbee_update_tc_link_key"
+    ],
+    [
+      "zigbee_pro_stack",
+      "zigbee_pro_stack_basic",
+      "zigbee_pro_stack_library",
+      "zigbee_stack_common",
+      "zigbee_system_common"
+    ],
+    [
+      "zigbee_secure_key_storage",
+      "zigbee_secure_key_storage_upgrade"
+    ],
+    [
+      "zigbee_source_route",
+      "zigbee_source_route_library"
+    ],
+    [
+      "zigbee_zll",
+      "zigbee_zll_library"
+    ],
+    [
+      "zigbee_application_bootloader"
+    ],
+    [
+      "zigbee_basic"
+    ],
+    [
+      "zigbee_cli"
+    ],
+    [
+      "zigbee_cluster_service"
+    ],
+    [
+      "zigbee_color_control_server"
+    ],
+    [
+      "zigbee_core_cli"
+    ],
+    [
+      "zigbee_counters"
+    ],
+    [
+      "zigbee_debug_print"
+    ],
+    [
+      "zigbee_device_config"
+    ],
+    [
+      "zigbee_enhanced_routing"
+    ],
+    [
+      "zigbee_find_and_bind_target"
+    ],
+    [
+      "zigbee_green_power_client"
+    ],
+    [
+      "zigbee_green_power_client_cli"
+    ],
+    [
+      "zigbee_green_power_common"
+    ],
+    [
+      "zigbee_groups_server"
+    ],
+    [
+      "zigbee_identify"
+    ],
+    [
+      "zigbee_interpan"
+    ],
+    [
+      "zigbee_level_control"
+    ],
+    [
+      "zigbee_network_creator"
+    ],
+    [
+      "zigbee_network_creator_security"
+    ],
+    [
+      "zigbee_on_off"
+    ],
+    [
+      "zigbee_phy_2_4"
+    ],
+    [
+      "zigbee_reporting"
+    ],
+    [
+      "zigbee_scan_dispatch"
+    ],
+    [
+      "zigbee_scenes"
+    ],
+    [
+      "zigbee_security_manager"
+    ],
+    [
+      "zigbee_signature_decode"
+    ],
+    [
+      "zigbee_stack_diagnostics"
+    ],
+    [
+      "zigbee_strong_random_api_psa"
+    ],
+    [
+      "zigbee_system_common_app_framework"
+    ],
+    [
+      "zigbee_zcl_cli"
+    ],
+    [
+      "zigbee_zcl_framework_core"
+    ],
+    [
+      "zigbee_zll_commissioning_common"
+    ],
+    [
+      "zigbee_zll_commissioning_server"
+    ],
+    [
+      "zigbee_zll_identify_server"
+    ],
+    [
+      "zigbee_zll_level_control_server"
+    ],
+    [
+      "zigbee_zll_on_off_server"
+    ],
+    [
+      "zigbee_zll_scenes_server"
+    ],
+    [
+      "zigbee_zll_utility_server"
+    ]
+  ],
+  "include_dirs": [
+    "protocol/zigbee",
+    "protocol/zigbee/app/em260",
+    "protocol/zigbee/app/framework/cli",
+    "protocol/zigbee/app/framework/common",
+    "protocol/zigbee/app/framework/common/config",
+    "protocol/zigbee/app/framework/include",
+    "protocol/zigbee/app/framework/plugin/basic",
+    "protocol/zigbee/app/framework/plugin/color-control-server",
+    "protocol/zigbee/app/framework/plugin/color-control-server/config",
+    "protocol/zigbee/app/framework/plugin/counters",
+    "protocol/zigbee/app/framework/plugin/counters/config",
+    "protocol/zigbee/app/framework/plugin/debug-print",
+    "protocol/zigbee/app/framework/plugin/debug-print/config",
+    "protocol/zigbee/app/framework/plugin/dhc",
+    "protocol/zigbee/app/framework/plugin/find-and-bind-target",
+    "protocol/zigbee/app/framework/plugin/find-and-bind-target/config",
+    "protocol/zigbee/app/framework/plugin/green-power-client",
+    "protocol/zigbee/app/framework/plugin/green-power-client/config",
+    "protocol/zigbee/app/framework/plugin/green-power-common",
+    "protocol/zigbee/app/framework/plugin/groups-server",
+    "protocol/zigbee/app/framework/plugin/identify",
+    "protocol/zigbee/app/framework/plugin/interpan",
+    "protocol/zigbee/app/framework/plugin/interpan/config",
+    "protocol/zigbee/app/framework/plugin/level-control",
+    "protocol/zigbee/app/framework/plugin/level-control/config",
+    "protocol/zigbee/app/framework/plugin/network-creator",
+    "protocol/zigbee/app/framework/plugin/network-creator-security",
+    "protocol/zigbee/app/framework/plugin/network-creator-security/config",
+    "protocol/zigbee/app/framework/plugin/network-creator/config",
+    "protocol/zigbee/app/framework/plugin/network-steering",
+    "protocol/zigbee/app/framework/plugin/network-steering/config",
+    "protocol/zigbee/app/framework/plugin/on-off",
+    "protocol/zigbee/app/framework/plugin/reporting",
+    "protocol/zigbee/app/framework/plugin/reporting/config",
+    "protocol/zigbee/app/framework/plugin/scan-dispatch",
+    "protocol/zigbee/app/framework/plugin/scan-dispatch/config",
+    "protocol/zigbee/app/framework/plugin/scenes",
+    "protocol/zigbee/app/framework/plugin/scenes/config",
+    "protocol/zigbee/app/framework/plugin/stack-diagnostics/config",
+    "protocol/zigbee/app/framework/plugin/update-tc-link-key",
+    "protocol/zigbee/app/framework/plugin/update-tc-link-key/config",
+    "protocol/zigbee/app/framework/plugin/zcl-framework-core/config",
+    "protocol/zigbee/app/framework/plugin/zll-commissioning-common",
+    "protocol/zigbee/app/framework/plugin/zll-commissioning-common/config",
+    "protocol/zigbee/app/framework/plugin/zll-commissioning-server",
+    "protocol/zigbee/app/framework/plugin/zll-commissioning-server/config",
+    "protocol/zigbee/app/framework/plugin/zll-identify-server/config",
+    "protocol/zigbee/app/framework/plugin/zll-level-control-server",
+    "protocol/zigbee/app/framework/plugin/zll-on-off-server",
+    "protocol/zigbee/app/framework/plugin/zll-scenes-server",
+    "protocol/zigbee/app/framework/security",
+    "protocol/zigbee/app/framework/service-function",
+    "protocol/zigbee/app/framework/signature-decode",
+    "protocol/zigbee/app/framework/util",
+    "protocol/zigbee/app/util/common",
+    "protocol/zigbee/app/util/counters",
+    "protocol/zigbee/app/util/security",
+    "protocol/zigbee/app/util/serial",
+    "protocol/zigbee/app/util/zigbee-framework",
+    "protocol/zigbee/config",
+    "protocol/zigbee/platform/radio/mac",
+    "protocol/zigbee/platform/radio/mac/rail_mux",
+    "protocol/zigbee/stack",
+    "protocol/zigbee/stack/config/component_config",
+    "protocol/zigbee/stack/core",
+    "protocol/zigbee/stack/framework",
+    "protocol/zigbee/stack/gp",
+    "protocol/zigbee/stack/include",
+    "protocol/zigbee/stack/internal/inc",
+    "protocol/zigbee/stack/internal/src/ipc",
+    "protocol/zigbee/stack/mac",
+    "protocol/zigbee/stack/routing/zigbee",
+    "protocol/zigbee/stack/security",
+    "protocol/zigbee/stack/zigbee",
+    "protocol/zigbee/stack/zll",
+    "protocol/zigbee/util/silicon_labs/silabs_core"
+  ],
+  "unresolved_conditions": [
+    {
+      "component": "zigbee_core_cli",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/cli/core-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_counters",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/counters/counters-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_counters",
+      "condition": [
+        "zigbee_ezsp"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/counters/counters-ota-host.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_find_and_bind_target",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/find-and-bind-target/find-and-bind-target-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_gp",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "source",
+      "path": "app/em260/command-handlers-green-power-generated.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_gp",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/gp-types-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_gp",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_event_stub.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_gp",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/gp-proxy-table-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_gp",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_gp",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/gp-sink-table-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_gp",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include",
+      "path": "stack/internal/src/ipc",
+      "unless": []
+    },
+    {
+      "component": "zigbee_green_power_client_cli",
+      "condition": [
+        "cli",
+        "zigbee_green_power_client"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/green-power-client/green-power-client-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_green_power_client_cli",
+      "condition": [
+        "cli",
+        "zigbee_green_power_client"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/green-power-client/green-power-client.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_green_power_client_cli",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/green-power-common/green-power-cli.c",
+      "unless": [
+        "zigbee_green_power_client"
+      ]
+    },
+    {
+      "component": "zigbee_green_power_common",
+      "condition": [
+        "zigbee_ezsp"
+      ],
+      "kind": "source",
+      "path": "stack/gp/gp-util.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_groups_server",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/groups-server/groups-server-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_identify",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/identify/identify-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_interpan",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/interpan/interpan-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_interpan",
+      "condition": [
+        "zigbee_ezsp"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/interpan/interpan-host.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_network_creator",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/network-creator/network-creator-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_network_creator_security",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/network-creator-security/network-creator-security-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_network_steering",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/network-steering/network-steering-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_reporting",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/reporting/reporting-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_scenes",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/scenes/scenes-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_security_manager",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/security_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_security_manager",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/security_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_security_manager",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_security_manager",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_event_stub.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_security_manager",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/aes-mmo-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_security_manager",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee-security-manager-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_security_manager",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include",
+      "path": "stack/internal/src/ipc",
+      "unless": []
+    },
+    {
+      "component": "zigbee_source_route",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/source-route-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_source_route",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_source_route",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_event_stub.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_source_route",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include",
+      "path": "stack/internal/src/ipc",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "source",
+      "path": "app/em260/command-handlers-binding-generated.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/binding-table-ipc-callback-events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/binding-table-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_event_stub.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "source",
+      "path": "app/em260/command-handlers-messaging-generated.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "source",
+      "path": "app/em260/command-handlers-networking-generated.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "source",
+      "path": "app/em260/command-handlers-security-generated.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "source",
+      "path": "app/em260/command-handlers-trust-center-generated.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "source",
+      "path": "app/em260/command-handlers-configuration-generated.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [],
+      "kind": "source",
+      "path": "stack/framework/debug-stub.c",
+      "unless": [
+        "zigbee_debug_basic"
+      ]
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [],
+      "kind": "source",
+      "path": "stack/gp/gp-stub.c",
+      "unless": [
+        "zigbee_gp"
+      ]
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [],
+      "kind": "source",
+      "path": "stack/zll/zll-stubs.c",
+      "unless": [
+        "zigbee_zll"
+      ]
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [],
+      "kind": "source",
+      "path": "stack/zigbee/source-route-stub.c",
+      "unless": [
+        "zigbee_source_route"
+      ]
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/sl_zigbee_token_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [],
+      "kind": "source",
+      "path": "stack/platform/sl_zigbee_token.c",
+      "unless": [
+        "device_series_2"
+      ]
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [],
+      "kind": "source",
+      "path": "stack/platform/sl_zigbee_token_defines.c",
+      "unless": [
+        "device_series_2"
+      ]
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/child_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/raw-message-ipc-callback-events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/stack-info-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/stack-info-ipc-callback-events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/network-formation-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee-device-stack-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/mac-layer-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/multi-phy-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/trust-center-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/trust-center-ipc-callback-events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/raw-message-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/message_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/library_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/network-formation-ipc-callback-events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/message_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/bootload_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/bootload_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/child_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/sl_zigbee_duty_cycle_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/sl_zigbee_duty_cycle_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/raw-message-ipc-callback-events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/security_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/sl_zigbee_random_api_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/sl_zigbee_address_info_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "include_file",
+      "path": "app/em260/command-handlers-zll.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "include_file",
+      "path": "app/em260/command-handlers-binding.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "include_file",
+      "path": "app/em260/command-handlers-security.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "include_file",
+      "path": "app/em260/command-handlers-zigbee-pro.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/bootload_ipc_callback_events.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/bootload_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/child_ipc_callback_events.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/child_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/sl_zigbee_duty_cycle_ipc_callback_events.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/message_ipc_callback_events.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/network-formation-ipc-callback-events.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/raw-message-ipc-callback-events.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/security_ipc_callback_events.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/stack-info-ipc-callback-events.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/sl_zigbee_duty_cycle_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/sl_zigbee_random_api_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/library_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/mac-layer-ipc-command-messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/message_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/mfglib_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/multi-network-ipc-command-messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/multi-phy-ipc-command-messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/network-formation-ipc-command-messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/raw-message-ipc-command-messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/security_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/sl_zigbee_address_info_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/stack-info-ipc-command-messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/trust-center-ipc-command-messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/zigbee-device-stack-ipc-command-messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/zigbee-security-manager-ipc-command-messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/trust-center-ipc-callback-events.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include_file",
+      "path": "stack/internal/src/ipc/sl_zigbee_token_ipc_command_messages.h",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include",
+      "path": "stack/internal/src/ipc",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include",
+      "path": "stack/internal/src/ipc",
+      "unless": []
+    },
+    {
+      "component": "zigbee_stack_diagnostics",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/stack-diagnostics/stack-diagnostics.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common",
+      "condition": [
+        "native_host"
+      ],
+      "kind": "source",
+      "path": "app/framework/common/zigbee_app_framework_stack_cb.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common",
+      "condition": [
+        "cmsis_rtos2"
+      ],
+      "kind": "source",
+      "path": "app/framework/common/zigbee_stack_rtos_adaptation.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_event_stub.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/security_ipc_command_messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/security_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common",
+      "condition": [
+        "cmsis_rtos2"
+      ],
+      "kind": "include",
+      "path": "app/framework/common",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common",
+      "condition": [
+        "cmsis_rtos2"
+      ],
+      "kind": "include",
+      "path": "app/framework/common",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common",
+      "condition": [
+        "cmsis_rtos2"
+      ],
+      "kind": "include",
+      "path": "stack/internal/src/ipc",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common_app_framework",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/common/zigbee_app_framework_sleep_cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_system_common_app_framework",
+      "condition": [
+        "cmsis_rtos2"
+      ],
+      "kind": "source",
+      "path": "app/framework/common/zigbee_app_framework_rtos_adaptation.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_update_tc_link_key",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/update-tc-link-key/update-tc-link-key-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_cli",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/zcl_cli/zigbee-zcl-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/cli/core-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/cli/network-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/cli/option-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/cli/security-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/cli/zcl-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/cli/zdo-cli.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/util/serial/sl_zigbee_command_interpreter.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "zigbee_ezsp"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/zcl-framework-core/zcl-framework-core-cb.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "zigbee_ezsp"
+      ],
+      "kind": "include",
+      "path": "app/util/ezsp",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "zigbee_ezsp"
+      ],
+      "kind": "include",
+      "path": "app/framework/plugin/zcl-framework-core",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zcl_framework_core",
+      "condition": [
+        "cli"
+      ],
+      "kind": "include",
+      "path": "app/framework/cli",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zll",
+      "condition": [
+        "zigbee_ncp"
+      ],
+      "kind": "source",
+      "path": "app/em260/command-handlers-zll-generated.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zll",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_event_stub.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zll",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zll-api-ipc-callback-events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zll",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zll-api-ipc-command-messages.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zll",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "source",
+      "path": "stack/internal/src/ipc/zigbee_ipc_callback_events.c",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zll",
+      "condition": [
+        "zigbee_use_ipc"
+      ],
+      "kind": "include",
+      "path": "stack/internal/src/ipc",
+      "unless": []
+    },
+    {
+      "component": "zigbee_zll_commissioning_common",
+      "condition": [
+        "cli"
+      ],
+      "kind": "source",
+      "path": "app/framework/plugin/zll-commissioning-common/zll-commissioning-cli.c",
+      "unless": []
+    }
+  ]
+}
