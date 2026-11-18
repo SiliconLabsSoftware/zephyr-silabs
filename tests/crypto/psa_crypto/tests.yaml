@@ -42,3 +42,11 @@ tests:
     extra_configs:
       - CONFIG_SILABS_WISECONNECT_PSA_CRYPTO=n
       - CONFIG_MBEDTLS_PSA_P256M_DRIVER_ENABLED=y
+  crypto.psa_crypto.siwx91x.pm:
+    platform_allow:
+      - siwx917_rb4338a
+    extra_configs:
+      - CONFIG_MBEDTLS_PSA_STATIC_KEY_SLOTS=n
+      - CONFIG_PM=y
+      - CONFIG_PM_DEVICE=y
+      - CONFIG_ZTEST_NO_YIELD=n
