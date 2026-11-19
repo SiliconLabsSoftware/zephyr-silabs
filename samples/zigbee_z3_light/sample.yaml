@@ -1,0 +1,13 @@
+sample:
+  name: Silicon Labs Zigbee Z3 Light
+  description: >
+    Zephyr port of the Silicon Labs Zigbee Z3 Light sample. Links the Zigbee PRO
+    stack prebuilt libraries and enables the Z3 Light component profile.
+tests:
+  sample.zigbee.z3_light:
+    harness: none
+    integration_platforms:
+      - xg24_rb4187c
+    tags:
+      - zigbee
+    build_only: true
