@@ -216,6 +216,46 @@ void test_aead_aes_gcm(bool generate_key, psa_key_location_t location)
 	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy key");
 }
 
+
+ZTEST(psa_crypto_test, test_aead_aes_gcm_with_k_sleep_interval)
+{
+	psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+	psa_key_id_t key_id;
+	uint8_t first_cipher_tag[sizeof(aes_plaintext) + 16];
+	uint8_t second_cipher_tag[sizeof(aes_plaintext) + 16];
+	size_t first_len;
+	size_t second_len;
+
+	psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+	psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_ENCRYPT);
+	psa_set_key_algorithm(&attributes, PSA_ALG_GCM);
+	psa_set_key_bits(&attributes, 128);
+	psa_set_key_lifetime(&attributes, PSA_KEY_LIFETIME_FROM_PERSISTENCE_AND_LOCATION(
+					  PSA_KEY_PERSISTENCE_VOLATILE, 1));
+	zassert_equal(psa_generate_key(&attributes, &key_id), PSA_SUCCESS,
+		      "Failed to generate opaque AES key");
+
+	zassert_equal(psa_aead_encrypt(key_id, PSA_ALG_GCM, aes_nonce_buf, sizeof(aes_nonce_buf),
+				       aes_ad_buf, sizeof(aes_ad_buf), aes_plaintext,
+				       sizeof(aes_plaintext), first_cipher_tag,
+				       sizeof(first_cipher_tag), &first_len),
+		      PSA_SUCCESS, "First GCM call failed before M4 sleep");
+	
+	/* Sleep at least for 15 seconds to ensure the M4 is in sleep mode when PM is on */
+	k_sleep(K_SECONDS(20));
+
+	zassert_equal(psa_aead_encrypt(key_id, PSA_ALG_GCM, aes_nonce_buf, sizeof(aes_nonce_buf),
+				       aes_ad_buf, sizeof(aes_ad_buf), aes_plaintext,
+				       sizeof(aes_plaintext), second_cipher_tag,
+				       sizeof(second_cipher_tag), &second_len),
+		      PSA_SUCCESS, "Second GCM call failed after M4 sleep");
+
+	zassert_equal(second_len, first_len, "GCM output lengths differ");
+	zassert_mem_equal(second_cipher_tag, first_cipher_tag, first_len,
+			  "GCM output changed between calls");
+	zassert_equal(psa_destroy_key(key_id), PSA_SUCCESS, "Failed to destroy opaque AES key");
+}
+
 void test_aead_aes_gcm_long(bool generate_key, psa_key_location_t location)
 {
 	size_t out_len;
