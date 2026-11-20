@@ -1,0 +1,7 @@
+/*
+ * CHANNEL_MODE=mono_left: route mono samples to the LRCLK-low slot via DT
+ * (default is right). See silabs,efr32-usart-i2s binding.
+ */
+&usart0 {
+	silabs,mono-tx-slot = "left";
+};
