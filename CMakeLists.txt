@@ -6,6 +6,7 @@
 
 add_subdirectory(drivers)
 add_subdirectory(modules)
+add_subdirectory(subsys)
 
 if(DEFINED CONFIG_SOC_FAMILY_SILABS_S2)
 

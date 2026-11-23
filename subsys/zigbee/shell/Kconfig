@@ -1,0 +1,11 @@
+# Copyright (c) 2026 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+config ZIGBEE_SHELL
+	bool "Zigbee Zephyr Shell bridge (zigbee <sl-cli-line>)"
+	depends on ZIGBEE_SILABS
+	depends on SILABS_SISDK_CLI
+	default y
+	help
+	  Register a Zephyr Shell command that forwards arguments to the
+	  SiSDK sl_cli dispatcher (e.g. "zigbee info", "zigbee network form").

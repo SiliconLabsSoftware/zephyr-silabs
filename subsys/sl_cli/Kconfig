@@ -1,0 +1,5 @@
+# Copyright (c) 2026 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+# CONFIG_SILABS_SISDK_CLI is declared under Zigbee Kconfig today (selects
+# SHELL). This subsystem provides the Zephyr I/O + SYS_INIT runtime for it.
