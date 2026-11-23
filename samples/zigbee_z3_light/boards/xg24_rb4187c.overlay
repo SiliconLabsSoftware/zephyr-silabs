@@ -5,7 +5,14 @@
  * - Enable Zephyr silabs,pti (debug_silabs_pti.c) instead of SiSDK PTI util.
  * - Split the 32 KiB storage region so Zigbee token NVS and PSA ITS/settings
  *   do not share one NVS mount.
+ * - Map stack TX activity to led1; led0 stays free for the ZCL On/Off app LED.
  */
+
+/ {
+	chosen {
+		silabs,zigbee-activity-led = &led1;
+	};
+};
 
 &pti {
 	pinctrl-0 = <&pti_default>;

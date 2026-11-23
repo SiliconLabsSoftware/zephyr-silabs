@@ -34,8 +34,8 @@ target_sources(app PRIVATE
 )
 
 if(CONFIG_SILABS_SISDK_CLI)
+  # Zephyr Shell bridge lives in zephyr-silabs-internal/subsys/zigbee/shell.
   target_sources(app PRIVATE
-    src/zigbee_shell.c
     src/sl_cli_phase_a_stubs.c
     ${Z3_LIGHT_AUTOGEN}/sl_cli_command_table.c
     ${Z3_LIGHT_AUTOGEN}/zap-cli.c

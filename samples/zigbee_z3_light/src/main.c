@@ -24,21 +24,10 @@ int main(void)
 		return 1;
 	}
 
-#if defined(CONFIG_SILABS_ZIGBEE_RUNTIME_THREAD)
 	status = sl_zigbee_runtime_start();
 	if (status != SL_STATUS_OK) {
 		LOG_ERR("Zigbee runtime thread start failed: 0x%04x", status);
 		return 1;
-	}
-#endif
-
-	while (true) {
-#if !defined(CONFIG_SILABS_ZIGBEE_RUNTIME_THREAD)
-		sl_zigbee_runtime_process_once();
-		k_msleep(sl_zigbee_runtime_ms_until_next_tick());
-#else
-		k_sleep(K_FOREVER);
-#endif
 	}
 
 	return 0;

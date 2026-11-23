@@ -3,14 +3,15 @@ Silicon Labs Zigbee Z3 Light
 
 This downstream sample ports the Silicon Labs ``zigbee_z3_light`` reference
 application to Zephyr. It links the Zigbee PRO stack prebuilt libraries from
-the ``hal_silabs`` blob bundle and enables the Z3 Light component profile.
+the ``hal_silabs_extra`` blob bundle and enables the Z3 Light component profile.
 
 Requirements
 ------------
 
 * A Silicon Labs Series 2 board with a 2.4 GHz radio, such as ``xg24_rb4186c``
-* The ``hal_silabs`` module blobs fetched via west (``west blobs fetch hal_silabs``)
-* The ``hal_silabs_extra`` module (MSLA Zigbee SDK sources and Z3 Light ZAP autogen)
+* Open HAL blobs for RAIL (``west blobs fetch hal_silabs``)
+* Zigbee MSLA blobs plus SDK sources / ZAP autogen
+  (``west blobs fetch hal_silabs_extra``; module ``hal_silabs_extra``)
 
 Building
 --------
@@ -23,6 +24,10 @@ The sample enables ``CONFIG_ZIGBEE_SILABS`` and links the coordinator stack
 variant used by the Z3 Light profile. Zigbee SDK sources live in
 ``hal_silabs_extra``; Zephyr port glue and generated component Kconfig live
 under ``zephyr-silabs-internal/modules/hal_silabs/simplicity_sdk/zigbee/``.
+
+Board overlays may set chosen ``silabs,zigbee-activity-led`` to a
+``gpio-leds`` node for stack TX activity (this sample uses ``led1`` on
+``xg24_rb4187c`` so ``led0`` remains the application On/Off LED).
 
 ZAP / Studio autogen
 --------------------
