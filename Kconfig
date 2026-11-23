@@ -8,3 +8,4 @@
 rsource "drivers/Kconfig"
 rsource "soc/Kconfig"
 rsource "modules/hal_silabs/simplicity_sdk/Kconfig.zigbee"
+rsource "subsys/Kconfig"

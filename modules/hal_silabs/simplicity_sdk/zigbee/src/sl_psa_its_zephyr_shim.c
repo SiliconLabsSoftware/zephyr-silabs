@@ -40,12 +40,19 @@ psa_status_t sli_psa_its_change_key_id(mbedtls_svc_key_id_t old_id,
 		return status;
 	}
 
-	(void)psa_destroy_key(old_id);
-
+	/*
+	 * Import under new_id before destroying old_id. Destroy-then-import
+	 * leaves a power-loss / import-failure window where the only copy is
+	 * in RAM (key_buf).
+	 */
 	psa_set_key_id(&attributes, new_id);
 	status = psa_import_key(&attributes, key_buf, key_len, &imported_id);
 	psa_reset_key_attributes(&attributes);
 	memset(key_buf, 0, sizeof(key_buf));
+	if (status != PSA_SUCCESS) {
+		return status;
+	}
 
-	return status;
+	(void)psa_destroy_key(old_id);
+	return PSA_SUCCESS;
 }

@@ -3,12 +3,17 @@
  *
  * SPDX-License-Identifier: Apache-2.0
  *
- * Initialize the SiSDK sl_cli handle and default command group before AF
- * init_done. Zephyr Shell is the interactive front-end (see zigbee_shell.c).
+ * Initialize the SiSDK sl_cli handle and default command group. Zephyr Shell
+ * is the interactive front-end (see subsys/zigbee/shell). Registered via
+ * SYS_INIT so Zigbee AF init_done can attach ZCL groups without an explicit
+ * call from Zigbee runtime glue.
  */
 
+#include <errno.h>
 #include <string.h>
 
+#include <zephyr/init.h>
+#include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
 #include "sl_cli.h"
@@ -44,8 +49,9 @@ sl_status_t sl_cli_zephyr_runtime_init(void)
 	}
 
 	/*
-	 * Must run before Zigbee AF init_done so sli_zigbee_zcl_cli_init can
-	 * attach the ZCL command group to the default CLI instance.
+	 * Must complete before Zigbee AF init_done so sli_zigbee_zcl_cli_init
+	 * can attach the ZCL command group to the default CLI instance.
+	 * SYS_INIT(APPLICATION) runs before main() / sl_zigbee_runtime_init().
 	 */
 	memset(&instance_parameters, 0, sizeof(instance_parameters));
 
@@ -62,3 +68,17 @@ sl_status_t sl_cli_zephyr_runtime_init(void)
 	LOG_INF("SiSDK CLI command dispatcher initialized (Zephyr Shell front-end)");
 	return SL_STATUS_OK;
 }
+
+static int sl_cli_zephyr_sys_init(void)
+{
+	sl_status_t status = sl_cli_zephyr_runtime_init();
+
+	if (status != SL_STATUS_OK) {
+		LOG_ERR("sl_cli_zephyr_runtime_init failed: 0x%04x", status);
+		return -EIO;
+	}
+
+	return 0;
+}
+
+SYS_INIT(sl_cli_zephyr_sys_init, APPLICATION, 0);

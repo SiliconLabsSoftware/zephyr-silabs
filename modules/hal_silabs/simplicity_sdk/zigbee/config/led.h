@@ -4,7 +4,8 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  * Minimal led.h so SDK legacy_hal/hal.h can include it without pulling
- * Silicon Labs LED APIs. Activity indication uses Zephyr GPIO (led0).
+ * Silicon Labs LED APIs. Activity indication uses the chosen node
+ * silabs,zigbee-activity-led when present.
  */
 
 #ifndef __LED_H__

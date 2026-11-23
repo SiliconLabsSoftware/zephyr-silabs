@@ -20,8 +20,14 @@
 #include "micro.h"
 #include "sl_status.h"
 
-#if DT_NODE_HAS_STATUS(DT_ALIAS(led0), okay)
-#define ZIGBEE_ACTIVITY_LED_NODE DT_ALIAS(led0)
+/*
+ * Optional TX activity LED via chosen "silabs,zigbee-activity-led".
+ * Samples/boards must select a gpio-leds child (e.g. &led1); do not assume
+ * led0 so apps can keep that alias for ZCL On/Off or other UI.
+ */
+#if DT_HAS_CHOSEN(silabs_zigbee_activity_led) && \
+	DT_NODE_HAS_STATUS(DT_CHOSEN(silabs_zigbee_activity_led), okay)
+#define ZIGBEE_ACTIVITY_LED_NODE DT_CHOSEN(silabs_zigbee_activity_led)
 #endif
 
 void halReboot(void)

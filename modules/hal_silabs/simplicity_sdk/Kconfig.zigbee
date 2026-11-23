@@ -4,14 +4,14 @@
 menuconfig ZIGBEE_SILABS
 	bool "Silicon Labs Zigbee stack (prebuilt libraries)"
 	depends on SOC_VENDOR_SILABS_HAS_RADIO
-	depends on ZEPHYR_HAL_SILABS_MODULE_BLOBS || BUILD_ONLY_NO_BLOBS
+	depends on (ZEPHYR_HAL_SILABS_MODULE_BLOBS && ZEPHYR_HAL_SILABS_EXTRA_MODULE_BLOBS) || BUILD_ONLY_NO_BLOBS
 	select SOC_GECKO_USE_RAIL
 	select SILABS_SISDK_PROTOCOL_CRYPTO
 	select SILABS_SISDK_SLEEPTIMER
 	select SILABS_SISDK_CORE
 	help
 	  Link the Silicon Labs Zigbee PRO stack prebuilt libraries from the
-	  hal_silabs blob bundle. Open-source Zigbee SDK sources and Zephyr
+	  hal_silabs_extra blob bundle (MSLA). Open HAL RAIL blobs and Zephyr
 	  runtime glue are still required to produce a working firmware image.
 
 if ZIGBEE_SILABS
@@ -203,22 +203,15 @@ config SILABS_ZIGBEE_RUNTIME
 	depends on SILABS_SISDK_ZIGBEE_SYSTEM_COMMON
 	help
 	  Call sli_zigbee_stack_init_callback() and
-	  sli_zigbee_app_framework_init_callback(), and drive periodic stack
-	  and application framework ticks on Zephyr.
+	  sli_zigbee_app_framework_init_callback(), and drive stack /
+	  application framework ticks from a dedicated Zephyr thread
+	  (started via sl_zigbee_runtime_start()).
 
 if SILABS_ZIGBEE_RUNTIME
-
-config SILABS_ZIGBEE_RUNTIME_THREAD
-	bool "Run Zigbee ticks in a dedicated thread"
-	default y
-	help
-	  When enabled, sl_zigbee_runtime_start() creates a background thread
-	  that calls sl_zigbee_runtime_process_once() periodically.
 
 config SILABS_ZIGBEE_RUNTIME_THREAD_STACK_SIZE
 	int "Zigbee runtime thread stack size"
 	default 16384
-	depends on SILABS_ZIGBEE_RUNTIME_THREAD
 	help
 	  Stack for the dedicated Zigbee tick thread. 4 KiB is too small once
 	  commissioning / RAIL / PSA run; overflow corrupts neighboring stacks.
@@ -226,7 +219,6 @@ config SILABS_ZIGBEE_RUNTIME_THREAD_STACK_SIZE
 config SILABS_ZIGBEE_RUNTIME_THREAD_PRIORITY
 	int "Zigbee runtime thread priority"
 	default 5
-	depends on SILABS_ZIGBEE_RUNTIME_THREAD
 
 config SILABS_ZIGBEE_RUNTIME_DEFAULT_TICK_MS
 	int "Default Zigbee tick period when no AF events are scheduled"

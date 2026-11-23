@@ -68,9 +68,10 @@ if(CONFIG_SILABS_SISDK_PSA_CRYPTO AND CONFIG_DT_HAS_SILABS_GECKO_TRNG_ENABLED)
   )
 endif() # PSA Crypto
 
-# Zigbee / MSLA content lives in hal_silabs_extra. Open HAL (platform, PSA,
-# RAIL, blobs, common token_manager headers) stays in hal_silabs.
-set(BLOBS_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/zephyr/blobs/simplicity_sdk)
+# Zigbee / MSLA content (sources + prebuilt libs) lives in hal_silabs_extra.
+# Open HAL (platform, PSA, RAIL, common token_manager headers) stays in hal_silabs.
+set(ZIGBEE_BLOBS_DIR
+  ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/zephyr/blobs/simplicity_sdk)
 set(ZIGBEE_DIR ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/protocol/zigbee)
 set(OPEN_SERVICE_DIR ${ZEPHYR_HAL_SILABS_MODULE_DIR}/simplicity_sdk/platform/service)
 set(SERVICE_DIR ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/platform/service)
@@ -83,20 +84,15 @@ set(TOKEN_MANAGER_LEGACY_DIR
   ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/platform/service/token_manager/legacy)
 set(SECURITY_MANAGER_DIR ${ZEPHYR_HAL_SILABS_EXTRA_MODULE_DIR}/simplicity_sdk/platform/plugin/security_manager)
 
-function(add_prebuilt_library lib_name prebuilt_path)
+function(add_zigbee_prebuilt_library lib_name component)
   if(NOT CONFIG_BUILD_ONLY_NO_BLOBS)
     add_library(${lib_name} STATIC IMPORTED GLOBAL)
     set_target_properties(${lib_name} PROPERTIES
-      IMPORTED_LOCATION ${BLOBS_DIR}/${prebuilt_path}
+      IMPORTED_LOCATION
+        ${ZIGBEE_BLOBS_DIR}/zigbee/libs/build/gcc/cortex-m33/${component}/release/lib${component}.a
     )
     zephyr_link_libraries(${lib_name})
   endif()
-endfunction()
-
-function(add_zigbee_prebuilt_library lib_name component)
-  add_prebuilt_library(${lib_name}
-    zigbee/libs/build/gcc/cortex-m33/${component}/release/lib${component}.a
-  )
 endfunction()
 
 if(CONFIG_ZIGBEE_SILABS)
@@ -179,10 +175,8 @@ if(CONFIG_ZIGBEE_SILABS)
   zephyr_library_sources(
     zigbee/src/sl_zigbee_platform_shim.c
   )
-  zephyr_library_sources_ifdef(CONFIG_SILABS_ZIGBEE_TOKEN_NVS
-    zigbee/src/sl_zigbee_token_zephyr_shim.c
-    zigbee/src/sl_token_manager_lock_zephyr.c
-  )
+  # Zephyr CTM NVS backend + lock + SYS_INIT live under
+  # zephyr-silabs-internal/subsys/sl_token_manager.
   zephyr_library_sources_ifdef(CONFIG_SILABS_ZIGBEE_RUNTIME
     zigbee/src/sl_zigbee_hal_zephyr_shim.c
     zigbee/src/sl_zigbee_runtime_glue.c
@@ -223,6 +217,8 @@ if(CONFIG_ZIGBEE_SILABS)
   )
 
   if(CONFIG_SILABS_SISDK_CLI)
+    # SiSDK sl_cli parse/dispatch stays in the HAL overlay. Zephyr I/O glue,
+    # SYS_INIT, and the "zigbee" shell bridge live under zephyr-silabs-internal/subsys.
     set(CLI_DIR ${OPEN_SERVICE_DIR}/cli)
     zephyr_include_directories(
       ${CLI_DIR}/inc
@@ -230,8 +226,6 @@ if(CONFIG_ZIGBEE_SILABS)
       ${CLI_DIR}/src
     )
     zephyr_library_sources(
-      zigbee/src/sl_cli_io_zephyr.c
-      zigbee/src/sl_cli_zephyr_runtime.c
       ${CLI_DIR}/src/sl_cli.c
       ${CLI_DIR}/src/sl_cli_arguments.c
       ${CLI_DIR}/src/sl_cli_command.c

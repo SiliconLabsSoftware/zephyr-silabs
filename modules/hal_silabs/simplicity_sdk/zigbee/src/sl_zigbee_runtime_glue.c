@@ -17,14 +17,6 @@
 #include "sl_zigbee_system_common.h"
 #include "stack/include/stack-info.h"
 
-#if defined(CONFIG_SILABS_ZIGBEE_TOKEN_NVS)
-#include "sl_token_manager_api.h"
-#endif
-
-#if defined(CONFIG_SILABS_SISDK_CLI)
-#include "sl_cli_zephyr_runtime.h"
-#endif
-
 #if defined(CONFIG_SILABS_SISDK_ZIGBEE_SECURE_KEY_STORAGE_UPGRADE)
 #include "stack/security/zigbee-secure-key-storage-upgrade.h"
 #endif
@@ -47,6 +39,45 @@ static k_tid_t zigbee_thread_id;
 static K_THREAD_STACK_DEFINE(zigbee_thread_stack, CONFIG_SILABS_ZIGBEE_RUNTIME_THREAD_STACK_SIZE);
 static bool zigbee_runtime_ready;
 
+static void zigbee_runtime_process_once(void)
+{
+	sli_zigbee_stack_tick_callback();
+	sli_zigbee_app_framework_tick_callback();
+}
+
+static uint32_t zigbee_runtime_ms_until_next_tick(void)
+{
+	uint32_t delay_ms;
+
+#if defined(CONFIG_PM)
+	uint32_t af_ms;
+	uint32_t stack_ms;
+
+	/*
+	 * Studio baremetal/RTOS runs BOTH AF and stack PM helpers each loop.
+	 * AF alone may drop EM1 when OK_TO_SLEEP; the stack helper re-asserts
+	 * EM1 for coordinator/router so RX stays on (beacon requests, etc.).
+	 * Skipping the stack path lets Zephyr idle enter EM2 (radio off) while
+	 * the parent still reports NETWORK_UP / open-network — joiners then
+	 * hear 0 beacons. Zephyr idle still enters EM via CONFIG_PM →
+	 * pm_state_set → sl_power_manager_sleep (soc_power_pmgr.c).
+	 */
+	af_ms = sli_zigbee_app_framework_set_pm_requirements_and_get_ms_to_next_wakeup();
+	stack_ms = sli_zigbee_stack_get_ms_to_next_wakeup();
+	delay_ms = (af_ms < stack_ms) ? af_ms : stack_ms;
+#else
+	delay_ms = sli_zigbee_af_ms_to_next_event();
+#endif
+
+	if (delay_ms == 0U) {
+		delay_ms = CONFIG_SILABS_ZIGBEE_RUNTIME_DEFAULT_TICK_MS;
+	} else if (delay_ms > CONFIG_SILABS_ZIGBEE_RUNTIME_MAX_SLEEP_MS) {
+		delay_ms = CONFIG_SILABS_ZIGBEE_RUNTIME_MAX_SLEEP_MS;
+	}
+
+	return delay_ms;
+}
+
 static void zigbee_thread_entry(void *p1, void *p2, void *p3)
 {
 	ARG_UNUSED(p1);
@@ -54,8 +85,21 @@ static void zigbee_thread_entry(void *p1, void *p2, void *p3)
 	ARG_UNUSED(p3);
 
 	while (true) {
-		sl_zigbee_runtime_process_once();
-		k_msleep(sl_zigbee_runtime_ms_until_next_tick());
+		zigbee_runtime_process_once();
+		k_msleep(zigbee_runtime_ms_until_next_tick());
+	}
+}
+
+/*
+ * SiSDK radio ISR calls this (via sli_zigbee_stack_rtos_stack_wakeup_isr_handler).
+ * Without SL_CATALOG_KERNEL_PRESENT the SDK only provides a weak empty stub, so
+ * RX (e.g. beacon responses during active scan) would wait for the next
+ * k_msleep timeout. Override with a strong definition that wakes our thread.
+ */
+void sl_zigbee_wakeup_common_task(void)
+{
+	if (zigbee_thread_id != NULL) {
+		k_wakeup(zigbee_thread_id);
 	}
 }
 
@@ -97,32 +141,7 @@ sl_status_t sl_zigbee_runtime_init(void)
 	sl_rail_util_pa_init();
 	sl_rail_util_power_manager_init();
 	/* PTI itself is configured by Zephyr's silabs,pti driver when enabled. */
-
-#if defined(CONFIG_SILABS_ZIGBEE_TOKEN_NVS)
-	/*
-	 * Token registration/defaults come from
-	 * sl_zigbee_token_defines.c::halStackInitTokens().
-	 */
-	{
-		sl_status_t token_status = sl_token_manager_init();
-
-		if (token_status != SL_STATUS_OK) {
-			LOG_ERR("sl_token_manager_init failed: 0x%04x", token_status);
-			return token_status;
-		}
-	}
-#endif
-
-#if defined(CONFIG_SILABS_SISDK_CLI)
-	{
-		sl_status_t cli_status = sl_cli_zephyr_runtime_init();
-
-		if (cli_status != SL_STATUS_OK) {
-			LOG_ERR("sl_cli_zephyr_runtime_init failed: 0x%04x", cli_status);
-			return cli_status;
-		}
-	}
-#endif
+	/* CTM: SYS_INIT in subsys/sl_token_manager when CONFIG_SILABS_ZIGBEE_TOKEN_NVS. */
 
 	sli_zigbee_stack_init_callback();
 	sli_zigbee_app_framework_init_callback();
@@ -163,36 +182,6 @@ sl_status_t sl_zigbee_runtime_init(void)
 	LOG_INF("Zigbee stack and application framework initialized");
 
 	return SL_STATUS_OK;
-}
-
-void sl_zigbee_runtime_process_once(void)
-{
-	sli_zigbee_stack_tick_callback();
-	sli_zigbee_app_framework_tick_callback();
-}
-
-uint32_t sl_zigbee_runtime_ms_until_next_tick(void)
-{
-	uint32_t delay_ms;
-
-#if defined(CONFIG_PM)
-	/*
-	 * Update EM1 requirements from stack/AF state, then
-	 * sleep on the Zephyr thread. Zephyr idle enters EM via CONFIG_PM →
-	 * pm_state_set → sl_power_manager_sleep (soc_power_pmgr.c).
-	 */
-	delay_ms = sli_zigbee_app_framework_set_pm_requirements_and_get_ms_to_next_wakeup();
-#else
-	delay_ms = sli_zigbee_af_ms_to_next_event();
-#endif
-
-	if (delay_ms == 0U) {
-		delay_ms = CONFIG_SILABS_ZIGBEE_RUNTIME_DEFAULT_TICK_MS;
-	} else if (delay_ms > CONFIG_SILABS_ZIGBEE_RUNTIME_MAX_SLEEP_MS) {
-		delay_ms = CONFIG_SILABS_ZIGBEE_RUNTIME_MAX_SLEEP_MS;
-	}
-
-	return delay_ms;
 }
 
 sl_status_t sl_zigbee_runtime_start(void)

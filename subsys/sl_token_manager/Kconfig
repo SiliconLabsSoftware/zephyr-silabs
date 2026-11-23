@@ -1,0 +1,5 @@
+# Copyright (c) 2026 Silicon Laboratories Inc.
+# SPDX-License-Identifier: Apache-2.0
+
+# CONFIG_SILABS_ZIGBEE_TOKEN_NVS is declared under Zigbee Kconfig today.
+# This subsystem provides the Zephyr NVS CTM backend, lock, and SYS_INIT.

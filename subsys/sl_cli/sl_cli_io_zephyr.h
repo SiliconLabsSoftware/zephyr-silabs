@@ -4,7 +4,7 @@
  * SPDX-License-Identifier: Apache-2.0
  *
  * Bind sli_cli_io_* output to an active Zephyr Shell for the duration of a
- * zigbee shell command.
+ * shell command that dispatches into SiSDK sl_cli.
  */
 
 #ifndef SL_CLI_IO_ZEPHYR_H
